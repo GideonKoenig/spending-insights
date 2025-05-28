@@ -1,85 +1,80 @@
-export interface RawBankTransaction {
-    accountName: string;
-    accountIban: string;
-    accountBic: string;
-    bankName: string;
-    bookingDate: Date;
-    valueDate: Date;
-    paymentParticipant: string;
-    paymentParticipantIban: string;
-    paymentParticipantBic: string;
-    transactionType: string;
-    purpose: string;
-    amount: number;
-    currency: string;
-    balanceAfterTransaction: number;
-    note: string;
-    markedTransaction: string;
-    creditorId: string;
-    mandateReference: string;
-}
+import { z } from "npm:zod";
 
-export class CsvReader {
-    private static parseGermanDate(dateStr: string): Date {
-        const [day, month, year] = dateStr.split(".");
+export type Transaction = z.infer<typeof TransactionSchema>;
+export const TransactionSchema = z.object({
+    accountName: z.string(),
+    accountIban: z.string(),
+    accountBic: z.string(),
+    bankName: z.string(),
+    bookingDate: z.string().transform((v: string) => {
+        const [day, month, year] = v.split(".");
         return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-    }
+    }),
+    valueDate: z.string().transform((v: string) => {
+        const [day, month, year] = v.split(".");
+        return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    }),
+    paymentParticipant: z.string(),
+    paymentParticipantIban: z.string(),
+    paymentParticipantBic: z.string(),
+    transactionType: z.string(),
+    purpose: z.string(),
+    amount: z
+        .string()
+        .transform((v: string) => parseFloat(v.replace(",", "."))),
+    currency: z.string(),
+    balanceAfterTransaction: z
+        .string()
+        .transform((v: string) => parseFloat(v.replace(",", "."))),
+    note: z.string(),
+    markedTransaction: z.string(),
+    creditorId: z.string(),
+    mandateReference: z.string(),
+});
 
-    private static parseGermanAmount(amountStr: string): number {
-        return parseFloat(amountStr.replace(",", "."));
-    }
+const keys = Object.keys(TransactionSchema.shape);
 
-    static async readFromFile(filePath: string): Promise<RawBankTransaction[]> {
-        const content = await Deno.readTextFile(filePath);
-        return this.readFromString(content);
-    }
+function readFromString(csvContent: string): Transaction[] {
+    const lines = csvContent.trim().split("\n");
+    const headers = lines[0].split(";");
 
-    static readFromString(csvContent: string): RawBankTransaction[] {
-        const lines = csvContent.trim().split("\n");
-        const headers = lines[0].split(";");
-
-        const transactions: RawBankTransaction[] = [];
-
-        for (let i = 1; i < lines.length; i++) {
-            const values = lines[i].split(";");
-
+    return lines
+        .slice(1)
+        .map((line, index) => {
+            const values = line.split(";");
             if (values.length !== headers.length) {
                 console.warn(
-                    `Line ${i + 1} has ${values.length} columns, expected ${
+                    `Line ${index + 2} has ${values.length} columns, expected ${
                         headers.length
                     }. Skipping.`
                 );
-                continue;
+                return null;
             }
-
-            try {
-                const transaction: RawBankTransaction = {
-                    accountName: values[0] || "",
-                    accountIban: values[1] || "",
-                    accountBic: values[2] || "",
-                    bankName: values[3] || "",
-                    bookingDate: this.parseGermanDate(values[4]),
-                    valueDate: this.parseGermanDate(values[5]),
-                    paymentParticipant: values[6] || "",
-                    paymentParticipantIban: values[7] || "",
-                    paymentParticipantBic: values[8] || "",
-                    transactionType: values[9] || "",
-                    purpose: values[10] || "",
-                    amount: this.parseGermanAmount(values[11]),
-                    currency: values[12] || "",
-                    balanceAfterTransaction: this.parseGermanAmount(values[13]),
-                    note: values[14] || "",
-                    markedTransaction: values[15] || "",
-                    creditorId: values[16] || "",
-                    mandateReference: values[17] || "",
-                };
-
-                transactions.push(transaction);
-            } catch (error) {
-                console.warn(`Failed to parse line ${i + 1}:`, error);
+            const transaction = keys.reduce((acc, key, index) => {
+                acc[key] = values[index]!;
+                return acc;
+            }, {} as Record<string, string>);
+            const result = TransactionSchema.safeParse(transaction);
+            if (!result.success) {
+                console.warn(
+                    `Failed to parse line ${index + 2}:`,
+                    result.error.issues.map((issue) => issue.message).join(", ")
+                );
+                return null;
             }
-        }
-
-        return transactions;
-    }
+            return result.data;
+        })
+        .filter(
+            (transaction): transaction is Transaction => transaction !== null
+        );
 }
+
+async function readFromFile(filePath: string): Promise<Transaction[]> {
+    const content = await Deno.readTextFile(filePath);
+    return readFromString(content);
+}
+
+export const CsvReader = {
+    readFromFile,
+    readFromString,
+};
