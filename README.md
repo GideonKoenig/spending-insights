@@ -1,4 +1,4 @@
-# Bank History Parser
+# Bank History
 
 A modular TypeScript/Deno system for parsing and categorizing German bank CSV files using a pattern-based approach.
 
