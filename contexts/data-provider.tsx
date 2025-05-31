@@ -1,6 +1,12 @@
 "use client";
 
-import { createContext, useContext, useState, type ReactNode } from "react";
+import {
+    createContext,
+    useContext,
+    useState,
+    useEffect,
+    type ReactNode,
+} from "react";
 import { csvParser } from "@/lib/csv-parser";
 import { fileHandleStore } from "@/lib/file-handle-store";
 import { type Result, tryCatchAsync, newError } from "@/lib/utils";
@@ -25,6 +31,9 @@ interface DataContextType {
     loading: boolean;
     error: string | null;
     setError: (error: string | null) => void;
+    needsFileHandle: boolean;
+    needsPermission: boolean;
+    requestPermission: () => Promise<void>;
     selectFile: () => Promise<void>;
     clearFile: () => Promise<void>;
 }
@@ -55,8 +64,75 @@ async function loadTransactions(
 
 export function DataProvider(props: { children: ReactNode }) {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [fileHandle, setFileHandle] = useState<FileSystemFileHandle | null>(
+        null
+    );
+    const [hasPermission, setHasPermission] = useState(false);
+
+    const needsFileHandle = !fileHandle;
+    const needsPermission = Boolean(fileHandle && !hasPermission);
+
+    async function setNewFileHandle(handle: FileSystemFileHandle) {
+        setFileHandle(handle);
+
+        const accessResult = await fileHandleStore.hasAccess(handle);
+        if (!accessResult.success) {
+            setError(accessResult.error);
+            return;
+        }
+
+        setHasPermission(accessResult.value);
+        if (accessResult.value) {
+            const parseResult = await loadTransactions(handle);
+            if (!parseResult.success) {
+                setError(parseResult.error);
+            } else {
+                setTransactions(parseResult.value);
+            }
+        }
+    }
+
+    useEffect(() => {
+        async function initializeFileHandle() {
+            setLoading(true);
+            const handleResult = await fileHandleStore.load(FILE_HANDLE_KEY);
+            if (handleResult.success) {
+                await setNewFileHandle(handleResult.value);
+            } else if (handleResult.error !== "File handle not found") {
+                setError(handleResult.error);
+            }
+            setLoading(false);
+        }
+
+        initializeFileHandle();
+    }, []);
+
+    async function requestPermission() {
+        if (!fileHandle) return;
+
+        setLoading(true);
+        setError(null);
+
+        const accessResult = await fileHandleStore.requestAccess(fileHandle);
+        if (!accessResult.success) {
+            setError(accessResult.error);
+            setLoading(false);
+            return;
+        }
+
+        setHasPermission(accessResult.value);
+        if (accessResult.value) {
+            const parseResult = await loadTransactions(fileHandle);
+            if (!parseResult.success) {
+                setError(parseResult.error);
+            } else {
+                setTransactions(parseResult.value);
+            }
+        }
+        setLoading(false);
+    }
 
     async function selectFile() {
         setLoading(true);
@@ -75,7 +151,7 @@ export function DataProvider(props: { children: ReactNode }) {
         });
 
         if (!pickerResult.success) {
-            if (!pickerResult.error.includes("AbortError")) {
+            if (!pickerResult.error.includes("The user aborted a request")) {
                 setError(pickerResult.error);
             }
             setLoading(false);
@@ -92,23 +168,19 @@ export function DataProvider(props: { children: ReactNode }) {
             return;
         }
 
-        const parseResult = await loadTransactions(pickerResult.value);
-        if (!parseResult.success) {
-            setError(parseResult.error);
-        } else {
-            setTransactions(parseResult.value);
-        }
-
+        await setNewFileHandle(pickerResult.value);
         setLoading(false);
     }
 
     async function clearFile() {
-        const result = await fileHandleStore.delete(FILE_HANDLE_KEY);
+        const result = await fileHandleStore.remove(FILE_HANDLE_KEY);
         if (!result.success) {
             setError(result.error);
             return;
         }
 
+        setFileHandle(null);
+        setHasPermission(false);
         setTransactions([]);
         setError(null);
     }
@@ -116,8 +188,11 @@ export function DataProvider(props: { children: ReactNode }) {
     const value: DataContextType = {
         transactions,
         loading,
-        error: error,
+        error,
         setError,
+        needsFileHandle,
+        needsPermission,
+        requestPermission,
         selectFile,
         clearFile,
     };

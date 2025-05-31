@@ -52,6 +52,36 @@ async function openDatabase(): Promise<Result<IDBDatabase>> {
     });
 }
 
+async function hasAccess(
+    handle: FileSystemFileHandle
+): Promise<Result<boolean>> {
+    try {
+        const permission = await handle.queryPermission({ mode: "read" });
+        return { success: true, value: permission === "granted" };
+    } catch (error) {
+        return newError(
+            error instanceof Error
+                ? error.message
+                : "Failed to check file permission"
+        );
+    }
+}
+
+async function requestAccess(
+    handle: FileSystemFileHandle
+): Promise<Result<boolean>> {
+    try {
+        const permission = await handle.requestPermission({ mode: "read" });
+        return { success: true, value: permission === "granted" };
+    } catch (error) {
+        return newError(
+            error instanceof Error
+                ? error.message
+                : "Failed to request file permission"
+        );
+    }
+}
+
 async function save(
     key: string,
     handle: FileSystemFileHandle
@@ -117,18 +147,7 @@ async function load(key: string): Promise<Result<FileSystemFileHandle>> {
         return newError("File handle not found");
     }
 
-    const handle = handleResult.value;
-    const permission = await handle.queryPermission({ mode: "readwrite" });
-    if (permission !== "granted") {
-        const newPermission = await handle.requestPermission({
-            mode: "readwrite",
-        });
-        if (newPermission !== "granted") {
-            return newError("Permission denied for file handle");
-        }
-    }
-
-    return { success: true, value: handle };
+    return { success: true, value: handleResult.value };
 }
 
 async function remove(key: string): Promise<Result<void>> {
@@ -160,5 +179,7 @@ async function remove(key: string): Promise<Result<void>> {
 export const fileHandleStore = {
     save,
     load,
-    delete: remove,
+    remove,
+    hasAccess,
+    requestAccess,
 } as const;

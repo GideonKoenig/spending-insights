@@ -1,68 +1,86 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { format } from "date-fns";
-import type { Transaction } from "@/lib/types";
+"use client";
 
-interface TransactionCardProps {
+import { type Transaction } from "@/lib/types";
+import { cn } from "@/lib/utils";
+
+export function TransactionCard(props: {
     transaction: Transaction;
-    category?: string;
-}
+    className?: string;
+}) {
+    const amount = new Intl.NumberFormat("de-DE", {
+        style: "currency",
+        currency: props.transaction.currency,
+    }).format(props.transaction.amount);
 
-export function TransactionCard(props: TransactionCardProps) {
-    const { transaction, category } = props;
+    const newBalance = new Intl.NumberFormat("de-DE", {
+        style: "currency",
+        currency: props.transaction.currency,
+    }).format(props.transaction.balanceAfterTransaction);
+
+    const date = props.transaction.bookingDate.toLocaleDateString("de-DE", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+    });
 
     return (
-        <Card className="h-full">
-            <CardContent className="p-6">
-                <div className="flex items-start justify-between">
-                    <div className="space-y-2">
-                        <div className="flex items-center space-x-2">
-                            <h3 className="font-medium">
-                                {transaction.paymentParticipant}
-                            </h3>
-                            {category && (
-                                <Badge variant="secondary">{category}</Badge>
-                            )}
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                            {transaction.purpose}
-                        </p>
-                        <div className="flex items-center space-x-4 text-xs text-muted-foreground">
-                            <span>
-                                Booking:{" "}
-                                {format(
-                                    transaction.bookingDate,
-                                    "MMM dd, yyyy"
-                                )}
-                            </span>
-                            <span>
-                                Value:{" "}
-                                {format(transaction.valueDate, "MMM dd, yyyy")}
-                            </span>
-                            <span>{transaction.transactionType}</span>
-                        </div>
-                    </div>
+        <div
+            className={cn(
+                "p-6 grid grid-cols-5 gap-4 h-48 bg-card text-card-foreground  rounded-xl border shadow-sm",
+                props.className
+            )}
+        >
+            <div className="flex flex-col col-span-4">
+                <h3 className="font-medium text-sm truncate">
+                    {props.transaction.paymentParticipant}
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                    {props.transaction.transactionType}
+                </p>
+            </div>
 
-                    <div className="text-right">
-                        <div
-                            className={`text-lg font-medium ${
-                                transaction.amount >= 0
-                                    ? "text-green-600"
-                                    : "text-red-600"
-                            }`}
-                        >
-                            {transaction.amount >= 0 ? "+" : ""}
-                            {transaction.amount.toFixed(2)}{" "}
-                            {transaction.currency}
-                        </div>
-                        <div className="text-sm text-muted-foreground">
-                            Balance:{" "}
-                            {transaction.balanceAfterTransaction.toFixed(2)}{" "}
-                            {transaction.currency}
-                        </div>
-                    </div>
-                </div>
-            </CardContent>
-        </Card>
+            <div className="flex flex-col items-end">
+                <p
+                    className={cn(
+                        "font-medium",
+                        props.transaction.amount >= 0
+                            ? "text-green-600"
+                            : "text-red-600"
+                    )}
+                >
+                    {amount}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                    Balance: {newBalance}
+                </p>
+            </div>
+
+            <div className="col-span-4">
+                <p className="text-sm text-muted-foreground line-clamp-2">
+                    {props.transaction.purpose}
+                </p>
+            </div>
+
+            <div />
+
+            <div className="flex flex-col gap-1">
+                <p className="text-xs text-muted-foreground">{"Date"}</p>
+                <p className="text-xs text-muted-foreground">{date}</p>
+            </div>
+
+            <div className="flex flex-col col-span-2 gap-1">
+                <p className="text-xs text-muted-foreground">{"IBAN"}</p>
+                <p className="text-xs text-muted-foreground">
+                    {props.transaction.paymentParticipantIban}
+                </p>
+            </div>
+
+            <div className="flex flex-col col-span-2 gap-1">
+                <p className="text-xs text-muted-foreground">{"BIC"}</p>
+                <p className="text-xs text-muted-foreground">
+                    {props.transaction.paymentParticipantBic}
+                </p>
+            </div>
+        </div>
     );
 }

@@ -1,15 +1,17 @@
 import type React from "react";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "./globals.css";
+import { cn } from "@/lib/utils";
 import { DataProvider } from "@/contexts/data-provider";
-import { LayoutContent } from "@/components/layout-content";
+import { NavBar } from "@/components/nav-bar";
+import "./globals.css";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-    title: "Bank Transaction Analyzer",
-    description: "Analyze and categorize your bank transactions",
+    title: "Bank History",
+    description: "Analyze your bank transactions",
 };
 
 export default function RootLayout({
@@ -18,12 +20,15 @@ export default function RootLayout({
     children: React.ReactNode;
 }) {
     return (
-        <html lang="en" suppressHydrationWarning>
-            <body className={inter.className}>
-                <DataProvider>
-                    <LayoutContent>{children}</LayoutContent>
-                </DataProvider>
-            </body>
+        <html lang="en" className={inter.className} suppressHydrationWarning>
+            <DataProvider>
+                <body className="h-dvh w-dvw bg-background text-foreground flex flex-col">
+                    <NavBar />
+                    <div className="flex-grow overflow-hidden">
+                        <ScrollArea className="h-full">{children}</ScrollArea>
+                    </div>
+                </body>
+            </DataProvider>
         </html>
     );
 }
