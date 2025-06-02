@@ -10,6 +10,11 @@ import { type FilterRule } from "@/lib/transaction-filter/types";
 import { FILTER_OPTIONS } from "@/lib/transaction-filter/transaction-filter-options";
 import { cn } from "@/lib/utils";
 import { useVirtualizer, Virtualizer } from "@tanstack/react-virtual";
+import {
+    sortTransactions,
+    type SortOption,
+    SORT_OPTIONS,
+} from "@/lib/transaction-sorter";
 
 export function TransactionList(props: {
     transactions: Transaction[];
@@ -17,15 +22,17 @@ export function TransactionList(props: {
     className?: string;
 }) {
     const [filters, setFilters] = useState<FilterRule[]>([]);
+    const [sortBy, setSortBy] = useState<SortOption>("newest");
 
     const filteredTransactions = filter(
         props.transactions,
         filters,
         FILTER_OPTIONS
     );
+    const sortedTransactions = sortTransactions(filteredTransactions, sortBy);
 
     const virtualizer = useVirtualizer({
-        count: filteredTransactions.length,
+        count: sortedTransactions.length,
         getScrollElement: () => props.containerRef.current,
         estimateSize: () => 192,
         overscan: 5,
@@ -48,7 +55,10 @@ export function TransactionList(props: {
                     filters={filters}
                     onFiltersChange={setFilters}
                     transactions={props.transactions}
-                    filteredCount={filteredTransactions.length}
+                    filteredCount={sortedTransactions.length}
+                    sortBy={sortBy}
+                    onSortChange={setSortBy}
+                    sortOptions={SORT_OPTIONS}
                 />
                 <div
                     className="relative"
@@ -56,8 +66,8 @@ export function TransactionList(props: {
                 >
                     {virtualizer.getVirtualItems().map((item) => (
                         <TransactionCard
-                            key={getKey(filteredTransactions[item.index])}
-                            transaction={filteredTransactions[item.index]}
+                            key={getKey(sortedTransactions[item.index])}
+                            transaction={sortedTransactions[item.index]}
                             style={{
                                 position: "absolute",
                                 top: 0,
@@ -69,15 +79,6 @@ export function TransactionList(props: {
                             }}
                         />
                     ))}
-
-                    {/* <div className="flex flex-col gap-4">
-                    {filteredTransactions.map((transaction) => (
-                        <TransactionCard
-                            key={getKey(transaction)}
-                            transaction={transaction}
-                        />
-                    ))}
-                </div> */}
                 </div>
             </div>
         </div>

@@ -2,10 +2,6 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { type Transaction } from "@/lib/types";
-import { TypedOperator, type FilterRule } from "@/lib/transaction-filter/types";
-import { OPERATORS } from "@/lib/transaction-filter/main";
-import { FILTER_OPTIONS } from "@/lib/transaction-filter/transaction-filter-options";
 import {
     Select,
     SelectContent,
@@ -13,16 +9,21 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { type Transaction } from "@/lib/types";
+import {
+    type FilterRule,
+    type TypedOperator,
+} from "@/lib/transaction-filter/types";
+import { FILTER_OPTIONS } from "@/lib/transaction-filter/transaction-filter-options";
+import { getOperatorsForFilterOption } from "@/lib/transaction-filter/utils";
+import { OPERATORS } from "@/lib/transaction-filter/main";
 import { TextInput } from "@/lib/transaction-filter/input-components/text-input";
 import { CurrencyInput } from "@/lib/transaction-filter/input-components/currency-input";
 import { DateInput } from "@/lib/transaction-filter/input-components/date-input";
 import { ListInput } from "@/lib/transaction-filter/input-components/list-input";
+import { getListOptions } from "@/lib/transaction-filter/utils";
 import { TransactionFilterBadge } from "@/lib/transaction-filter/badge";
-import {
-    getListOptions,
-    getOperatorsForFilterOption,
-} from "@/lib/transaction-filter/utils";
-import { cn } from "@/lib/utils";
+import { type SortOption } from "@/lib/transaction-sorter";
 
 type Value = string | number | Date | undefined;
 
@@ -31,6 +32,9 @@ export function TransactionHeader(props: {
     filters: FilterRule[];
     transactions: Transaction[];
     filteredCount: number;
+    sortBy: SortOption;
+    onSortChange: (sort: SortOption) => void;
+    sortOptions: readonly { value: SortOption; label: string }[];
 }) {
     const [option, setOption] = useState(FILTER_OPTIONS[0]);
     const [operator, setOperator] = useState<TypedOperator>(
@@ -76,7 +80,11 @@ export function TransactionHeader(props: {
     return (
         <div className="p-2 flex flex-col gap-4">
             {props.filters.length > 0 && (
-                <div className="flex">
+                <div className="grid grid-cols-2">
+                    <p className="text-xs col-span-2 text-muted-foreground">
+                        {`${props.filteredCount}/${props.transactions.length} Transactions`}
+                    </p>
+
                     <div className="flex flex-col flex-grow gap-2">
                         {props.filters.map((filter, index) => (
                             <TransactionFilterBadge
@@ -90,9 +98,16 @@ export function TransactionHeader(props: {
                         ))}
                     </div>
 
-                    <p className="text-xs text-muted-foreground">
-                        {`${props.filteredCount}/${props.transactions.length} Transactions`}
-                    </p>
+                    <div className="flex items-end justify-end">
+                        <Button
+                            variant="ghost"
+                            className="text-xs border border-border"
+                            onClick={clearAllFilters}
+                            disabled={props.filters.length < 1}
+                        >
+                            Clear
+                        </Button>
+                    </div>
                 </div>
             )}
 
@@ -195,18 +210,18 @@ export function TransactionHeader(props: {
 
                 <div className="flex-grow" />
 
-                <Button
-                    variant="ghost"
-                    tabIndex={5}
-                    className={cn(
-                        "text-xs",
-                        props.filters.length > 0 && "border border-border"
-                    )}
-                    onClick={clearAllFilters}
-                    disabled={props.filters.length < 1}
-                >
-                    Clear
-                </Button>
+                <Select value={props.sortBy} onValueChange={props.onSortChange}>
+                    <SelectTrigger className="w-40" tabIndex={5}>
+                        <SelectValue placeholder="Sort by..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {props.sortOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
             </div>
         </div>
     );
