@@ -1,15 +1,17 @@
 import type { FilterOperator } from "@/lib/transaction-filter/types";
 
-export const stringEquals: FilterOperator<string> = {
-    name: "string-equals",
-    type: "string",
+export const textEquals: FilterOperator<string> = {
+    name: "text-equals",
+    label: "=",
+    type: "text",
     compare: (userValue, valueToCompare) =>
         valueToCompare.toLowerCase() === userValue.toLowerCase(),
 };
 
-export const stringIncludes: FilterOperator<string> = {
-    name: "string-includes",
-    type: "string",
+export const textIncludes: FilterOperator<string> = {
+    name: "text-includes",
+    label: "includes",
+    type: "text",
     compare: (userValue, valueToCompare) =>
         valueToCompare.toLowerCase().includes(userValue.toLowerCase()),
 };

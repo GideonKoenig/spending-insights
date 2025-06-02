@@ -1,20 +1,21 @@
-import type { ValueType } from "@/lib/transaction-filter/types";
+import { FilterOption, TypedOperator } from "@/lib/transaction-filter/types";
+import { Transaction } from "@/lib/types";
 
-export function isDate(value: unknown): value is Date {
-    return value instanceof Date;
+export function getOperatorsForFilterOption(
+    attribute: string,
+    options: FilterOption[],
+    operators: TypedOperator[]
+) {
+    const option = options.find((o) => o.attribute === attribute);
+    if (!option) return [];
+    return operators.filter((op) => op.type === option.inputType);
 }
 
-export function isNumber(value: unknown): value is number {
-    return typeof value === "number" && !isNaN(value);
-}
-
-export function isString(value: unknown): value is string {
-    return typeof value === "string";
-}
-
-export function getValueType(value: unknown): ValueType | null {
-    if (isDate(value)) return "date";
-    if (isNumber(value)) return "number";
-    if (isString(value)) return "string";
-    return null;
+export function getListOptions(
+    filterOption: FilterOption,
+    transactions: Transaction[]
+) {
+    return Array.from(
+        new Set(transactions.map((t) => t[filterOption.attribute].toString()))
+    );
 }

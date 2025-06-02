@@ -3,9 +3,14 @@
 import { useData } from "@/contexts/data-provider";
 import { FileSelector } from "@/components/file-selector";
 import { TransactionList } from "@/components/transaction-list";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useVirtualizer } from "@tanstack/react-virtual";
+import { useRef } from "react";
 
 export default function HomePage() {
+    const containerRef = useRef<HTMLDivElement>(null);
     const dataResult = useData();
+
     if (!dataResult.success)
         return (
             <p className="p-4 text-destructive">
@@ -18,11 +23,14 @@ export default function HomePage() {
         return <FileSelector />;
     }
 
-    const transactions = dataResult.value.transactions.slice(0, 20);
-
     return (
-        <div className="p-4 max-w-4xl mx-auto">
-            <TransactionList transactions={transactions} />
+        <div className="flex-grow overflow-hidden">
+            <ScrollArea ref={containerRef} className="h-full">
+                <TransactionList
+                    transactions={dataResult.value.transactions}
+                    containerRef={containerRef}
+                />
+            </ScrollArea>
         </div>
     );
 }

@@ -31,13 +31,13 @@ export function NavBar() {
 
     return (
         <nav className="border-b min-h-12 px-4 flex items-center justify-between bg-background">
-            <div className="flex items-center gap-8">
+            <div className="flex items-center gap-4">
                 {links.map((link) => (
                     <Link
                         key={link.href}
                         href={link.href}
                         className={cn(
-                            "text-sm font-medium hover:text-primary",
+                            "text-sm font-medium hover:text-primary p-2",
                             pathname === link.href
                                 ? "text-primary"
                                 : "text-muted-foreground"

@@ -24,9 +24,7 @@ export default function RootLayout({
             <DataProvider>
                 <body className="h-dvh w-dvw bg-background text-foreground flex flex-col">
                     <NavBar />
-                    <div className="flex-grow overflow-hidden">
-                        <ScrollArea className="h-full">{children}</ScrollArea>
-                    </div>
+                    {children}
                 </body>
             </DataProvider>
         </html>

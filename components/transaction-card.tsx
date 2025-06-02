@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 export function TransactionCard(props: {
     transaction: Transaction;
     className?: string;
+    style?: React.CSSProperties;
 }) {
     const amount = new Intl.NumberFormat("de-DE", {
         style: "currency",
@@ -29,6 +30,7 @@ export function TransactionCard(props: {
                 "p-6 grid grid-cols-5 gap-4 h-48 bg-card text-card-foreground  rounded-xl border shadow-sm",
                 props.className
             )}
+            style={props.style}
         >
             <div className="flex flex-col col-span-4">
                 <h3 className="font-medium text-sm truncate">

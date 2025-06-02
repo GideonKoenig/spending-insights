@@ -1,52 +1,56 @@
 import type { Transaction } from "@/lib/types";
-import { getValueType } from "@/lib/transaction-filter/utils";
 import type {
+    FilterOption,
     FilterRule,
+    InputType,
     TypedOperator,
-    ValueType,
 } from "@/lib/transaction-filter/types";
-import {
-    stringEquals,
-    stringIncludes,
-} from "@/lib/transaction-filter/operators/strings";
-import {
-    numberEquals,
-    numberGreaterThan,
-    numberLessThan,
-} from "@/lib/transaction-filter/operators/numbers";
 import {
     dateEquals,
     dateAfter,
     dateBefore,
 } from "@/lib/transaction-filter/operators/dates";
+import { listEquals } from "@/lib/transaction-filter/operators/list";
+import {
+    textEquals,
+    textIncludes,
+} from "@/lib/transaction-filter/operators/text";
+import {
+    currencyEquals,
+    currencyGreaterThan,
+    currencyLessThan,
+} from "@/lib/transaction-filter/operators/currency";
+import { getOperatorsForFilterOption } from "@/lib/transaction-filter/utils";
 
 export const OPERATORS: TypedOperator[] = [
-    stringEquals,
-    stringIncludes,
-    numberEquals,
-    numberGreaterThan,
-    numberLessThan,
+    textIncludes,
+    textEquals,
+    currencyEquals,
+    currencyGreaterThan,
+    currencyLessThan,
     dateEquals,
     dateAfter,
     dateBefore,
+    listEquals,
 ] as const;
 
-export function getOperatorsForType(type: ValueType) {
-    return OPERATORS.filter((op) => op.type === type);
-}
-
-export function filter(transactions: Transaction[], rules: FilterRule[]) {
+export function filter(
+    transactions: Transaction[],
+    rules: FilterRule[],
+    options: FilterOption[]
+) {
     if (rules.length === 0) return transactions;
 
     return transactions.filter((transaction) => {
         return rules.every((rule) => {
             const value = transaction[rule.attribute];
-            const valueType = getValueType(value);
-            if (!valueType) return false;
-
-            const operator = OPERATORS.find(
-                (op) => op.name === rule.operator && op.type === valueType
+            const operators = getOperatorsForFilterOption(
+                rule.attribute,
+                options,
+                OPERATORS
             );
+
+            const operator = operators.find((op) => op.name === rule.operator);
             if (!operator) return false;
 
             // Type assertion is safe here because we've checked the types match
