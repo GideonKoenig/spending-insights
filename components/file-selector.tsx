@@ -16,10 +16,10 @@ export function FileSelector() {
     const {
         loading,
         error,
-        selectFile,
+        selectFiles,
         needsFileHandle,
         needsPermission,
-        requestPermission,
+        requestPermissions,
     } = dataResult.value;
 
     if (loading) {
@@ -37,7 +37,7 @@ export function FileSelector() {
                 <p className="text-muted-foreground">
                     We need your permission to read the selected bank statement
                 </p>
-                <Button onClick={requestPermission}>Grant Permission</Button>
+                <Button onClick={requestPermissions}>Grant Permission</Button>
                 {error && <p className="text-destructive">{error}</p>}
             </div>
         );
@@ -53,7 +53,7 @@ export function FileSelector() {
                     Select a CSV file containing your bank statement to get
                     started
                 </p>
-                <Button onClick={selectFile}>Select Bank Statement</Button>
+                <Button onClick={selectFiles}>Select Bank Statement</Button>
                 {error && <p className="text-destructive">{error}</p>}
             </div>
         );

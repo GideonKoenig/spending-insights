@@ -1,3 +1,5 @@
+import { Transaction } from "@/lib/types";
+import { Dataset } from "@/lib/types";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -50,4 +52,19 @@ export async function tryCatchAsync<T>(
 
 export function newError<T>(error: string): Result<T> {
     return { success: false, error };
+}
+
+export function getActiveTransactions(
+    datasets: Dataset[],
+    activeDataset: string | true | null
+): Transaction[] {
+    if (activeDataset === true)
+        return datasets.flatMap((dataset) => dataset.transactions);
+
+    if (activeDataset === null) return [];
+
+    const dataset = datasets.find((d) => d.name === activeDataset);
+    if (!dataset) return [];
+
+    return dataset.transactions;
 }

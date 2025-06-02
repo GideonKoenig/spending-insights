@@ -2,9 +2,16 @@
 
 import { useData } from "@/contexts/data-provider";
 import { Button } from "@/components/ui/button";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
+import { cn, getActiveTransactions } from "@/lib/utils";
 
 export function NavBar() {
     const dataResult = useData();
@@ -23,11 +30,22 @@ export function NavBar() {
         error,
         needsFileHandle,
         needsPermission,
-        transactions,
-        selectFile,
-        clearFile,
-        requestPermission,
+        datasets,
+        activeDataset,
+        setActiveDataset,
+        requestPermissions,
+        selectFiles,
+        clearFiles,
     } = dataResult.value;
+
+    const getErrorMessage = (error: string | null) => {
+        if (!error) return "";
+        if (error.length > 200) {
+            console.error("Bank History Error:\n", error);
+            return "Error - check console for more details";
+        }
+        return error;
+    };
 
     return (
         <nav className="border-b min-h-12 px-4 flex items-center justify-between bg-background">
@@ -51,28 +69,64 @@ export function NavBar() {
                 {loading ? (
                     <p className="text-muted-foreground text-sm">Loading...</p>
                 ) : error ? (
-                    <p className="text-destructive text-sm">{error}</p>
+                    <p className="text-destructive text-sm">
+                        {getErrorMessage(error)}
+                    </p>
                 ) : needsPermission ? (
                     <Button
                         size="sm"
                         variant="outline"
-                        onClick={requestPermission}
+                        onClick={requestPermissions}
                     >
                         Grant Permission
                     </Button>
                 ) : needsFileHandle ? (
-                    <Button size="sm" variant="outline" onClick={selectFile}>
-                        Select File
+                    <Button size="sm" variant="outline" onClick={selectFiles}>
+                        Select Files
                     </Button>
                 ) : (
                     <>
                         <p className="text-muted-foreground text-sm">
-                            {transactions.length} transactions
+                            {`${
+                                getActiveTransactions(datasets, activeDataset)
+                                    .length
+                            } transactions`}
                         </p>
+                        <Select
+                            value={
+                                activeDataset === true
+                                    ? "all"
+                                    : activeDataset ?? ""
+                            }
+                            onValueChange={(value) => {
+                                if (value === "all") {
+                                    setActiveDataset(true);
+                                } else {
+                                    setActiveDataset(value);
+                                }
+                            }}
+                        >
+                            <SelectTrigger className="w-48" size="sm">
+                                <SelectValue placeholder="Select account..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">
+                                    All Accounts
+                                </SelectItem>
+                                {datasets.map((dataset) => (
+                                    <SelectItem
+                                        key={dataset.name}
+                                        value={dataset.name}
+                                    >
+                                        {dataset.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                         <Button
                             variant="destructive"
                             size="sm"
-                            onClick={clearFile}
+                            onClick={clearFiles}
                         >
                             Clear Data
                         </Button>

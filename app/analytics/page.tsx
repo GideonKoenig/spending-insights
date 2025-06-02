@@ -8,6 +8,7 @@ import { Calendar } from "lucide-react";
 import { summarize } from "@/app/analytics/utilts";
 import { AnalyticsHeader } from "@/app/analytics/header";
 import { BalanceChart } from "@/app/analytics/balance-chart";
+import { getActiveTransactions } from "@/lib/utils";
 
 export default function AnalyticsPage() {
     const dataResult = useData();
@@ -20,11 +21,22 @@ export default function AnalyticsPage() {
         );
     }
 
-    const { needsFileHandle, needsPermission, loading, transactions } =
-        dataResult.value;
+    const {
+        needsFileHandle,
+        needsPermission,
+        loading,
+        datasets,
+        activeDataset,
+    } = dataResult.value;
     if (needsFileHandle || needsPermission || loading) {
         return <FileSelector />;
     }
+
+    const transactions = getActiveTransactions(datasets, activeDataset).sort(
+        (a, b) =>
+            new Date(a.bookingDate).getTime() -
+            new Date(b.bookingDate).getTime()
+    );
 
     const monthSummaries = summarize(transactions, "monthly").sort(
         (a, b) => new Date(b.title).getTime() - new Date(a.title).getTime()

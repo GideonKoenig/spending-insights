@@ -1,5 +1,6 @@
-import { type Result, newError } from "./utils";
+import { type Result, newError } from "@/lib/utils";
 import { z } from "zod";
+import { mapHeaders, findMapping } from "./mapper";
 
 function parseLine(line: string): string[] {
     return line
@@ -23,6 +24,15 @@ function parseHeader(line: string): Result<string[]> {
     const uniqueHeaders = new Set(headers);
     if (uniqueHeaders.size !== headers.length) {
         return newError("CSV headers must be unique");
+    }
+
+    const mapping = findMapping(headers);
+    if (mapping) {
+        const mappedHeaders = mapHeaders(headers, mapping);
+        if (!mappedHeaders.success) {
+            return mappedHeaders;
+        }
+        return { success: true, value: mappedHeaders.value };
     }
 
     return { success: true, value: headers };

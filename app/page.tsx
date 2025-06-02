@@ -4,8 +4,8 @@ import { useData } from "@/contexts/data-provider";
 import { FileSelector } from "@/components/file-selector";
 import { TransactionList } from "@/components/transaction-list";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useVirtualizer } from "@tanstack/react-virtual";
 import { useRef } from "react";
+import { getActiveTransactions } from "@/lib/utils";
 
 export default function HomePage() {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -23,10 +23,15 @@ export default function HomePage() {
         return <FileSelector />;
     }
 
+    const transactions = getActiveTransactions(
+        dataResult.value.datasets,
+        dataResult.value.activeDataset
+    );
+
     return (
         <ScrollArea ref={containerRef} className="h-full">
             <TransactionList
-                transactions={dataResult.value.transactions}
+                transactions={transactions}
                 containerRef={containerRef}
             />
         </ScrollArea>

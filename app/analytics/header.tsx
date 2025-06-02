@@ -25,7 +25,15 @@ export function AnalyticsHeader(props: { transactions: Transaction[] }) {
             .reduce((sum, month) => sum + month.income - month.expense, 0) / 6;
 
     const transactionsPerMonth = Math.round(
-        props.transactions.length / monthSummaries.length
+        props.transactions.length /
+            Math.min(
+                (props.transactions[0]!.bookingDate.getTime() -
+                    props.transactions[
+                        props.transactions.length - 1
+                    ]!.bookingDate.getTime()) /
+                    (1000 * 60 * 60 * 24 * 30),
+                1
+            )
     );
 
     return (

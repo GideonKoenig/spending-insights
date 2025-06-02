@@ -22,6 +22,12 @@ export const TransactionSchema = z.object({
     mandateReference: z.string(),
 });
 
+export type Dataset = z.infer<typeof DatasetSchema>;
+export const DatasetSchema = z.object({
+    name: z.string(),
+    transactions: z.array(TransactionSchema),
+});
+
 function parseDate(dateStr: string): Date {
     if (!dateStr) return new Date();
 
