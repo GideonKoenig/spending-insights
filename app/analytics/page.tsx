@@ -56,7 +56,11 @@ export default function AnalyticsPage() {
                 </div>
 
                 {/* Meta Information Row */}
-                <AnalyticsHeader transactions={transactions} />
+                <AnalyticsHeader
+                    transactions={transactions}
+                    monthSummaries={monthSummaries}
+                    yearSummaries={yearSummaries}
+                />
 
                 {/* Months Row */}
                 <div className="grid grid-cols-3 gap-4">

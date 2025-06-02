@@ -7,10 +7,14 @@ import {
     useEffect,
     type ReactNode,
 } from "react";
-import { csvParser } from "@/lib/csv-parser/parser";
 import { fileHandleStore } from "@/lib/file-handle-store";
 import { type Result, tryCatchAsync, newError } from "@/lib/utils";
-import { TransactionSchema, type Dataset } from "@/lib/types";
+import { type Dataset } from "@/lib/types";
+import {
+    createHandles,
+    loadDatasetsFromHandles,
+    type Handle,
+} from "@/contexts/data-provider-utils";
 
 const ALL_DATASET_NAMES_KEY = "bank-history_all_dataset_names";
 const ACTIVE_DATASET_KEY = "bank-history_active_dataset";
@@ -51,73 +55,29 @@ export function useData(): Result<DataContextType> {
     return { success: true, value: context };
 }
 
-async function loadDataset(
-    handle: FileSystemFileHandle
-): Promise<Result<Dataset>> {
-    const fileResult = await tryCatchAsync(async () => await handle.getFile());
-    if (!fileResult.success) return fileResult;
-
-    const contentResult = await tryCatchAsync(
-        async () => await fileResult.value.text()
-    );
-    if (!contentResult.success) return contentResult;
-
-    const parseResult = await csvParser.parse(
-        contentResult.value,
-        TransactionSchema
-    );
-    if (!parseResult.success) return parseResult;
-
-    return {
-        success: true,
-        value: {
-            name: handle.name.replace(".csv", ""),
-            transactions: parseResult.value,
-        },
-    };
-}
-
 export function DataProvider(props: { children: ReactNode }) {
     const [datasets, setDatasets] = useState<Dataset[]>([]);
+    const [activeDataset, setActiveDataset] = useState<string | true>(true);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [fileHandles, setFileHandles] = useState<FileSystemFileHandle[]>([]);
-    const [hasPermission, setHasPermission] = useState<boolean[]>([]);
-    const [activeDataset, setActiveDataset] = useState<string | true>(true);
+    const [fileHandles, setFileHandles] = useState<Handle[]>([]);
 
     const needsFileHandle = fileHandles.length === 0;
-    const needsPermission = hasPermission.some(
-        (permission, index) => fileHandles[index] && !permission
-    );
+    const needsPermission = fileHandles.some((info) => !info.hasPermission);
 
     async function setNewFileHandles(handles: FileSystemFileHandle[]) {
-        setFileHandles(handles);
-
-        const permissions = await Promise.all(
-            handles.map((handle) => fileHandleStore.hasAccess(handle))
+        const { newHandles, errors: createErrors } = await createHandles(
+            handles
         );
+        setError(createErrors.join("\n"));
+        setFileHandles(newHandles);
 
-        const permissionStates = permissions.map((result) => {
-            if (!result.success)
-                setError((prev) => `${prev ?? ""}\n${result.error}`);
-            return result.success ? result.value : false;
-        });
-        setHasPermission(permissionStates);
+        if (!newHandles.every((handle) => handle.hasPermission)) return;
 
-        if (!permissionStates.every((permission) => permission)) return;
-
-        const datasetResults = await Promise.all(
-            handles.map((handle) => loadDataset(handle))
+        const { datasets, errors: loadErrors } = await loadDatasetsFromHandles(
+            newHandles
         );
-        const datasets = datasetResults
-            .map((result) => {
-                if (!result.success) {
-                    setError((prev) => `${prev ?? ""}\n${result.error}`);
-                    return null;
-                }
-                return result.value;
-            })
-            .filter((dataset) => dataset !== null);
+        setError((prev) => [prev, ...loadErrors].join("\n"));
         setDatasets(datasets);
     }
 
@@ -139,15 +99,16 @@ export function DataProvider(props: { children: ReactNode }) {
             }
 
             const datasetNames: string[] = JSON.parse(datasetNamesJson);
-            const handles = (
-                await Promise.all(
-                    datasetNames.map(async (name) =>
-                        fileHandleStore.load(`dataset_${name}`)
-                    )
-                )
-            )
-                .filter((result) => result.success)
-                .map((result) => result.value);
+            const handles: FileSystemFileHandle[] = [];
+
+            for (const name of datasetNames) {
+                const result = await fileHandleStore.load(`dataset_${name}`);
+                if (result.success) {
+                    handles.push(result.value);
+                } else {
+                    setError(result.error);
+                }
+            }
 
             await setNewFileHandles(handles);
             setLoading(false);
@@ -162,50 +123,36 @@ export function DataProvider(props: { children: ReactNode }) {
         setLoading(true);
         setError(null);
 
-        const permissionPromises = fileHandles
-            .map((handle, index) => ({
-                handle,
-                hasPermission: !hasPermission[index],
-                index,
-            }))
-            .filter(({ hasPermission }) => !hasPermission)
-            .map(async ({ handle, index }) => ({
-                result: await fileHandleStore.requestAccess(handle),
-                index,
-            }));
+        const updatedHandles = [...fileHandles];
 
-        const permissionResults = (
-            await Promise.all(permissionPromises)
-        ).filter((item) => {
-            const { result, index } = item;
-            if (!result.success) {
-                setError((prev) => `${prev ?? ""}\n${result.error}`);
-            }
-            return result.success;
-        });
-
-        const newPermissions = hasPermission.map((value, index) => {
-            return (
-                permissionResults.find(
-                    ({ index: resultIndex }) => resultIndex === index
-                )?.result.success ?? value
-            );
-        });
-        setHasPermission(newPermissions);
-        if (!newPermissions.every((permission) => permission)) return;
-
-        const datasetResults = await Promise.all(
-            fileHandles.map((handle) => loadDataset(handle))
-        );
-        const datasets = datasetResults
-            .map((result) => {
+        for (let i = 0; i < updatedHandles.length; i++) {
+            const handle = updatedHandles[i];
+            if (!handle.hasPermission) {
+                const result = await fileHandleStore.requestAccess(
+                    handle.handle
+                );
                 if (!result.success) {
-                    setError((prev) => `${prev ?? ""}\n${result.error}`);
-                    return null;
+                    setError((prev) => [prev, result.error].join("\n"));
+                } else {
+                    updatedHandles[i] = {
+                        ...handle,
+                        hasPermission: result.value,
+                    };
                 }
-                return result.value;
-            })
-            .filter((dataset) => dataset !== null);
+            }
+        }
+
+        setFileHandles(updatedHandles);
+        if (!updatedHandles.every((handle) => handle.hasPermission)) {
+            setLoading(false);
+            return;
+        }
+
+        const { datasets, errors: loadErrors } = await loadDatasetsFromHandles(
+            updatedHandles
+        );
+        setError((prev) => [prev, ...loadErrors].join("\n"));
+
         setDatasets(datasets);
         setLoading(false);
     }
@@ -235,27 +182,28 @@ export function DataProvider(props: { children: ReactNode }) {
         }
 
         const handles = pickerResult.value;
-        const saveResults = (
-            await Promise.all(
-                handles.map((handle) =>
-                    fileHandleStore.save(
-                        `dataset_${handle.name.replace(".csv", "")}`,
-                        handle
-                    )
-                )
-            )
-        ).map((result) => {
+
+        let allSaveSuccessful = true;
+        for (const handle of handles) {
+            const name = handle.name.replace(".csv", "");
+            const result = await fileHandleStore.save(
+                `dataset_${name}`,
+                handle
+            );
             if (!result.success) {
-                setError((prev) => `${prev ?? ""}\n${result.error}`);
+                setError((prev) => [prev, result.error].join("\n"));
+                allSaveSuccessful = false;
             }
-            return result.success;
-        });
-        if (!saveResults.every((result) => result)) {
+        }
+
+        if (!allSaveSuccessful) {
             setLoading(false);
             return;
         }
 
-        const datasetNames = handles.map((h) => h.name.replace(".csv", ""));
+        const datasetNames = handles.map((handle) =>
+            handle.name.replace(".csv", "")
+        );
         localStorage.setItem(
             ALL_DATASET_NAMES_KEY,
             JSON.stringify(datasetNames)
@@ -270,13 +218,12 @@ export function DataProvider(props: { children: ReactNode }) {
         if (!datasetNamesJson) return;
 
         const datasetNames: string[] = JSON.parse(datasetNamesJson);
-        datasetNames.forEach(async (name) => {
+        for (const name of datasetNames) {
             await fileHandleStore.remove(`dataset_${name}`);
-        });
+        }
 
         localStorage.removeItem(ALL_DATASET_NAMES_KEY);
         setFileHandles([]);
-        setHasPermission([]);
         setDatasets([]);
         setError(null);
     }
