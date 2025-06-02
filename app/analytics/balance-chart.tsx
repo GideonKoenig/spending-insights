@@ -16,7 +16,7 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 
-const DISPLAYED_TRANSACTIONS_PER_MONTH = 1000 as const;
+const DISPLAYED_TRANSACTIONS_PER_MONTH = 10 as const;
 
 type Datapoint = {
     date: string;
