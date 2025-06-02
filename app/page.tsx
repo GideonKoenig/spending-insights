@@ -26,6 +26,10 @@ export default function HomePage() {
     const transactions = getActiveTransactions(
         dataResult.value.datasets,
         dataResult.value.activeDataset
+    ).sort(
+        (a, b) =>
+            new Date(b.bookingDate).getTime() -
+            new Date(a.bookingDate).getTime()
     );
 
     return (

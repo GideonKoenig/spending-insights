@@ -4,6 +4,20 @@ import { Transaction } from "@/lib/types";
 import { formatEuro } from "@/lib/utils";
 import { BarChart3, Hash, Target } from "lucide-react";
 
+//Todo: The main page should have a "sort by" selector where the clear button is currently and the clear button should be displayed above it when an actual filter is applied.
+
+// Todo: The Analytics have to be refined, to properly handle "Umbuchungen und Überweisungsgutschr. and the graph needs to somehow display the full balance, which is a little harder to do."
+// Todo: maybe this should be handled through the "categories..."
+
+// Todo: next step after this is categories
+// Todo: then the fancy graph from Finanzfluss, to see what is spend when (with a nice month or year picker)
+
+// Todo: also create a input reader for splitwise data -> the current mapper is not strong enough. its not enough to just map the headers, but rather each element should get mapped.
+
+// Todo: some arrows on the month and year analytics blocks to "scroll would be nice"
+
+// Todo: when i have to much free time, after everything else is done, i should do some burn down chart analysis for the performance, especially for the analytics page.
+
 export function AnalyticsHeader(props: { transactions: Transaction[] }) {
     const totalIncome = props.transactions
         .filter((t) => t.amount > 0)
@@ -27,10 +41,10 @@ export function AnalyticsHeader(props: { transactions: Transaction[] }) {
     const transactionsPerMonth = Math.round(
         props.transactions.length /
             Math.min(
-                (props.transactions[0]!.bookingDate.getTime() -
+                (props.transactions[0]?.bookingDate.getTime() -
                     props.transactions[
                         props.transactions.length - 1
-                    ]!.bookingDate.getTime()) /
+                    ]?.bookingDate.getTime()) /
                     (1000 * 60 * 60 * 24 * 30),
                 1
             )

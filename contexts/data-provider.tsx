@@ -29,11 +29,11 @@ declare global {
 
 interface DataContextType {
     datasets: Dataset[];
-    activeDataset: string | true | null;
+    activeDataset: string | true;
     loading: boolean;
     error: string | null;
     setError: (error: string | null) => void;
-    setActiveDataset: (dataset: string | true | null) => void;
+    setActiveDataset: (dataset: string | true) => void;
     needsFileHandle: boolean;
     needsPermission: boolean;
     requestPermissions: () => Promise<void>;
@@ -83,9 +83,7 @@ export function DataProvider(props: { children: ReactNode }) {
     const [error, setError] = useState<string | null>(null);
     const [fileHandles, setFileHandles] = useState<FileSystemFileHandle[]>([]);
     const [hasPermission, setHasPermission] = useState<boolean[]>([]);
-    const [activeDataset, setActiveDataset] = useState<string | true | null>(
-        null
-    );
+    const [activeDataset, setActiveDataset] = useState<string | true>(true);
 
     const needsFileHandle = fileHandles.length === 0;
     const needsPermission = hasPermission.some(
@@ -283,7 +281,7 @@ export function DataProvider(props: { children: ReactNode }) {
         setError(null);
     }
 
-    function handleSetActiveDataset(dataset: string | true | null) {
+    function handleSetActiveDataset(dataset: string | true) {
         setActiveDataset(dataset);
         localStorage.setItem(ACTIVE_DATASET_KEY, JSON.stringify(dataset));
     }
