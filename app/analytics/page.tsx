@@ -2,160 +2,90 @@
 
 import { useData } from "@/contexts/data-provider";
 import { FileSelector } from "@/components/file-selector";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
-import { BarChart3, TrendingUp, DollarSign, Calendar } from "lucide-react";
-import { categorizeTransactions } from "@/lib/pattern-matcher";
+import { AnalyticsCardSummary } from "@/components/analytics-card-summary";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Calendar } from "lucide-react";
+import { summarize } from "@/app/analytics/utilts";
+import { AnalyticsHeader } from "@/app/analytics/header";
+import { BalanceChart } from "@/app/analytics/balance-chart";
 
 export default function AnalyticsPage() {
-    const { fileHandle, hasPermission, transactions, patterns } = useData();
+    const dataResult = useData();
 
-    const categorizedTransactions = categorizeTransactions(
-        transactions,
-        patterns
-    );
+    if (!dataResult.success) {
+        return (
+            <p className="p-4 text-destructive">
+                Unexpected state: DataProvider not found
+            </p>
+        );
+    }
 
-    if (!fileHandle || !hasPermission) {
+    const { needsFileHandle, needsPermission, loading, transactions } =
+        dataResult.value;
+    if (needsFileHandle || needsPermission || loading) {
         return <FileSelector />;
     }
 
-    const totalTransactions = transactions.length;
-    const totalIncome = transactions
-        .filter((t) => t.amount > 0)
-        .reduce((sum, t) => sum + t.amount, 0);
-    const totalExpenses = transactions
-        .filter((t) => t.amount < 0)
-        .reduce((sum, t) => sum + Math.abs(t.amount), 0);
-    const categorizedCount = categorizedTransactions.size;
+    const monthSummaries = summarize(transactions, "monthly").sort(
+        (a, b) => new Date(b.title).getTime() - new Date(a.title).getTime()
+    );
+    const yearSummaries = summarize(transactions, "yearly").sort(
+        (a, b) => new Date(b.title).getTime() - new Date(a.title).getTime()
+    );
 
     return (
-        <main className="h-full overflow-auto">
-            <div className="mx-auto max-w-7xl px-4 py-8">
-                <div className="space-y-6">
-                    <div>
-                        <h1 className="text-3xl font-bold">Analytics</h1>
-                        <p className="text-muted-foreground">
-                            Overview of your transaction data and spending
-                            patterns
-                        </p>
-                    </div>
-
-                    <div className="grid grid-cols-4 gap-6">
-                        <Card>
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">
-                                    Total Transactions
-                                </CardTitle>
-                                <Calendar className="h-4 w-4 text-muted-foreground" />
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold">
-                                    {totalTransactions}
-                                </div>
-                                <p className="text-xs text-muted-foreground">
-                                    {categorizedCount} categorized
-                                </p>
-                            </CardContent>
-                        </Card>
-
-                        <Card>
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">
-                                    Total Income
-                                </CardTitle>
-                                <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold text-green-600">
-                                    +{totalIncome.toFixed(2)} EUR
-                                </div>
-                                <p className="text-xs text-muted-foreground">
-                                    From{" "}
-                                    {
-                                        transactions.filter((t) => t.amount > 0)
-                                            .length
-                                    }{" "}
-                                    transactions
-                                </p>
-                            </CardContent>
-                        </Card>
-
-                        <Card>
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">
-                                    Total Expenses
-                                </CardTitle>
-                                <DollarSign className="h-4 w-4 text-muted-foreground" />
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold text-red-600">
-                                    -{totalExpenses.toFixed(2)} EUR
-                                </div>
-                                <p className="text-xs text-muted-foreground">
-                                    From{" "}
-                                    {
-                                        transactions.filter((t) => t.amount < 0)
-                                            .length
-                                    }{" "}
-                                    transactions
-                                </p>
-                            </CardContent>
-                        </Card>
-
-                        <Card>
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">
-                                    Net Balance
-                                </CardTitle>
-                                <BarChart3 className="h-4 w-4 text-muted-foreground" />
-                            </CardHeader>
-                            <CardContent>
-                                <div
-                                    className={`text-2xl font-bold ${
-                                        totalIncome - totalExpenses >= 0
-                                            ? "text-green-600"
-                                            : "text-red-600"
-                                    }`}
-                                >
-                                    {totalIncome - totalExpenses >= 0
-                                        ? "+"
-                                        : ""}
-                                    {(totalIncome - totalExpenses).toFixed(2)}{" "}
-                                    EUR
-                                </div>
-                                <p className="text-xs text-muted-foreground">
-                                    Income minus expenses
-                                </p>
-                            </CardContent>
-                        </Card>
-                    </div>
-
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Coming Soon</CardTitle>
-                            <CardDescription>
-                                Advanced analytics and visualizations will be
-                                available here
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="py-12">
-                            <div className="text-center text-muted-foreground">
-                                <BarChart3 className="mx-auto h-12 w-12 mb-4" />
-                                <p>
-                                    Charts and graphs for spending patterns,
-                                    category breakdowns, and trends over time
-                                    will be implemented here.
-                                </p>
-                            </div>
-                        </CardContent>
-                    </Card>
+        <ScrollArea className="h-full">
+            <div className="mx-auto flex flex-col gap-6 max-w-7xl px-4 py-8">
+                <div>
+                    <h1 className="text-3xl font-bold">Analytics</h1>
+                    <p className="text-muted-foreground">
+                        Overview of your transaction data and spending patterns
+                    </p>
                 </div>
+
+                {/* Meta Information Row */}
+                <AnalyticsHeader transactions={transactions} />
+
+                {/* Months Row */}
+                <div className="grid grid-cols-3 gap-4">
+                    {monthSummaries
+                        .slice(0, 3)
+                        .reverse()
+                        .map((month) => (
+                            <AnalyticsCardSummary
+                                key={month.title}
+                                summary={{
+                                    title: month.title,
+                                    income: month.income,
+                                    expense: month.expense,
+                                    average: month.average,
+                                }}
+                                icon={<Calendar />}
+                            />
+                        ))}
+                </div>
+
+                {/* Years Row */}
+                <div className="grid grid-cols-3 gap-4">
+                    {yearSummaries
+                        .slice(0, 3)
+                        .reverse()
+                        .map((year) => (
+                            <AnalyticsCardSummary
+                                key={year.title}
+                                summary={{
+                                    title: year.title,
+                                    income: year.income,
+                                    expense: year.expense,
+                                    average: year.average,
+                                }}
+                                icon={<Calendar />}
+                            />
+                        ))}
+                </div>
+
+                <BalanceChart transactions={transactions} />
             </div>
-        </main>
+        </ScrollArea>
     );
 }

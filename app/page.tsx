@@ -24,13 +24,11 @@ export default function HomePage() {
     }
 
     return (
-        <div className="flex-grow overflow-hidden">
-            <ScrollArea ref={containerRef} className="h-full">
-                <TransactionList
-                    transactions={dataResult.value.transactions}
-                    containerRef={containerRef}
-                />
-            </ScrollArea>
-        </div>
+        <ScrollArea ref={containerRef} className="h-full">
+            <TransactionList
+                transactions={dataResult.value.transactions}
+                containerRef={containerRef}
+            />
+        </ScrollArea>
     );
 }

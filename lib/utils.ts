@@ -5,6 +5,19 @@ export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
+export function formatEuro(amount: number): string {
+    const isNegative = amount < 0;
+    const absoluteAmount = Math.abs(amount);
+
+    const formatter = new Intl.NumberFormat("de-DE", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    });
+
+    const formatted = formatter.format(absoluteAmount);
+    return `${isNegative ? "-" : "+"}${formatted} EUR`;
+}
+
 export type Result<T> =
     | { success: true; value: T }
     | { success: false; error: string };

@@ -27,7 +27,7 @@ export function TransactionCard(props: {
     return (
         <div
             className={cn(
-                "p-6 grid grid-cols-5 gap-4 h-48 bg-card text-card-foreground  rounded-xl border shadow-sm",
+                "p-6 grid grid-cols-5 gap-4 h-48 bg-card text-card-foreground  rounded-md border shadow-sm",
                 props.className
             )}
             style={props.style}

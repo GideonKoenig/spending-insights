@@ -12,7 +12,7 @@ export function NavBar() {
 
     const links = [
         { href: "/", label: "Transactions" },
-        { href: "/overview", label: "Overview" },
+        { href: "/analytics", label: "Analytics" },
         { href: "/categories", label: "Categories" },
     ];
 
@@ -74,7 +74,7 @@ export function NavBar() {
                             size="sm"
                             onClick={clearFile}
                         >
-                            Clear File
+                            Clear Data
                         </Button>
                     </>
                 )}
