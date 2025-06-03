@@ -38,16 +38,17 @@ export function AnalyticsHeader(props: {
             0
         ) / props.yearSummaries.length;
 
+    const sortedTransactions = props.transactions.sort(
+        (a, b) => b.bookingDate.getTime() - a.bookingDate.getTime()
+    );
+    const dateRangeMs =
+        sortedTransactions[0]?.bookingDate.getTime() -
+        sortedTransactions[
+            sortedTransactions.length - 1
+        ]?.bookingDate.getTime();
+    const monthsInRange = Math.max(dateRangeMs / (1000 * 60 * 60 * 24 * 30), 1);
     const transactionsPerMonth = Math.round(
-        props.transactions.length /
-            Math.min(
-                (props.transactions[0]?.bookingDate.getTime() -
-                    props.transactions[
-                        props.transactions.length - 1
-                    ]?.bookingDate.getTime()) /
-                    (1000 * 60 * 60 * 24 * 30),
-                1
-            )
+        props.transactions.length / monthsInRange
     );
 
     return (
