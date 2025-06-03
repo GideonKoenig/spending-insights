@@ -4,8 +4,8 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-    --color-positive: var(--color-green-700);
-    --color-negative: var(--color-red-800);
+    --color-positive: var(--positive);
+    --color-negative: var(--negative);
     --color-background: var(--background);
     --color-foreground: var(--foreground);
     --font-sans: var(--font-geist-sans);
@@ -47,6 +47,8 @@
 
 :root {
     --radius: 0.625rem;
+    --positive: var(--color-green-700);
+    --negative: var(--color-red-800);
     --background: oklch(0.15 0.02 35);
     --foreground: oklch(0.92 0.01 45);
     --card: oklch(0.18 0.02 40);

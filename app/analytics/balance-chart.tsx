@@ -7,7 +7,7 @@ import {
     ChartTooltip,
     ChartTooltipContent,
 } from "@/components/ui/chart";
-import { Transaction } from "@/lib/types";
+import { Dataset } from "@/lib/types";
 import {
     Card,
     CardContent,
@@ -15,14 +15,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-
-const DISPLAYED_TRANSACTIONS_PER_MONTH = 10 as const;
-
-type Datapoint = {
-    date: string;
-    balance: number;
-    fullDate: Date;
-};
+import { transformDatapoints, formatDate } from "@/app/analytics/utilts";
 
 const chartConfig = {
     balance: {
@@ -31,70 +24,25 @@ const chartConfig = {
     },
 } satisfies ChartConfig;
 
-export function BalanceChart(props: { transactions: Transaction[] }) {
-    const chartData = props.transactions
-        .sort((a, b) => a.bookingDate.getTime() - b.bookingDate.getTime())
-        .map(
-            (transaction) =>
-                ({
-                    date:
-                        transaction.bookingDate.toLocaleDateString("en-US", {
-                            month: "short",
-                        }) +
-                        " " +
-                        transaction.bookingDate
-                            .getFullYear()
-                            .toString()
-                            .slice(-2),
-                    balance: transaction.balanceAfterTransaction,
-                    fullDate: transaction.bookingDate,
-                } as Datapoint)
-        )
-        .reduce((groups, datapoint) => {
-            const existing = groups.find(
-                (group) => group.length > 0 && group[0].date === datapoint.date
-            );
-            if (existing) {
-                existing.push(datapoint);
-            } else {
-                groups.push([datapoint]);
-            }
-            return groups;
-        }, [] as Datapoint[][])
-        .map((group) => {
-            if (group.length <= DISPLAYED_TRANSACTIONS_PER_MONTH) return group;
-            const step = Math.ceil(
-                group.length / DISPLAYED_TRANSACTIONS_PER_MONTH
-            );
-            return group.filter(
-                (_, index) =>
-                    index % step === 0 ||
-                    index === 0 ||
-                    index === group.length - 1
-            );
-        })
-        .flat();
-
-    const yTicks = Array.from(
-        {
-            length:
-                Math.ceil(Math.max(...chartData.map((d) => d.balance)) / 2000) +
-                1,
-        },
-        (_, i) => i * 2000
+export function BalanceChart(props: { datasets: Dataset[] }) {
+    const chartData = transformDatapoints(props.datasets);
+    const transactions = props.datasets.flatMap(
+        (dataset) => dataset.transactions
     );
 
-    const xTicks = props.transactions
-        .sort((a, b) => a.bookingDate.getTime() - b.bookingDate.getTime())
-        .reduce((acc, transaction) => {
-            const tick =
-                transaction.bookingDate.toLocaleDateString("en-US", {
-                    month: "short",
-                }) +
-                " " +
-                transaction.bookingDate.getFullYear().toString().slice(-2);
-            return acc.includes(tick) ? acc : [...acc, tick];
-        }, [] as string[]);
+    const maxBalance = Math.max(...chartData.map((d) => d.balance));
+    const yTicks = Array.from(
+        { length: Math.ceil(maxBalance / 2000) + 1 },
+        (_, i) => i * 2000
+    );
+    const xTicks = new Set(
+        transactions
+            .sort((a, b) => a.bookingDate.getTime() - b.bookingDate.getTime())
+            .map((transaction) => {
+                const date = transaction.bookingDate;
+                return formatDate(date);
+            })
+    );
 
     return (
         <Card>
@@ -114,7 +62,7 @@ export function BalanceChart(props: { transactions: Transaction[] }) {
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis
                             dataKey="date"
-                            ticks={xTicks}
+                            ticks={Array.from(xTicks)}
                             tickLine={false}
                             axisLine={false}
                             tickMargin={8}
