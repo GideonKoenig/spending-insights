@@ -65,23 +65,19 @@ export function TransactionCard(props: {
 
             <div />
 
-            <div className="flex flex-col gap-1">
-                <p className="text-xs text-muted-foreground">{"Date"}</p>
-                <p className="text-xs text-muted-foreground">{date}</p>
+            <div className="flex flex-col gap-1 text-xs text-muted-foreground">
+                <p className="">{"Date"}</p>
+                <p className="">{date}</p>
             </div>
 
-            <div className="flex flex-col col-span-2 gap-1">
-                <p className="text-xs text-muted-foreground">{"IBAN"}</p>
-                <p className="text-xs text-muted-foreground">
-                    {props.transaction.paymentParticipantIban}
-                </p>
+            <div className="flex flex-col col-span-2 gap-1 text-xs text-muted-foreground">
+                <p className="">{"IBAN"}</p>
+                <p className="">{props.transaction.paymentParticipantIban}</p>
             </div>
 
-            <div className="flex flex-col col-span-2 gap-1">
-                <p className="text-xs text-muted-foreground">{"BIC"}</p>
-                <p className="text-xs text-muted-foreground">
-                    {props.transaction.paymentParticipantBic}
-                </p>
+            <div className="flex flex-col col-span-2 gap-1 text-xs text-muted-foreground">
+                <p className="">{"BIC"}</p>
+                <p className="">{props.transaction.paymentParticipantBic}</p>
             </div>
         </div>
     );

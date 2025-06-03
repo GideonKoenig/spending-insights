@@ -74,7 +74,7 @@ export function TransactionFilterBadge(props: {
 
             <Badge
                 variant="secondary"
-                className="rounded-none select-none border-0 bg-primary p-1 px-3"
+                className="rounded-none h-6 select-none border-0 bg-primary p-1 px-3"
             >
                 {valueToString(props.filter.value)}
             </Badge>

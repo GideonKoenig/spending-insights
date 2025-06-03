@@ -20,7 +20,7 @@ export function NavBar() {
     const links = [
         { href: "/", label: "Transactions" },
         { href: "/analytics", label: "Analytics" },
-        { href: "/categories", label: "Categories" },
+        { href: "/tags", label: "Tags" },
     ];
 
     if (!dataResult.success) return null;

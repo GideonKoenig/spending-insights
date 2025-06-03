@@ -7,7 +7,7 @@ export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
-export function formatEuro(amount: number): string {
+export function formatEuro(amount: number) {
     const isNegative = amount < 0;
     const absoluteAmount = Math.abs(amount);
 
@@ -57,7 +57,7 @@ export function newError<T>(error: string): Result<T> {
 export function getActiveTransactions(
     datasets: Dataset[],
     activeDataset: string | true | null
-): Transaction[] {
+) {
     if (activeDataset === true)
         return datasets.flatMap((dataset) => dataset.transactions);
 
@@ -67,4 +67,13 @@ export function getActiveTransactions(
     if (!dataset) return [];
 
     return dataset.transactions;
+}
+
+export function getActiveDatasets(
+    datasets: Dataset[],
+    activeDataset: string | true | null
+) {
+    if (activeDataset === true) return datasets;
+    if (activeDataset === null) return [];
+    return datasets.filter((d) => d.name === activeDataset);
 }
