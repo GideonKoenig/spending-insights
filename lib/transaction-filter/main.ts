@@ -2,7 +2,6 @@ import type { Transaction } from "@/lib/types";
 import type {
     FilterOption,
     FilterRule,
-    InputType,
     TypedOperator,
 } from "@/lib/transaction-filter/types";
 import {
@@ -57,4 +56,32 @@ export function filter(
             return (operator as any).compare(rule.value, value);
         });
     });
+}
+
+export function splitTransactions(
+    transactions: Transaction[],
+    rules: FilterRule[],
+    options: FilterOption[]
+) {
+    if (rules.length === 0) return { matches: transactions, unmatches: [] };
+
+    const matches = filter(transactions, rules, options);
+    const unmatches = transactions.filter((transaction) => {
+        return rules.some((rule) => {
+            const value = transaction[rule.attribute];
+            const operators = getOperatorsForFilterOption(
+                rule.attribute,
+                options,
+                OPERATORS
+            );
+
+            const operator = operators.find((op) => op.name === rule.operator);
+            if (!operator) return true;
+
+            // Type assertion is safe here because we've checked the types match
+            return !(operator as any).compare(rule.value, value);
+        });
+    });
+
+    return { matches, unmatches };
 }

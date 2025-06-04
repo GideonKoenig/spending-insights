@@ -1,5 +1,6 @@
 "use client";
 
+import { TagBadge } from "@/components/ui/tag-badge";
 import { type Transaction } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -28,18 +29,31 @@ export function TransactionCard(props: {
     return (
         <div
             className={cn(
-                "p-6 grid grid-cols-5 gap-4 bg-card text-card-foreground  rounded-md border shadow-sm",
+                "p-5 grid grid-cols-5 gap-4 bg-card text-card-foreground  rounded-md border shadow-sm",
                 props.className
             )}
             style={props.style}
         >
-            <div className="flex flex-col col-span-3">
-                <h3 className="font-medium text-sm truncate">
-                    {props.transaction.paymentParticipant}
+            <div className="flex flex-col gap-1 col-span-3">
+                <h3
+                    className={cn(
+                        "font-medium text-sm truncate",
+                        !props.transaction.paymentParticipant &&
+                            "text-muted-foreground"
+                    )}
+                >
+                    {props.transaction.paymentParticipant === ""
+                        ? "???"
+                        : props.transaction.paymentParticipant}
                 </h3>
-                <p className="text-xs text-muted-foreground">
-                    {props.transaction.transactionType}
-                </p>
+                <div className="flex gap-2 items-center">
+                    {props.transaction.tag && (
+                        <TagBadge tag={props.transaction.tag} />
+                    )}
+                    <p className="text-xs text-muted-foreground">
+                        {props.transaction.transactionType}
+                    </p>
+                </div>
             </div>
 
             <div className="flex flex-col items-end col-span-2">
@@ -81,12 +95,20 @@ export function TransactionCard(props: {
 
             <div className="flex flex-col col-span-2 gap-1 text-xs text-muted-foreground">
                 <p className="">{"IBAN"}</p>
-                <p className="">{props.transaction.paymentParticipantIban}</p>
+                <p className="">
+                    {props.transaction.paymentParticipantIban === ""
+                        ? "???"
+                        : props.transaction.paymentParticipantIban}
+                </p>
             </div>
 
             <div className="flex flex-col col-span-2 gap-1 text-xs text-muted-foreground">
                 <p className="">{"BIC"}</p>
-                <p className="">{props.transaction.paymentParticipantBic}</p>
+                <p className="">
+                    {props.transaction.paymentParticipantBic === ""
+                        ? "???"
+                        : props.transaction.paymentParticipantBic}
+                </p>
             </div>
         </div>
     );

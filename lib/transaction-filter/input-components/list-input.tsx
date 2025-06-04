@@ -23,7 +23,7 @@ export function ListInput(props: {
             disabled={props.disabled}
         >
             <SelectTrigger
-                className={cn("w-48 text-sm", props.className)}
+                className={cn("w-48 text-sm truncate", props.className)}
                 tabIndex={props.tabIndex}
             >
                 <SelectValue

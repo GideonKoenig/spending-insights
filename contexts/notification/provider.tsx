@@ -25,9 +25,9 @@ interface NotificationContextType {
     clearErrors: () => void;
     clearDebugs: () => void;
 
-    markWarningsAsRead: () => void;
-    markErrorsAsRead: () => void;
-    markDebugsAsRead: () => void;
+    markWarningsAsRead: (id?: number) => void;
+    markErrorsAsRead: (id?: number) => void;
+    markDebugsAsRead: (id?: number) => void;
 }
 
 const NotificationContext = createContext<NotificationContextType | null>(null);
@@ -74,18 +74,46 @@ export function NotificationProvider(props: { children: ReactNode }) {
         setDebugs([]);
     }
 
-    function markWarningsAsRead() {
-        setWarnings((prev) =>
-            prev.map((warning) => ({ ...warning, seen: true }))
-        );
+    function markWarningsAsRead(id?: number) {
+        if (id) {
+            setWarnings((prev) =>
+                prev.map((warning) =>
+                    warning.id === id ? { ...warning, seen: true } : warning
+                )
+            );
+        } else {
+            setWarnings((prev) =>
+                prev.map((warning) => ({ ...warning, seen: true }))
+            );
+        }
     }
 
-    function markErrorsAsRead() {
-        setErrors((prev) => prev.map((error) => ({ ...error, seen: true })));
+    function markErrorsAsRead(id?: number) {
+        if (id) {
+            setErrors((prev) =>
+                prev.map((error) =>
+                    error.id === id ? { ...error, seen: true } : error
+                )
+            );
+        } else {
+            setErrors((prev) =>
+                prev.map((error) => ({ ...error, seen: true }))
+            );
+        }
     }
 
-    function markDebugsAsRead() {
-        setDebugs((prev) => prev.map((debug) => ({ ...debug, seen: true })));
+    function markDebugsAsRead(id?: number) {
+        if (id) {
+            setDebugs((prev) =>
+                prev.map((debug) =>
+                    debug.id === id ? { ...debug, seen: true } : debug
+                )
+            );
+        } else {
+            setDebugs((prev) =>
+                prev.map((debug) => ({ ...debug, seen: true }))
+            );
+        }
     }
 
     const value: NotificationContextType = {

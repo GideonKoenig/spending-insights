@@ -15,7 +15,10 @@ export function TextInput(props: {
             placeholder={props.placeholder || "Value"}
             value={props.value || ""}
             onChange={(event) => props.onChange(event.target.value)}
-            className={cn("w-48 text-sm", props.className)}
+            className={cn(
+                "w-48 text-sm bg-background truncate",
+                props.className
+            )}
             type="text"
             disabled={props.disabled}
             tabIndex={props.tabIndex}

@@ -8,7 +8,13 @@ import { Calendar } from "lucide-react";
 import { summarize } from "@/app/analytics/utilts";
 import { AnalyticsHeader } from "@/app/analytics/header";
 import { BalanceChart } from "@/app/analytics/balance-chart";
-import { getActiveDatasets, getActiveTransactions } from "@/lib/utils";
+import {
+    getActiveDatasets,
+    getActiveTransactions,
+    preprocessDatasets,
+    preprocessTransactions,
+} from "@/lib/utils";
+import { useTagRules } from "@/app/tags/use-tag-rules";
 
 export default function AnalyticsPage() {
     const {
@@ -18,12 +24,16 @@ export default function AnalyticsPage() {
         datasets,
         activeDataset,
     } = useData();
+    const { tagRules } = useTagRules();
 
     if (needsFileHandle || needsPermission || loading) {
         return <FileSelector />;
     }
 
-    const activeDatasets = getActiveDatasets(datasets, activeDataset);
+    const activeDatasets = preprocessDatasets(
+        getActiveDatasets(datasets, activeDataset),
+        tagRules
+    );
     const transactions = getActiveTransactions(datasets, activeDataset).sort(
         (a, b) =>
             new Date(a.bookingDate).getTime() -

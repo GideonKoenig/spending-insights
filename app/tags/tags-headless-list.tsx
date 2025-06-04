@@ -1,13 +1,18 @@
 "use client";
 
-import { Transaction, TagMatcher } from "@/lib/types";
+import { Transaction } from "@/lib/types";
 import { TransactionCard } from "@/components/transaction-card";
 import { getKey } from "@/components/utils";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useEffect, useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
+import { getTaggedTransactions } from "@/lib/transaction-tags/utils";
 
-export function TagsHeadlessList(props: { transactions: Transaction[] }) {
+export function TagsHeadlessList(props: {
+    transactions: Transaction[];
+    className?: string;
+}) {
     const containerRef = useRef<HTMLDivElement>(null);
     const virtualizer = useVirtualizer({
         count: props.transactions.length,
@@ -21,9 +26,18 @@ export function TagsHeadlessList(props: { transactions: Transaction[] }) {
         virtualizer._willUpdate();
     }, [containerRef.current]);
 
+    const tagged = getTaggedTransactions(props.transactions);
+    const taggedCount = tagged.length;
+    const untaggedCount = props.transactions.length - taggedCount;
+
     return (
-        <div className="h-full overflow-hidden">
+        <div className={cn("h-full overflow-hidden", props.className)}>
             <ScrollArea ref={containerRef} className="h-full pr-3">
+                <div className="flex items-center bg-card rounded-md p-2 border border-border shadow-sm mb-1">
+                    <p className="text-sm whitespace-pre-wrap">
+                        {`${taggedCount} tagged   ${untaggedCount} untagged`}
+                    </p>
+                </div>
                 <div
                     className="relative h-full"
                     style={{
@@ -33,6 +47,8 @@ export function TagsHeadlessList(props: { transactions: Transaction[] }) {
                 >
                     {virtualizer.getVirtualItems().map((item) => (
                         <TransactionCard
+                            className="p-3"
+                            purposeLineClamp={3}
                             key={getKey(props.transactions[item.index])}
                             transaction={props.transactions[item.index]}
                             style={{
