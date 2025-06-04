@@ -16,6 +16,6 @@ export function getListOptions(
     transactions: Transaction[]
 ) {
     return Array.from(
-        new Set(transactions.map((t) => t[filterOption.attribute].toString()))
+        new Set(transactions.map((t) => t[filterOption.attribute]!.toString()))
     );
 }

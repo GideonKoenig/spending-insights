@@ -7,6 +7,7 @@ export function TransactionCard(props: {
     transaction: Transaction;
     className?: string;
     style?: React.CSSProperties;
+    purposeLineClamp?: 2 | 3 | 4;
 }) {
     const amount = new Intl.NumberFormat("de-DE", {
         style: "currency",
@@ -27,12 +28,12 @@ export function TransactionCard(props: {
     return (
         <div
             className={cn(
-                "p-6 grid grid-cols-5 gap-4 h-48 bg-card text-card-foreground  rounded-md border shadow-sm",
+                "p-6 grid grid-cols-5 gap-4 bg-card text-card-foreground  rounded-md border shadow-sm",
                 props.className
             )}
             style={props.style}
         >
-            <div className="flex flex-col col-span-4">
+            <div className="flex flex-col col-span-3">
                 <h3 className="font-medium text-sm truncate">
                     {props.transaction.paymentParticipant}
                 </h3>
@@ -41,7 +42,7 @@ export function TransactionCard(props: {
                 </p>
             </div>
 
-            <div className="flex flex-col items-end">
+            <div className="flex flex-col items-end col-span-2">
                 <p
                     className={cn(
                         "font-medium",
@@ -58,7 +59,15 @@ export function TransactionCard(props: {
             </div>
 
             <div className="col-span-4">
-                <p className="text-sm text-muted-foreground line-clamp-2">
+                <p
+                    className={cn(
+                        "text-sm text-muted-foreground ",
+                        props.purposeLineClamp === undefined && "line-clamp-2",
+                        props.purposeLineClamp === 2 && "line-clamp-2",
+                        props.purposeLineClamp === 3 && "line-clamp-3",
+                        props.purposeLineClamp === 4 && "line-clamp-4"
+                    )}
+                >
                     {props.transaction.purpose}
                 </p>
             </div>

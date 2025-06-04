@@ -76,12 +76,18 @@ export function NavBar() {
                     <Button
                         size="sm"
                         variant="outline"
+                        className="rounded-sm"
                         onClick={requestPermissions}
                     >
                         Grant Permission
                     </Button>
                 ) : needsFileHandle ? (
-                    <Button size="sm" variant="outline" onClick={selectFiles}>
+                    <Button
+                        size="sm"
+                        variant="outline"
+                        className="rounded-sm"
+                        onClick={selectFiles}
+                    >
                         Select Files
                     </Button>
                 ) : (
@@ -126,6 +132,7 @@ export function NavBar() {
                         <Button
                             variant="destructive"
                             size="sm"
+                            className="rounded-sm"
                             onClick={clearFiles}
                         >
                             Clear Data
