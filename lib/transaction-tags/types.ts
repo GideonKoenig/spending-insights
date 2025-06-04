@@ -24,16 +24,17 @@ export type TagRuleList = z.infer<typeof TagRuleListSchema>;
 export const TagRuleListSchema = z.array(TagRuleSchema);
 
 export const MAIN_CATEGORIES = [
-    "Groceries",
-    "Transportation",
-    "Healthcare",
-    "Entertainment",
-    "Utilities",
-    "Housing",
-    "Insurance",
     "Education",
-    "Professional",
-    "Investments",
+    "Entertainment",
+    "Fitness",
+    "Groceries",
+    "Healthcare",
+    "Housing",
     "Income",
+    "Insurance",
+    "Investments",
     "Other",
+    "Professional",
+    "Transportation",
+    "Utilities",
 ] as const;

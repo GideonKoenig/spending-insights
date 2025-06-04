@@ -13,6 +13,7 @@ import { listEquals } from "@/lib/transaction-filter/operators/list";
 import {
     textEquals,
     textIncludes,
+    textExcludes,
 } from "@/lib/transaction-filter/operators/text";
 import {
     currencyEquals,
@@ -23,6 +24,7 @@ import { getOperatorsForFilterOption } from "@/lib/transaction-filter/utils";
 
 export const OPERATORS: TypedOperator[] = [
     textIncludes,
+    textExcludes,
     textEquals,
     currencyEquals,
     currencyGreaterThan,

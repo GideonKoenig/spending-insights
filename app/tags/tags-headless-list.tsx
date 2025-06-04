@@ -11,11 +11,16 @@ import { getTaggedTransactions } from "@/lib/transaction-tags/utils";
 
 export function TagsHeadlessList(props: {
     transactions: Transaction[];
+    taggedTransactions: Transaction[];
+    showTagged: boolean;
     className?: string;
 }) {
     const containerRef = useRef<HTMLDivElement>(null);
+    const selectedTransactions = props.showTagged
+        ? props.taggedTransactions
+        : props.transactions;
     const virtualizer = useVirtualizer({
-        count: props.transactions.length,
+        count: selectedTransactions.length,
         getScrollElement: () => containerRef.current,
         estimateSize: () => 192,
         overscan: 5,
@@ -26,8 +31,7 @@ export function TagsHeadlessList(props: {
         virtualizer._willUpdate();
     }, [containerRef.current]);
 
-    const tagged = getTaggedTransactions(props.transactions);
-    const taggedCount = tagged.length;
+    const taggedCount = props.taggedTransactions.length;
     const untaggedCount = props.transactions.length - taggedCount;
 
     return (

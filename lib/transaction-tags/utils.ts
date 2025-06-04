@@ -25,20 +25,10 @@ export function createRuleName(tagRule: PartialTagRule) {
     const hasCategory = tagRule.tag.category;
     const hasSubCategory = tagRule.tag.subCategory?.trim();
 
-    console.log(hasName, hasCategory, hasSubCategory);
-    console.log(
-        `${hasCategory!.toLowerCase()}-${hasSubCategory!.toLowerCase()}`.replace(
-            /\s+/g,
-            "-"
-        )
-    );
-
-    return hasName
-        ? hasName
-        : `${hasCategory!.toLowerCase()}-${hasSubCategory!.toLowerCase()}`.replace(
-              /\s+/g,
-              "-"
-          );
+    const baseName = hasName
+        ? `${hasCategory}-${hasName}`
+        : `${hasCategory}-${hasSubCategory}`;
+    return baseName.toLowerCase().replace(/\s+/g, "-");
 }
 
 export function hasNoIssues(
@@ -67,14 +57,6 @@ export function getIssues(tagRule: PartialTagRule, other: TagRule[]) {
 
     if (!hasCategory) {
         issues.push("select a category for the tag");
-    }
-
-    if (hasCategory && (hasName || hasSubCategory)) {
-        const ruleName = createRuleName(tagRule);
-        const existingRule = other.find((rule) => rule.name === ruleName);
-        if (existingRule) {
-            issues.push(`change the name - "${ruleName}" already exists`);
-        }
     }
 
     return issues;

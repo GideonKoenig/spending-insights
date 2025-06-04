@@ -28,10 +28,11 @@ export function TagsHeader(props: {
     tagRules: TagRule[];
     addTagRule: (rule: TagRule) => void;
     removeTagRule: (id: string) => void;
+    updateTagRule: (id: string, rule: TagRule) => void;
 }) {
     const { addWarning } = useNotifications();
 
-    const createRule = () => {
+    const saveRule = () => {
         const issues = getIssues(props.currentRule, props.tagRules);
         if (issues.length > 0) {
             addWarning(
@@ -51,13 +52,17 @@ export function TagsHeader(props: {
         };
 
         const newRule: TagRule = {
-            id: crypto.randomUUID(),
+            id: props.currentRule.id ?? crypto.randomUUID(),
             name: ruleName,
             filters: props.currentRule.filters,
             tag: tag,
         };
 
-        props.addTagRule(newRule);
+        if (props.currentRule.id) {
+            props.updateTagRule(props.currentRule.id, newRule);
+        } else {
+            props.addTagRule(newRule);
+        }
         props.setCurrentRule({ filters: [] });
     };
 
@@ -124,7 +129,7 @@ export function TagsHeader(props: {
                     Delete Rule
                 </Button>
                 <Button
-                    onClick={createRule}
+                    onClick={saveRule}
                     className={cn(
                         "flex-2",
                         hasNoIssues(props.currentRule, props.tagRules)
