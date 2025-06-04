@@ -24,17 +24,16 @@ import { ListInput } from "@/lib/transaction-filter/input-components/list-input"
 import { getListOptions } from "@/lib/transaction-filter/utils";
 import { TransactionFilterBadge } from "@/lib/transaction-filter/badge";
 import { type SortOption } from "@/lib/transaction-sorter";
+import { cn } from "@/lib/utils";
 
 type Value = string | number | Date | undefined;
 
 export function TransactionHeader(props: {
+    className?: string;
     onFiltersChange: (filters: FilterRule[]) => void;
     filters: FilterRule[];
     transactions: Transaction[];
-    filteredCount: number;
-    sortBy: SortOption;
-    onSortChange: (sort: SortOption) => void;
-    sortOptions: readonly { value: SortOption; label: string }[];
+    sortSelector?: React.ReactNode;
 }) {
     const [option, setOption] = useState(FILTER_OPTIONS[0]);
     const [operator, setOperator] = useState<TypedOperator>(
@@ -78,13 +77,9 @@ export function TransactionHeader(props: {
     };
 
     return (
-        <div className="p-2 flex flex-col gap-4">
+        <div className={cn("flex flex-col gap-2", props.className)}>
             {props.filters.length > 0 && (
                 <div className="grid grid-cols-2">
-                    <p className="text-xs col-span-2 text-muted-foreground">
-                        {`${props.filteredCount}/${props.transactions.length} Transactions`}
-                    </p>
-
                     <div className="flex flex-col flex-grow gap-2">
                         {props.filters.map((filter, index) => (
                             <TransactionFilterBadge
@@ -125,7 +120,10 @@ export function TransactionHeader(props: {
                         }
                     }}
                 >
-                    <SelectTrigger className="w-48" tabIndex={1}>
+                    <SelectTrigger
+                        className="min-w-44 bg-background"
+                        tabIndex={1}
+                    >
                         <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -151,7 +149,10 @@ export function TransactionHeader(props: {
                     }}
                     disabled={!option}
                 >
-                    <SelectTrigger className="w-48" tabIndex={2}>
+                    <SelectTrigger
+                        className="min-w-28 bg-background"
+                        tabIndex={2}
+                    >
                         <SelectValue placeholder="Select operator..." />
                     </SelectTrigger>
                     <SelectContent>
@@ -165,6 +166,10 @@ export function TransactionHeader(props: {
 
                 {option.inputType === "text" && (
                     <TextInput
+                        className={cn(
+                            "bg-background",
+                            !props.sortSelector ? "flex-grow" : ""
+                        )}
                         tabIndex={3}
                         value={value as string}
                         onChange={setValue}
@@ -174,6 +179,10 @@ export function TransactionHeader(props: {
 
                 {option.inputType === "currency" && (
                     <CurrencyInput
+                        className={cn(
+                            "bg-background",
+                            !props.sortSelector ? "flex-grow" : ""
+                        )}
                         tabIndex={3}
                         value={value as number}
                         onChange={setValue}
@@ -183,6 +192,10 @@ export function TransactionHeader(props: {
 
                 {option.inputType === "date" && (
                     <DateInput
+                        className={cn(
+                            "bg-background",
+                            !props.sortSelector ? "flex-grow" : ""
+                        )}
                         tabIndex={3}
                         value={value as Date}
                         onChange={setValue}
@@ -191,6 +204,10 @@ export function TransactionHeader(props: {
 
                 {option.inputType === "list" && (
                     <ListInput
+                        className={cn(
+                            "bg-background",
+                            !props.sortSelector ? "flex-grow" : ""
+                        )}
                         tabIndex={3}
                         value={value as string}
                         onChange={setValue}
@@ -208,20 +225,12 @@ export function TransactionHeader(props: {
                     Add
                 </Button>
 
-                <div className="flex-grow" />
-
-                <Select value={props.sortBy} onValueChange={props.onSortChange}>
-                    <SelectTrigger className="w-40" tabIndex={5}>
-                        <SelectValue placeholder="Sort by..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {props.sortOptions.map((option) => (
-                            <SelectItem key={option.value} value={option.value}>
-                                {option.label}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
+                {props.sortSelector && (
+                    <>
+                        <div className="flex-grow" />
+                        {props.sortSelector}
+                    </>
+                )}
             </div>
         </div>
     );

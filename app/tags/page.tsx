@@ -1,38 +1,140 @@
 "use client";
 
-// import { useData } from "@/contexts/data-provider";
-// import { FileSelector } from "@/components/file-selector";
-// import { PatternCreator } from "@/components/pattern-creator";
-// import { TransactionViewer } from "@/components/transaction-viewer";
+import { useState, useRef } from "react";
+import { useData } from "@/contexts/data-provider";
+import { FileSelector } from "@/components/file-selector";
+import { getActiveTransactions } from "@/lib/utils";
+import { filter } from "@/lib/transaction-filter/main";
+import { FILTER_OPTIONS } from "@/lib/transaction-filter/transaction-filter-options";
+import { PartialTagMatcher, Tag, TagMatcher } from "@/lib/types";
+import { useTagMatchers } from "@/app/tags/use-tag-matchers";
+import { TagDefinitionPanel } from "@/app/tags/tags-definition-panel";
+import { TagsHeadlessList } from "@/app/tags/tags-headless-list";
+import { TransactionHeader } from "@/components/transaction-header";
+import { TagsHeader } from "@/app/tags/tags-header";
+import { TransactionCard } from "@/components/transaction-card";
+import {
+    getTaggedTransactions,
+    getUntaggedTransactions,
+} from "@/app/tags/utils";
 
-export default function PatternsPage() {
-    // const { fileHandle, hasPermission } = useData();
+export default function TagsPage() {
+    const dataResult = useData();
+    const { matchers, addMatcher, isLoaded } = useTagMatchers();
+    const [showOnlyTagged, setShowOnlyTagged] = useState(false);
+    const [currentMatcher, setCurrentMatcher] =
+        useState<PartialTagMatcher | null>(null);
 
-    // if (!fileHandle || !hasPermission) {
-    //     return <FileSelector />;
-    // }
+    if (!dataResult.success) {
+        return (
+            <p className="p-4 text-destructive">
+                Unexpected state: DataProvider not found
+            </p>
+        );
+    }
+    const { needsFileHandle, needsPermission, loading } = dataResult.value;
+    if (needsFileHandle || needsPermission || loading) {
+        return <FileSelector />;
+    }
+    if (!isLoaded) {
+        return <p className="p-4 text-muted-foreground">Loading...</p>;
+    }
 
-    // return (
-    //     <main className="h-full flex flex-col">
-    //         <div className="mx-auto max-w-7xl px-4 py-8 w-full flex flex-col h-full">
-    //             <div className="space-y-6 mb-6">
-    //                 <div>
-    //                     <h1 className="text-3xl font-bold">
-    //                         Pattern Management
-    //                     </h1>
-    //                     <p className="text-muted-foreground">
-    //                         Create rules to automatically categorize your
-    //                         transactions
-    //                     </p>
-    //                 </div>
-    //             </div>
+    const transactions = getActiveTransactions(
+        dataResult.value.datasets,
+        dataResult.value.activeDataset
+    );
+    const filteredTransactions =
+        currentMatcher && currentMatcher.filters && currentMatcher.filters
+            ? filter(transactions, currentMatcher.filters, FILTER_OPTIONS)
+            : [];
+    const taggedTransactions = getTaggedTransactions(
+        filteredTransactions,
+        matchers
+    );
+    const untaggedTransactions = getUntaggedTransactions(
+        transactions,
+        matchers
+    );
 
-    //             <div className="grid grid-cols-2 gap-6 flex-1 min-h-0">
-    //                 <TransactionViewer />
-    //                 <PatternCreator />
-    //             </div>
-    //         </div>
-    //     </main>
-    // );
-    return <div>Categories</div>;
+    const firstUntaggedTransaction = untaggedTransactions[0];
+
+    const handleCreateMatcher = (name: string, tags: Tag) => {
+        if (currentFilters.length === 0) return;
+
+        const newMatcher: TagMatcher = {
+            id: crypto.randomUUID(),
+            name,
+            filters: currentFilters,
+            tags,
+        };
+
+        addMatcher(newMatcher);
+        handleClear();
+    };
+
+    const handleClear = () => {
+        setCurrentFilters([]);
+        setCurrentMatcher(null);
+        setCurrentMatcherName("");
+        setCurrentTags(null);
+    };
+
+    const handleSelectMatcher = (matcher: TagMatcher | null) => {
+        setCurrentMatcher(matcher);
+        if (matcher) {
+            setCurrentFilters(matcher.filters);
+        }
+    };
+
+    const handleTagsChange = (name: string, tags: Tag | null) => {
+        setCurrentMatcherName(name);
+        setCurrentTags(tags);
+    };
+
+    const hasActiveFilters = currentFilters.length > 0;
+
+    return (
+        <div className="h-full max-w-7xl mx-auto grid grid-cols-2 gap-4 p-4">
+            <TagsHeadlessList
+                transactions={showOnlyTagged ? transactions : transactions}
+            />
+
+            <div className="flex h-full flex-col gap-4">
+                <TagsHeader
+                    matchers={matchers}
+                    selectedMatcher={currentMatcher}
+                    onSelectMatcher={handleSelectMatcher}
+                    onClear={handleClear}
+                    onCreateMatcher={handleCreateMatcher}
+                    hasActiveFilters={hasActiveFilters}
+                    matcherName={currentMatcherName}
+                    tags={currentTags}
+                    showOnlyTagged={showOnlyTagged}
+                    onShowOnlyTaggedChange={setShowOnlyTagged}
+                />
+
+                <div className="bg-card flex items-end flex-grow rounded-md p-4 border border-border shadow-sm">
+                    <TransactionHeader
+                        className="w-full"
+                        filters={currentFilters}
+                        onFiltersChange={setCurrentFilters}
+                        transactions={transactions}
+                        filteredCount={filteredTransactions.length}
+                    />
+                </div>
+
+                <TagDefinitionPanel
+                    onTagsChange={handleTagsChange}
+                    selectedMatcher={currentMatcher}
+                    hasActiveFilters={hasActiveFilters}
+                />
+
+                <TransactionCard
+                    transaction={firstUntaggedTransaction}
+                    purposeLineClamp={4}
+                />
+            </div>
+        </div>
+    );
 }

@@ -20,6 +20,7 @@ export const TransactionSchema = z.object({
     markedTransaction: z.string(),
     creditorId: z.string(),
     mandateReference: z.string(),
+    tags: z.array(z.string()).optional(),
 });
 
 export type Dataset = z.infer<typeof DatasetSchema>;
@@ -27,6 +28,66 @@ export const DatasetSchema = z.object({
     name: z.string(),
     transactions: z.array(TransactionSchema),
 });
+
+export type Tag = z.infer<typeof TagSchema>;
+export const TagSchema = z.object({
+    mainCategory: z.string(),
+    spreadOverMonths: z.number().optional(),
+    additionalTags: z.array(z.string()).default([]),
+});
+
+export type PartialTagMatcher = Partial<TagMatcher>;
+export type TagMatcher = z.infer<typeof TagMatcherSchema>;
+export const TagMatcherSchema = z.object({
+    id: z.string(),
+    name: z.string(),
+    filters: z.array(
+        z.object({
+            attribute: z.enum([
+                "accountName",
+                "accountIban",
+                "accountBic",
+                "bankName",
+                "bookingDate",
+                "valueDate",
+                "paymentParticipant",
+                "paymentParticipantIban",
+                "paymentParticipantBic",
+                "transactionType",
+                "purpose",
+                "amount",
+                "currency",
+                "balanceAfterTransaction",
+                "note",
+                "markedTransaction",
+                "creditorId",
+                "mandateReference",
+                "tags",
+            ]),
+            operator: z.string(),
+            value: z.union([z.string(), z.number(), z.date()]),
+        })
+    ),
+    tags: TagSchema,
+});
+
+export type TagMatcherList = z.infer<typeof TagMatcherListSchema>;
+export const TagMatcherListSchema = z.array(TagMatcherSchema);
+
+export const MAIN_CATEGORIES = [
+    "Groceries",
+    "Transportation",
+    "Healthcare",
+    "Entertainment",
+    "Utilities",
+    "Housing",
+    "Insurance",
+    "Education",
+    "Professional",
+    "Investments",
+    "Income",
+    "Other",
+] as const;
 
 function parseDate(dateStr: string): Date {
     if (!dateStr) return new Date();

@@ -15,6 +15,13 @@ import {
     type SortOption,
     SORT_OPTIONS,
 } from "@/lib/transaction-sorter";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
 export function TransactionList(props: {
     transactions: Transaction[];
@@ -45,20 +52,37 @@ export function TransactionList(props: {
 
     return (
         <div className="p-4 max-w-4xl mx-auto">
-            <div
-                className={cn(
-                    props.className,
-                    "border border-border p-4 rounded-md"
-                )}
-            >
+            <div className={cn(props.className, "p-4")}>
                 <TransactionHeader
+                    className="mb-2 p-2 bg-card border border-border rounded-md shadow-sm"
                     filters={filters}
                     onFiltersChange={setFilters}
                     transactions={props.transactions}
-                    filteredCount={sortedTransactions.length}
-                    sortBy={sortBy}
-                    onSortChange={setSortBy}
-                    sortOptions={SORT_OPTIONS}
+                    sortSelector={
+                        <Select
+                            value={sortBy}
+                            onValueChange={(value) =>
+                                setSortBy(value as SortOption)
+                            }
+                        >
+                            <SelectTrigger
+                                className="w-40 bg-background"
+                                tabIndex={5}
+                            >
+                                <SelectValue placeholder="Sort by..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {SORT_OPTIONS.map((option) => (
+                                    <SelectItem
+                                        key={option.value}
+                                        value={option.value}
+                                    >
+                                        {option.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    }
                 />
                 <div
                     className="relative"
