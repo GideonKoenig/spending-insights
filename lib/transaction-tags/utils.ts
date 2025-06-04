@@ -25,9 +25,10 @@ export function createRuleName(tagRule: PartialTagRule) {
     const hasCategory = tagRule.tag.category;
     const hasSubCategory = tagRule.tag.subCategory?.trim();
 
-    const baseName = hasName
-        ? `${hasCategory}-${hasName}`
-        : `${hasCategory}-${hasSubCategory}`;
+    let baseName = "";
+    if (hasName && tagRule.id) baseName = hasName;
+    if (hasName && !tagRule.id) baseName = `${hasCategory}-${hasName}`;
+    if (!hasName) baseName = `${hasCategory}-${hasSubCategory}`;
     return baseName.toLowerCase().replace(/\s+/g, "-");
 }
 

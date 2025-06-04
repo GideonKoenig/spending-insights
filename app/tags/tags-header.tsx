@@ -20,6 +20,8 @@ import {
     hasNoIssues,
 } from "@/lib/transaction-tags/utils";
 
+let index = 0;
+
 export function TagsHeader(props: {
     currentRule: PartialTagRule;
     setCurrentRule: Dispatch<SetStateAction<PartialTagRule>>;
@@ -30,7 +32,7 @@ export function TagsHeader(props: {
     removeTagRule: (id: string) => void;
     updateTagRule: (id: string, rule: TagRule) => void;
 }) {
-    const { addWarning } = useNotifications();
+    const { addWarning, addDebug } = useNotifications();
 
     const saveRule = () => {
         const issues = getIssues(props.currentRule, props.tagRules);
@@ -46,8 +48,8 @@ export function TagsHeader(props: {
         const ruleName = createRuleName(props.currentRule)!;
 
         const tag: Tag = {
-            category: props.currentRule.tag.category,
-            subCategory: props.currentRule.tag.subCategory,
+            category: props.currentRule.tag.category.toLowerCase(),
+            subCategory: props.currentRule.tag.subCategory?.toLowerCase(),
             spreadOverMonths: props.currentRule.tag.spreadOverMonths,
         };
 
@@ -64,6 +66,23 @@ export function TagsHeader(props: {
             props.addTagRule(newRule);
         }
         props.setCurrentRule({ filters: [] });
+    };
+
+    const updateAllCategories = () => {
+        const updatedRules = props.tagRules.map((rule) => ({
+            ...rule,
+            tag: {
+                ...rule.tag,
+                category: rule.tag.category.toLowerCase(),
+                subCategory: rule.tag.subCategory?.toLowerCase(),
+            },
+        }))[index++];
+
+        addDebug(
+            "updateAllCategories",
+            updatedRules.name + "\n" + (index - 1) + "\n" + updatedRules.id
+        );
+        props.updateTagRule(updatedRules.id, updatedRules);
     };
 
     return (
@@ -115,6 +134,14 @@ export function TagsHeader(props: {
                     className="flex-1"
                 >
                     Clear
+                </Button>
+                <Button
+                    variant="outline"
+                    onClick={updateAllCategories}
+                    disabled={props.tagRules.length === 0}
+                    className="flex-1"
+                >
+                    Update All Categories
                 </Button>
                 <Button
                     variant="destructive"

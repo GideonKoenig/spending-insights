@@ -53,8 +53,8 @@ export function TagsHeadlessList(props: {
                         <TransactionCard
                             className="p-3"
                             purposeLineClamp={3}
-                            key={getKey(props.transactions[item.index])}
-                            transaction={props.transactions[item.index]}
+                            key={getKey(selectedTransactions[item.index])}
+                            transaction={selectedTransactions[item.index]}
                             style={{
                                 position: "absolute",
                                 top: 0,
