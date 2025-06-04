@@ -36,7 +36,7 @@ export function TagDefinitionPanel(props: {
         }
 
         const tags: Tag = {
-            mainCategory,
+            category: mainCategory,
             spreadOverMonths,
             additionalTags,
         };
@@ -74,7 +74,7 @@ export function TagDefinitionPanel(props: {
     React.useEffect(() => {
         if (props.selectedMatcher) {
             setMatcherName(props.selectedMatcher.name);
-            setMainCategory(props.selectedMatcher.tags.mainCategory);
+            setMainCategory(props.selectedMatcher.tags.category);
             setSpreadOverMonths(props.selectedMatcher.tags.spreadOverMonths);
             setAdditionalTags(props.selectedMatcher.tags.additionalTags);
         } else {

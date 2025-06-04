@@ -1,6 +1,6 @@
 "use client";
 
-import { useData } from "@/contexts/data-provider";
+import { useData } from "@/contexts/data/provider";
 import { FileSelector } from "@/components/file-selector";
 import { AnalyticsCardSummary } from "@/components/analytics-card-summary";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -11,23 +11,14 @@ import { BalanceChart } from "@/app/analytics/balance-chart";
 import { getActiveDatasets, getActiveTransactions } from "@/lib/utils";
 
 export default function AnalyticsPage() {
-    const dataResult = useData();
-
-    if (!dataResult.success) {
-        return (
-            <p className="p-4 text-destructive">
-                Unexpected state: DataProvider not found
-            </p>
-        );
-    }
-
     const {
         needsFileHandle,
         needsPermission,
         loading,
         datasets,
         activeDataset,
-    } = dataResult.value;
+    } = useData();
+
     if (needsFileHandle || needsPermission || loading) {
         return <FileSelector />;
     }
@@ -38,13 +29,8 @@ export default function AnalyticsPage() {
             new Date(a.bookingDate).getTime() -
             new Date(b.bookingDate).getTime()
     );
-
-    const monthSummaries = summarize(transactions, "monthly").sort(
-        (a, b) => new Date(b.title).getTime() - new Date(a.title).getTime()
-    );
-    const yearSummaries = summarize(transactions, "yearly").sort(
-        (a, b) => new Date(b.title).getTime() - new Date(a.title).getTime()
-    );
+    const monthlySummaries = summarize(transactions, "monthly");
+    const yearlySummaries = summarize(transactions, "yearly");
 
     return (
         <ScrollArea className="h-full">
@@ -59,13 +45,13 @@ export default function AnalyticsPage() {
                 {/* Meta Information Row */}
                 <AnalyticsHeader
                     transactions={transactions}
-                    monthSummaries={monthSummaries}
-                    yearSummaries={yearSummaries}
+                    monthSummaries={monthlySummaries}
+                    yearSummaries={yearlySummaries}
                 />
 
                 {/* Months Row */}
                 <div className="grid grid-cols-3 gap-4">
-                    {monthSummaries
+                    {monthlySummaries
                         .slice(0, 3)
                         .reverse()
                         .map((month) => (
@@ -84,7 +70,7 @@ export default function AnalyticsPage() {
 
                 {/* Years Row */}
                 <div className="grid grid-cols-3 gap-4">
-                    {yearSummaries
+                    {yearlySummaries
                         .slice(0, 3)
                         .reverse()
                         .map((year) => (

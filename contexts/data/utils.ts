@@ -1,4 +1,4 @@
-import { type Result, tryCatchAsync } from "@/lib/utils";
+import { tryCatchAsync } from "@/lib/utils";
 import { csvParser } from "@/lib/csv-parser/parser";
 import { TransactionSchema, type Dataset } from "@/lib/types";
 import { fileHandleStore } from "@/lib/file-handle-store";

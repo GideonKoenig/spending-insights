@@ -1,6 +1,6 @@
 "use client";
 
-import { useData } from "@/contexts/data-provider";
+import { useData } from "@/contexts/data/provider";
 import { FileSelector } from "@/components/file-selector";
 import { TransactionList } from "@/components/transaction-list";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -9,24 +9,19 @@ import { getActiveTransactions } from "@/lib/utils";
 
 export default function HomePage() {
     const containerRef = useRef<HTMLDivElement>(null);
-    const dataResult = useData();
+    const {
+        needsFileHandle,
+        needsPermission,
+        loading,
+        datasets,
+        activeDataset,
+    } = useData();
 
-    if (!dataResult.success)
-        return (
-            <p className="p-4 text-destructive">
-                Unexpected state: DataProvider not found
-            </p>
-        );
-
-    const { needsFileHandle, needsPermission, loading } = dataResult.value;
     if (needsFileHandle || needsPermission || loading) {
         return <FileSelector />;
     }
 
-    const transactions = getActiveTransactions(
-        dataResult.value.datasets,
-        dataResult.value.activeDataset
-    ).sort(
+    const transactions = getActiveTransactions(datasets, activeDataset).sort(
         (a, b) =>
             new Date(b.bookingDate).getTime() -
             new Date(a.bookingDate).getTime()

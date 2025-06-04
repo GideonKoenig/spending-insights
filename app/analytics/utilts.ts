@@ -1,6 +1,5 @@
 import { Summary } from "@/components/analytics-card-summary";
-import { sortTransactions } from "@/lib/transaction-sorter";
-import { Dataset, Transaction } from "@/lib/types";
+import { type Dataset, type Transaction } from "@/lib/types";
 
 export type Datapoint = {
     date: string;
@@ -50,7 +49,11 @@ export function summarize(
     return summaries.map((summary) => ({ ...summary, average }));
 }
 
-function orderTransactionsByDomino(transactions: Transaction[]) {
+function orderTransactionsByDomino(
+    transactions: Transaction[],
+    addWarning?: (origin: string, message: string) => void,
+    addError?: (origin: string, message: string) => void
+) {
     if (transactions.length === 0) return [];
 
     const sortedTransactions = [...transactions].sort(
@@ -87,9 +90,12 @@ function orderTransactionsByDomino(transactions: Transaction[]) {
             if (
                 candidate.bookingDate.getTime() < current.bookingDate.getTime()
             ) {
-                console.warn(
-                    `Skipping transaction that should have come before current transaction: ${candidate.bookingDate.toDateString()} < ${current.bookingDate.toDateString()}`
-                );
+                if (addWarning) {
+                    addWarning(
+                        "Analytics",
+                        `Skipping transaction that should have come before current transaction: ${candidate.bookingDate.toDateString()} < ${current.bookingDate.toDateString()}`
+                    );
+                }
                 remaining.splice(nextIndex, 1);
                 continue;
             }
@@ -107,13 +113,20 @@ function orderTransactionsByDomino(transactions: Transaction[]) {
             getDateKey(remainingTransaction.bookingDate) ===
             getDateKey(oldestDate)
         ) {
-            console.warn(
-                `Disregarding transaction from start date that doesn't fit the domino chain: ${remainingTransaction.bookingDate.toDateString()}`
-            );
+            if (addWarning) {
+                addWarning(
+                    "Analytics - orderTransactionsByDomino",
+                    `Disregarding transaction from start date that doesn't fit the domino chain: ${remainingTransaction.bookingDate.toDateString()}`
+                );
+            }
         } else {
-            throw new Error(
-                `Unable to process transaction from ${remainingTransaction.bookingDate.toDateString()}. Expected all remaining transactions to be from start date ${oldestDate.toDateString()}`
-            );
+            if (addError) {
+                addError(
+                    "Analytics - orderTransactionsByDomino",
+                    `Unexpected transaction from ${remainingTransaction.bookingDate.toDateString()}. Expected all remaining transactions to be from start date ${oldestDate.toDateString()}`
+                );
+            }
+            return ordered;
         }
     }
 
@@ -124,8 +137,16 @@ function getDateKey(date: Date) {
     return date.toDateString();
 }
 
-function getDayClosingBalances(transactions: Transaction[]) {
-    const orderedTransactions = orderTransactionsByDomino(transactions);
+function getDayClosingBalances(
+    transactions: Transaction[],
+    addWarning?: (origin: string, message: string) => void,
+    addError?: (origin: string, message: string) => void
+) {
+    const orderedTransactions = orderTransactionsByDomino(
+        transactions,
+        addWarning,
+        addError
+    );
     const dayBalances = new Map<string, number>();
 
     for (const transaction of orderedTransactions) {
@@ -136,12 +157,20 @@ function getDayClosingBalances(transactions: Transaction[]) {
     return dayBalances;
 }
 
-export function transformDatapoints(datasets: Dataset[]) {
+export function transformDatapoints(
+    datasets: Dataset[],
+    addWarning?: (origin: string, message: string) => void,
+    addError?: (origin: string, message: string) => void
+) {
     const allDates = new Set<string>();
     const datasetDayBalances = new Map<string, Map<string, number>>();
 
     for (const dataset of datasets) {
-        const dayBalances = getDayClosingBalances(dataset.transactions);
+        const dayBalances = getDayClosingBalances(
+            dataset.transactions,
+            addWarning,
+            addError
+        );
         datasetDayBalances.set(dataset.name, dayBalances);
 
         for (const date of dayBalances.keys()) {

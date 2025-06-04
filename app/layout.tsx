@@ -1,7 +1,8 @@
 import type React from "react";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { DataProvider } from "@/contexts/data-provider";
+import { DataProvider } from "@/contexts/data/provider";
+import { NotificationProvider } from "@/contexts/notification/provider";
 import { NavBar } from "@/components/nav-bar";
 import "./globals.css";
 
@@ -19,12 +20,16 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en" className={inter.className} suppressHydrationWarning>
-            <DataProvider>
-                <body className="h-dvh w-dvw bg-background text-foreground flex flex-col">
-                    <NavBar />
-                    <div className="flex-grow overflow-hidden">{children}</div>
-                </body>
-            </DataProvider>
+            <NotificationProvider>
+                <DataProvider>
+                    <body className="h-dvh w-dvw bg-background text-foreground flex flex-col">
+                        <NavBar />
+                        <div className="flex-grow overflow-hidden">
+                            {children}
+                        </div>
+                    </body>
+                </DataProvider>
+            </NotificationProvider>
         </html>
     );
 }

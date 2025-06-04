@@ -31,9 +31,9 @@ export const DatasetSchema = z.object({
 
 export type Tag = z.infer<typeof TagSchema>;
 export const TagSchema = z.object({
-    mainCategory: z.string(),
+    category: z.string(),
+    subCategory: z.string(),
     spreadOverMonths: z.number().optional(),
-    additionalTags: z.array(z.string()).default([]),
 });
 
 export type PartialTagMatcher = Partial<TagMatcher>;
