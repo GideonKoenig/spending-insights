@@ -1,5 +1,6 @@
 "use client";
 
+import { Dispatch, SetStateAction } from "react";
 import { Button } from "@/components/ui/button";
 import {
     Select,
@@ -10,58 +11,92 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { TagMatcher, Tag } from "@/lib/types";
+import { TagRule, Tag, PartialTagRule } from "@/lib/transaction-tags/types";
+import { useNotifications } from "@/contexts/notification/provider";
+import { cn } from "@/lib/utils";
+import {
+    createRuleName,
+    getIssues,
+    hasNoIssues,
+} from "@/lib/transaction-tags/utils";
 
 export function TagsHeader(props: {
-    matchers: TagMatcher[];
-    selectedMatcher: TagMatcher | null;
-    onSelectMatcher: (matcher: TagMatcher | null) => void;
-    onClear: () => void;
-    onCreateMatcher: (name: string, tags: Tag) => void;
-    hasActiveFilters: boolean;
-    matcherName: string;
-    tags: Tag | null;
+    currentRule: PartialTagRule;
+    setCurrentRule: Dispatch<SetStateAction<PartialTagRule>>;
     showOnlyTagged: boolean;
-    onShowOnlyTaggedChange: (showOnlyTagged: boolean) => void;
+    setShowOnlyTagged: Dispatch<SetStateAction<boolean>>;
+    tagRules: TagRule[];
+    addTagRule: (rule: TagRule) => void;
+    removeTagRule: (id: string) => void;
 }) {
-    const handleCreateMatcher = () => {
-        if (!props.matcherName.trim() || !props.tags) return;
-        props.onCreateMatcher(props.matcherName.trim(), props.tags);
+    const { addWarning } = useNotifications();
+
+    const createRule = () => {
+        const issues = getIssues(props.currentRule, props.tagRules);
+        if (issues.length > 0) {
+            addWarning(
+                "TagsHeader",
+                `Cannot create tag rule:\n → ${issues.join("\n → ")}`
+            );
+            return;
+        }
+
+        if (!hasNoIssues(props.currentRule, props.tagRules)) return;
+        const ruleName = createRuleName(props.currentRule)!;
+
+        const tag: Tag = {
+            category: props.currentRule.tag.category,
+            subCategory: props.currentRule.tag.subCategory,
+            spreadOverMonths: props.currentRule.tag.spreadOverMonths,
+        };
+
+        const newRule: TagRule = {
+            id: crypto.randomUUID(),
+            name: ruleName,
+            filters: props.currentRule.filters,
+            tag: tag,
+        };
+
+        props.addTagRule(newRule);
+        props.setCurrentRule({ filters: [] });
     };
 
     return (
-        <div className="p-4 bg-card flex flex-col gap-4 rounded-md border border-border shadow-sm">
+        <div className="p-2 bg-card flex flex-col gap-4 rounded-md border border-border shadow-sm">
             <Select
-                value={props.selectedMatcher?.id || ""}
+                value={props.currentRule.id || ""}
                 onValueChange={(value) => {
-                    const matcher =
-                        props.matchers.find((m) => m.id === value) || null;
-                    props.onSelectMatcher(matcher);
+                    props.setCurrentRule(
+                        props.tagRules.find((m) => m.id === value) ?? {
+                            filters: [],
+                        }
+                    );
                 }}
             >
-                <SelectTrigger className="flex-1 w-full">
-                    <SelectValue placeholder="Select existing matcher..." />
+                <SelectTrigger className="flex-1 w-full bg-background">
+                    <SelectValue placeholder="Select saved rule..." />
                 </SelectTrigger>
                 <SelectContent>
-                    {props.matchers.length === 0 ? (
-                        <SelectItem value="no-matchers" disabled>
-                            No matchers available
+                    {props.tagRules.length === 0 ? (
+                        <SelectItem value="no-rules" disabled>
+                            No rules available
                         </SelectItem>
                     ) : (
-                        props.matchers.map((matcher) => (
-                            <SelectItem key={matcher.id} value={matcher.id}>
-                                {matcher.name}
+                        props.tagRules.map((rule) => (
+                            <SelectItem key={rule.id} value={rule.id}>
+                                {rule.name}
                             </SelectItem>
                         ))
                     )}
                 </SelectContent>
             </Select>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 ml-2">
                 <Switch
                     id="show-only-tagged"
                     checked={props.showOnlyTagged}
-                    onCheckedChange={props.onShowOnlyTaggedChange}
+                    onCheckedChange={props.setShowOnlyTagged}
+                    className="data-[state=unchecked]:bg-muted-foreground"
                 />
                 <Label htmlFor="show-only-tagged" className="text-sm">
                     Show only tagged transactions
@@ -71,21 +106,33 @@ export function TagsHeader(props: {
             <div className="flex gap-2">
                 <Button
                     variant="outline"
-                    onClick={props.onClear}
+                    onClick={() => props.setCurrentRule({ filters: [] })}
                     className="flex-1"
                 >
                     Clear
                 </Button>
                 <Button
-                    onClick={handleCreateMatcher}
-                    disabled={
-                        !props.matcherName.trim() ||
-                        !props.tags ||
-                        !props.hasActiveFilters
-                    }
+                    variant="destructive"
+                    onClick={() => {
+                        if (!props.currentRule.id) return;
+                        props.removeTagRule(props.currentRule.id);
+                        props.setCurrentRule({ filters: [] });
+                    }}
+                    disabled={!props.currentRule.id}
                     className="flex-1"
                 >
-                    Create Tag Matcher
+                    Delete Rule
+                </Button>
+                <Button
+                    onClick={createRule}
+                    className={cn(
+                        "flex-2",
+                        hasNoIssues(props.currentRule, props.tagRules)
+                            ? ""
+                            : "opacity-50"
+                    )}
+                >
+                    Save Tag Rule
                 </Button>
             </div>
         </div>

@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/popover";
 import { Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { cloneElement, ReactElement } from "react";
+import { cloneElement, ReactElement, useState } from "react";
 import type { Notification } from "@/contexts/notification/types";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -18,20 +18,25 @@ export function NotificationButton(props: {
     activeColorClass: string;
     typeLabel: string;
     emptyMessage: string;
-    onMarkAsRead: () => void;
+    onMarkAsRead: (id?: number) => void;
     onClear: () => void;
     onAddTest: () => void;
 }) {
+    const [isOpen, setIsOpen] = useState(false);
     const hasUnseen = props.notifications.some((n) => !n.seen);
 
     return (
-        <Popover>
+        <Popover open={isOpen} onOpenChange={setIsOpen}>
             <PopoverTrigger asChild>
                 <Button
                     variant="ghost"
                     size="sm"
                     className="h-8 w-8 p-0"
-                    onClick={props.onMarkAsRead}
+                    onClick={() => {
+                        if (isOpen) {
+                            props.onMarkAsRead();
+                        }
+                    }}
                 >
                     {cloneElement(props.icon, {
                         className: cn(
@@ -84,12 +89,23 @@ export function NotificationButton(props: {
                                 .map((notification) => (
                                     <div
                                         key={notification.id}
+                                        onClick={() => {
+                                            props.onMarkAsRead(notification.id);
+                                        }}
                                         className="p-2 border-b last:border-b-0 text-sm"
                                     >
-                                        <p className="font-medium text-xs text-muted-foreground mb-1">
+                                        <p className="font-medium gap-1 flex items-center text-xs text-muted-foreground mb-1">
                                             {notification.origin}
+                                            {!notification.seen && (
+                                                <span className="w-1 h-1 bg-primary rounded-full  shadow-lg shadow-white/50"></span>
+                                            )}
                                         </p>
-                                        <p className={props.activeColorClass}>
+                                        <p
+                                            className={cn(
+                                                props.activeColorClass,
+                                                "whitespace-pre-wrap"
+                                            )}
+                                        >
                                             {notification.message}
                                         </p>
                                     </div>

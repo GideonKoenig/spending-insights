@@ -5,7 +5,8 @@ import { FileSelector } from "@/components/file-selector";
 import { TransactionList } from "@/components/transaction-list";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useRef } from "react";
-import { getActiveTransactions } from "@/lib/utils";
+import { getActiveTransactions, preprocessTransactions } from "@/lib/utils";
+import { useTagRules } from "@/app/tags/use-tag-rules";
 
 export default function HomePage() {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -16,15 +17,19 @@ export default function HomePage() {
         datasets,
         activeDataset,
     } = useData();
+    const { tagRules } = useTagRules();
 
     if (needsFileHandle || needsPermission || loading) {
         return <FileSelector />;
     }
 
-    const transactions = getActiveTransactions(datasets, activeDataset).sort(
-        (a, b) =>
-            new Date(b.bookingDate).getTime() -
-            new Date(a.bookingDate).getTime()
+    const transactions = preprocessTransactions(
+        getActiveTransactions(datasets, activeDataset).sort(
+            (a, b) =>
+                new Date(b.bookingDate).getTime() -
+                new Date(a.bookingDate).getTime()
+        ),
+        tagRules
     );
 
     return (

@@ -1,4 +1,5 @@
-import { type Transaction } from "@/lib/types";
+import { TransactionSchema, type Transaction } from "@/lib/types";
+import z from "zod";
 
 export type InputType = "text" | "currency" | "date" | "list";
 
@@ -14,14 +15,34 @@ export type TypedOperator =
     | FilterOperator<number>
     | FilterOperator<Date>;
 
-export type FilterRule = {
-    attribute: keyof Transaction;
-    operator: string;
-    value: string | number | Date;
-};
+export type FilterRule = z.infer<typeof FilterRuleSchema>;
+export const FilterRuleSchema = z.object({
+    attribute: z.enum([
+        "accountName",
+        "accountIban",
+        "accountBic",
+        "bankName",
+        "bookingDate",
+        "valueDate",
+        "paymentParticipant",
+        "paymentParticipantIban",
+        "paymentParticipantBic",
+        "transactionType",
+        "purpose",
+        "amount",
+        "currency",
+        "balanceAfterTransaction",
+        "note",
+        "markedTransaction",
+        "creditorId",
+        "mandateReference",
+    ]),
+    operator: z.string(),
+    value: z.union([z.string(), z.number(), z.date()]),
+});
 
 export type FilterOption = {
-    attribute: keyof Transaction;
+    attribute: keyof Omit<Transaction, "tag">;
     label: string;
     inputType: InputType;
 };

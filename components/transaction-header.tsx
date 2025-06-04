@@ -106,7 +106,7 @@ export function TransactionHeader(props: {
                 </div>
             )}
 
-            <div className="flex gap-1 items-center">
+            <div className="flex gap-1 items-center w-full">
                 <Select
                     value={option.attribute}
                     onValueChange={(newAttribute) => {
@@ -168,7 +168,7 @@ export function TransactionHeader(props: {
                     <TextInput
                         className={cn(
                             "bg-background",
-                            !props.sortSelector ? "flex-grow" : ""
+                            !props.sortSelector ? "flex-grow " : ""
                         )}
                         tabIndex={3}
                         value={value as string}

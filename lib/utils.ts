@@ -1,3 +1,5 @@
+import { tagTransactions } from "@/lib/transaction-tags/main";
+import { TagRule } from "@/lib/transaction-tags/types";
 import { Transaction } from "@/lib/types";
 import { Dataset } from "@/lib/types";
 import { clsx, type ClassValue } from "clsx";
@@ -76,4 +78,37 @@ export function getActiveDatasets(
     if (activeDataset === true) return datasets;
     if (activeDataset === null) return [];
     return datasets.filter((d) => d.name === activeDataset);
+}
+
+export function preprocessDatasets(datasets: Dataset[], tagRules: TagRule[]) {
+    return datasets.map((dataset) => ({
+        ...dataset,
+        transactions: preprocessTransactions(dataset.transactions, tagRules),
+    }));
+}
+
+export function preprocessTransactions(
+    transactions: Transaction[],
+    tagRules: TagRule[]
+) {
+    return tagTransactions(transactions, tagRules);
+}
+
+export function hashString(str: string): number {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = (hash << 5) - hash + char;
+        hash = hash & hash;
+    }
+    return Math.abs(hash);
+}
+
+export function generateCategoryColor(category: string): string {
+    const hash = hashString(category);
+    const hue = hash % 360;
+    const saturation = 50 + (hash % 30);
+    const lightness = 35;
+
+    return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 }
