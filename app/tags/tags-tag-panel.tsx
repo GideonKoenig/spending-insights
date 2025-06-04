@@ -125,7 +125,7 @@ export function TagPanel(props: {
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="none">None</SelectItem>
-                        {[2, 3, 4, 5, 6, 12, 24].map((months) => (
+                        {[-12, -6, -3, -2, 2, 3, 6, 12, 24].map((months) => (
                             <SelectItem key={months} value={months.toString()}>
                                 {months} month{months !== 1 ? "s" : ""}
                             </SelectItem>

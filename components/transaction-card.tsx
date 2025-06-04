@@ -1,6 +1,11 @@
 "use client";
 
 import { TagBadge } from "@/components/ui/tag-badge";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { type Transaction } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -8,7 +13,7 @@ export function TransactionCard(props: {
     transaction: Transaction;
     className?: string;
     style?: React.CSSProperties;
-    purposeLineClamp?: 2 | 3 | 4;
+    purposeLineClamp?: 2 | 3 | 4 | 5;
 }) {
     const amount = new Intl.NumberFormat("de-DE", {
         style: "currency",
@@ -72,19 +77,30 @@ export function TransactionCard(props: {
                 </p>
             </div>
 
-            <div className="col-span-4">
-                <p
-                    className={cn(
-                        "text-sm text-muted-foreground ",
-                        props.purposeLineClamp === undefined && "line-clamp-2",
-                        props.purposeLineClamp === 2 && "line-clamp-2",
-                        props.purposeLineClamp === 3 && "line-clamp-3",
-                        props.purposeLineClamp === 4 && "line-clamp-4"
-                    )}
-                >
-                    {props.transaction.purpose}
-                </p>
-            </div>
+            <Tooltip delayDuration={500}>
+                <TooltipTrigger asChild>
+                    <div className="col-span-4">
+                        <p
+                            className={cn(
+                                "text-sm text-muted-foreground ",
+                                props.purposeLineClamp === undefined &&
+                                    "line-clamp-2",
+                                props.purposeLineClamp === 2 && "line-clamp-2",
+                                props.purposeLineClamp === 3 && "line-clamp-3",
+                                props.purposeLineClamp === 4 && "line-clamp-4",
+                                props.purposeLineClamp === 5 && "line-clamp-5"
+                            )}
+                        >
+                            {props.transaction.purpose}
+                        </p>
+                    </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                    <p className="max-w-xs text-sm">
+                        {props.transaction.purpose}
+                    </p>
+                </TooltipContent>
+            </Tooltip>
 
             <div />
 

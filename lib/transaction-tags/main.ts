@@ -10,6 +10,8 @@ export function tagTransactions(
 ) {
     let taggedTransactions: Transaction[] = transactions;
     for (const tagRule of tagRules) {
+        console.dir(tagRule, { depth: null });
+
         const { matches, unmatches } = splitTransactions(
             taggedTransactions,
             tagRule.filters,
