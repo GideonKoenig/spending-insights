@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { useData } from "@/contexts/data-provider";
+import { useData } from "@/contexts/data/provider";
 import { FileSelector } from "@/components/file-selector";
 import { getActiveTransactions } from "@/lib/utils";
 import { filter } from "@/lib/transaction-filter/main";
@@ -19,20 +19,18 @@ import {
 } from "@/app/tags/utils";
 
 export default function TagsPage() {
-    const dataResult = useData();
+    const {
+        needsFileHandle,
+        needsPermission,
+        loading,
+        datasets,
+        activeDataset,
+    } = useData();
     const { matchers, addMatcher, isLoaded } = useTagMatchers();
     const [showOnlyTagged, setShowOnlyTagged] = useState(false);
     const [currentMatcher, setCurrentMatcher] =
         useState<PartialTagMatcher | null>(null);
 
-    if (!dataResult.success) {
-        return (
-            <p className="p-4 text-destructive">
-                Unexpected state: DataProvider not found
-            </p>
-        );
-    }
-    const { needsFileHandle, needsPermission, loading } = dataResult.value;
     if (needsFileHandle || needsPermission || loading) {
         return <FileSelector />;
     }
@@ -40,10 +38,7 @@ export default function TagsPage() {
         return <p className="p-4 text-muted-foreground">Loading...</p>;
     }
 
-    const transactions = getActiveTransactions(
-        dataResult.value.datasets,
-        dataResult.value.activeDataset
-    );
+    const transactions = getActiveTransactions(datasets, activeDataset);
     const filteredTransactions =
         currentMatcher && currentMatcher.filters && currentMatcher.filters
             ? filter(transactions, currentMatcher.filters, FILTER_OPTIONS)

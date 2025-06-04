@@ -47,8 +47,8 @@ export function TransactionCard(props: {
                     className={cn(
                         "font-medium",
                         props.transaction.amount >= 0
-                            ? "text-green-600"
-                            : "text-red-600"
+                            ? "text-positive"
+                            : "text-negative"
                     )}
                 >
                     {amount}

@@ -1,6 +1,7 @@
 "use client";
 
-import { useData } from "@/contexts/data-provider";
+import { useData } from "@/contexts/data/provider";
+import { useNotifications } from "@/contexts/notification/provider";
 import { Button } from "@/components/ui/button";
 import {
     Select,
@@ -9,25 +10,15 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { NotificationButton } from "@/components/notification-button";
+import { TriangleAlert, OctagonX, Bug } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn, getActiveTransactions } from "@/lib/utils";
 
 export function NavBar() {
-    const dataResult = useData();
-    const pathname = usePathname();
-
-    const links = [
-        { href: "/", label: "Transactions" },
-        { href: "/analytics", label: "Analytics" },
-        { href: "/tags", label: "Tags" },
-    ];
-
-    if (!dataResult.success) return null;
-
     const {
         loading,
-        error,
         needsFileHandle,
         needsPermission,
         datasets,
@@ -36,16 +27,28 @@ export function NavBar() {
         requestPermissions,
         selectFiles,
         clearFiles,
-    } = dataResult.value;
+    } = useData();
+    const {
+        warnings,
+        errors,
+        debugs,
+        markWarningsAsRead,
+        markErrorsAsRead,
+        markDebugsAsRead,
+        clearWarnings,
+        clearErrors,
+        clearDebugs,
+        addWarning,
+        addError,
+        addDebug,
+    } = useNotifications();
+    const pathname = usePathname();
 
-    const getErrorMessage = (error: string | null) => {
-        if (!error) return "";
-        if (error.length > 200) {
-            console.error("Bank History Error:\n", error);
-            return "Error - check console for more details";
-        }
-        return error;
-    };
+    const links = [
+        { href: "/", label: "Transactions" },
+        { href: "/analytics", label: "Analytics" },
+        { href: "/tags", label: "Tags" },
+    ];
 
     return (
         <nav className="border-b min-h-12 px-4 flex items-center justify-between bg-background">
@@ -68,10 +71,6 @@ export function NavBar() {
             <div className="flex items-center gap-2">
                 {loading ? (
                     <p className="text-muted-foreground text-sm">Loading...</p>
-                ) : error ? (
-                    <p className="text-destructive text-sm">
-                        {getErrorMessage(error)}
-                    </p>
                 ) : needsPermission ? (
                     <Button
                         size="sm"
@@ -139,6 +138,45 @@ export function NavBar() {
                         </Button>
                     </>
                 )}
+
+                <div className="flex items-center gap-1">
+                    <NotificationButton
+                        notifications={errors}
+                        icon={<OctagonX />}
+                        activeColorClass="text-destructive"
+                        typeLabel="error"
+                        emptyMessage="No errors"
+                        onMarkAsRead={markErrorsAsRead}
+                        onClear={clearErrors}
+                        onAddTest={() =>
+                            addError("Test", "This is a test error message")
+                        }
+                    />
+                    <NotificationButton
+                        notifications={warnings}
+                        icon={<TriangleAlert />}
+                        activeColorClass="text-warning"
+                        typeLabel="warning"
+                        emptyMessage="No warnings"
+                        onMarkAsRead={markWarningsAsRead}
+                        onClear={clearWarnings}
+                        onAddTest={() =>
+                            addWarning("Test", "This is a test warning message")
+                        }
+                    />
+                    <NotificationButton
+                        notifications={debugs}
+                        icon={<Bug />}
+                        activeColorClass="text-debug"
+                        typeLabel="debug message"
+                        emptyMessage="No debug messages"
+                        onMarkAsRead={markDebugsAsRead}
+                        onClear={clearDebugs}
+                        onAddTest={() =>
+                            addDebug("Test", "This is a test debug message")
+                        }
+                    />
+                </div>
             </div>
         </nav>
     );

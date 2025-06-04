@@ -8,13 +8,14 @@ import {
     type ReactNode,
 } from "react";
 import { fileHandleStore } from "@/lib/file-handle-store";
-import { type Result, tryCatchAsync, newError } from "@/lib/utils";
+import { tryCatchAsync } from "@/lib/utils";
 import { type Dataset } from "@/lib/types";
+import { useNotifications } from "@/contexts/notification/provider";
 import {
     createHandles,
     loadDatasetsFromHandles,
     type Handle,
-} from "@/contexts/data-provider-utils";
+} from "@/contexts/data/utils";
 
 const ALL_DATASET_NAMES_KEY = "bank-history_all_dataset_names";
 const ACTIVE_DATASET_KEY = "bank-history_active_dataset";
@@ -35,8 +36,6 @@ interface DataContextType {
     datasets: Dataset[];
     activeDataset: string | true;
     loading: boolean;
-    error: string | null;
-    setError: (error: string | null) => void;
     setActiveDataset: (dataset: string | true) => void;
     needsFileHandle: boolean;
     needsPermission: boolean;
@@ -47,20 +46,20 @@ interface DataContextType {
 
 const DataContext = createContext<DataContextType | null>(null);
 
-export function useData(): Result<DataContextType> {
+export function useData() {
     const context = useContext(DataContext);
     if (!context) {
-        return newError("useData must be used within a DataProvider");
+        throw new Error("useData must be used within a DataProvider");
     }
-    return { success: true, value: context };
+    return context;
 }
 
 export function DataProvider(props: { children: ReactNode }) {
     const [datasets, setDatasets] = useState<Dataset[]>([]);
     const [activeDataset, setActiveDataset] = useState<string | true>(true);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
     const [fileHandles, setFileHandles] = useState<Handle[]>([]);
+    const { addError } = useNotifications();
 
     const needsFileHandle = fileHandles.length === 0;
     const needsPermission = fileHandles.some((info) => !info.hasPermission);
@@ -69,7 +68,11 @@ export function DataProvider(props: { children: ReactNode }) {
         const { newHandles, errors: createErrors } = await createHandles(
             handles
         );
-        setError(createErrors.join("\n"));
+
+        createErrors.forEach((error) => {
+            addError("DataProvider - setNewFileHandles", error);
+        });
+
         setFileHandles(newHandles);
 
         if (!newHandles.every((handle) => handle.hasPermission)) return;
@@ -77,7 +80,11 @@ export function DataProvider(props: { children: ReactNode }) {
         const { datasets, errors: loadErrors } = await loadDatasetsFromHandles(
             newHandles
         );
-        setError((prev) => [prev, ...loadErrors].join("\n"));
+
+        loadErrors.forEach((error) => {
+            addError("DataProvider - setNewFileHandles", error);
+        });
+
         setDatasets(datasets);
     }
 
@@ -106,7 +113,10 @@ export function DataProvider(props: { children: ReactNode }) {
                 if (result.success) {
                     handles.push(result.value);
                 } else {
-                    setError(result.error);
+                    addError(
+                        "DataProvider - initializeDatasets",
+                        `Failed to load dataset ${name}: ${result.error}`
+                    );
                 }
             }
 
@@ -119,9 +129,7 @@ export function DataProvider(props: { children: ReactNode }) {
 
     async function requestPermissions() {
         if (fileHandles.length === 0) return;
-
         setLoading(true);
-        setError(null);
 
         const updatedHandles = [...fileHandles];
 
@@ -132,7 +140,10 @@ export function DataProvider(props: { children: ReactNode }) {
                     handle.handle
                 );
                 if (!result.success) {
-                    setError((prev) => [prev, result.error].join("\n"));
+                    addError(
+                        "DataProvider - requestPermissions",
+                        `Failed to request permission for ${handle.handle.name}: ${result.error}`
+                    );
                 } else {
                     updatedHandles[i] = {
                         ...handle,
@@ -151,7 +162,10 @@ export function DataProvider(props: { children: ReactNode }) {
         const { datasets, errors: loadErrors } = await loadDatasetsFromHandles(
             updatedHandles
         );
-        setError((prev) => [prev, ...loadErrors].join("\n"));
+
+        loadErrors.forEach((error) => {
+            addError("DataProvider - requestPermissions", error);
+        });
 
         setDatasets(datasets);
         setLoading(false);
@@ -159,7 +173,6 @@ export function DataProvider(props: { children: ReactNode }) {
 
     async function selectFiles() {
         setLoading(true);
-        setError(null);
 
         const pickerResult = await tryCatchAsync(async () => {
             return await window.showOpenFilePicker({
@@ -175,7 +188,10 @@ export function DataProvider(props: { children: ReactNode }) {
 
         if (!pickerResult.success) {
             if (!pickerResult.error.includes("The user aborted a request")) {
-                setError(pickerResult.error);
+                addError(
+                    "DataProvider - selectFiles",
+                    `File selection failed: ${pickerResult.error}`
+                );
             }
             setLoading(false);
             return;
@@ -191,7 +207,10 @@ export function DataProvider(props: { children: ReactNode }) {
                 handle
             );
             if (!result.success) {
-                setError((prev) => [prev, result.error].join("\n"));
+                addError(
+                    "DataProvider - selectFiles",
+                    `Failed to save ${handle.name}: ${result.error}`
+                );
                 allSaveSuccessful = false;
             }
         }
@@ -225,7 +244,6 @@ export function DataProvider(props: { children: ReactNode }) {
         localStorage.removeItem(ALL_DATASET_NAMES_KEY);
         setFileHandles([]);
         setDatasets([]);
-        setError(null);
     }
 
     function handleSetActiveDataset(dataset: string | true) {
@@ -237,8 +255,6 @@ export function DataProvider(props: { children: ReactNode }) {
         datasets,
         activeDataset,
         loading,
-        error,
-        setError,
         setActiveDataset: handleSetActiveDataset,
         needsFileHandle,
         needsPermission,

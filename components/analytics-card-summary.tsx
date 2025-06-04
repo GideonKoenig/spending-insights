@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { cloneElement, ReactElement } from "react";
 import { formatEuro } from "@/lib/utils";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import React from "react";
@@ -12,7 +12,7 @@ export type Summary = {
 
 export function AnalyticsCardSummary(props: {
     summary: Summary;
-    icon: ReactNode;
+    icon: ReactElement;
 }) {
     const trendUp = <TrendingUp className="h-3 w-3 text-positive" />;
     const trendDown = <TrendingDown className="h-3 w-3 text-negative" />;
@@ -28,12 +28,9 @@ export function AnalyticsCardSummary(props: {
             </div>
 
             <div className="flex items-center justify-end">
-                {React.cloneElement(
-                    props.icon as React.ReactElement,
-                    {
-                        className: "h-4 w-4 text-muted-foreground",
-                    } as any
-                )}
+                {cloneElement(props.icon, {
+                    className: "h-4 w-4 text-muted-foreground",
+                } as any)}
             </div>
 
             <div>
