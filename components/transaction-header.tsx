@@ -79,7 +79,7 @@ export function TransactionHeader(props: {
     return (
         <div className={cn("flex flex-col gap-2", props.className)}>
             {props.filters.length > 0 && (
-                <div className="grid grid-cols-2">
+                <div className="flex gap-2">
                     <div className="flex flex-col flex-grow gap-2">
                         {props.filters.map((filter, index) => (
                             <TransactionFilterBadge

@@ -27,8 +27,9 @@ export default function TagsPage() {
         datasets,
         activeDataset,
     } = useData();
-    const { tagRules, isLoaded, addTagRule, removeTagRule } = useTagRules();
-    const [showOnlyTagged, setShowOnlyTagged] = useState(true);
+    const { tagRules, isLoaded, addTagRule, removeTagRule, updateTagRule } =
+        useTagRules();
+    const [showOnlyTagged, setShowOnlyTagged] = useState(false);
     const [currentRule, setCurrentRule] = useState<PartialTagRule>({
         filters: [],
     });
@@ -58,11 +59,9 @@ export default function TagsPage() {
             {currentRule.filters.length > 0 ? (
                 <TagsHeadlessList
                     className="flex-grow"
-                    transactions={
-                        showOnlyTagged
-                            ? taggedTransactions
-                            : filteredTransactions
-                    }
+                    transactions={filteredTransactions}
+                    taggedTransactions={taggedTransactions}
+                    showTagged={showOnlyTagged}
                 />
             ) : (
                 <TagStatistics
@@ -80,6 +79,7 @@ export default function TagsPage() {
                     tagRules={tagRules}
                     addTagRule={addTagRule}
                     removeTagRule={removeTagRule}
+                    updateTagRule={updateTagRule}
                 />
 
                 <div className="bg-card flex items-end flex-grow rounded-md p-2 border border-border shadow-sm">

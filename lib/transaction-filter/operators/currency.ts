@@ -12,14 +12,12 @@ export const currencyGreaterThan: FilterOperator<number> = {
     name: "currency-greater-than",
     label: ">",
     type: "currency",
-    compare: (userValue, valueToCompare) =>
-        Math.abs(valueToCompare) > Math.abs(userValue),
+    compare: (userValue, valueToCompare) => valueToCompare > userValue,
 };
 
 export const currencyLessThan: FilterOperator<number> = {
     name: "currency-less-than",
     label: "<",
     type: "currency",
-    compare: (userValue, valueToCompare) =>
-        Math.abs(valueToCompare) < Math.abs(userValue),
+    compare: (userValue, valueToCompare) => valueToCompare < userValue,
 };
