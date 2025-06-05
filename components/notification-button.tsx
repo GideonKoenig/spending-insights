@@ -59,7 +59,10 @@ export function NotificationButton(props: {
                             variant="ghost"
                             disabled={props.notifications.length === 0}
                             size="sm"
-                            onClick={props.onClear}
+                            onClick={() => {
+                                props.onClear();
+                                setIsOpen(false);
+                            }}
                             className="h-6 text-xs"
                         >
                             Clear All
@@ -78,7 +81,7 @@ export function NotificationButton(props: {
                 </div>
                 <ScrollArea className="w-3xl max-h-[48rem]">
                     {props.notifications.length === 0 ? (
-                        <div className="p-4 text-center text-muted-foreground text-sm">
+                        <div className="p-4 h-40 text-center flex items-center justify-center text-muted-foreground text-sm">
                             {props.emptyMessage}
                         </div>
                     ) : (

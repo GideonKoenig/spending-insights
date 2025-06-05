@@ -26,8 +26,13 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function BalanceChart(props: { datasets: Dataset[] }) {
-    const { addWarning, addError } = useNotifications();
-    const chartData = transformDatapoints(props.datasets, addWarning, addError);
+    const { addWarning, addError, addDebug } = useNotifications();
+    const chartData = transformDatapoints(
+        props.datasets,
+        addWarning,
+        addError,
+        addDebug
+    );
     const transactions = props.datasets.flatMap(
         (dataset) => dataset.transactions
     );

@@ -80,18 +80,27 @@ export function getActiveDatasets(
     return datasets.filter((d) => d.name === activeDataset);
 }
 
-export function preprocessDatasets(datasets: Dataset[], tagRules: TagRule[]) {
+export function preprocessDatasets(
+    datasets: Dataset[],
+    tagRules: TagRule[],
+    addDebug?: (origin: string, message: string) => void
+) {
     return datasets.map((dataset) => ({
         ...dataset,
-        transactions: preprocessTransactions(dataset.transactions, tagRules),
+        transactions: preprocessTransactions(
+            dataset.transactions,
+            tagRules,
+            addDebug
+        ),
     }));
 }
 
 export function preprocessTransactions(
     transactions: Transaction[],
-    tagRules: TagRule[]
+    tagRules: TagRule[],
+    addDebug?: (origin: string, message: string) => void
 ) {
-    return tagTransactions(transactions, tagRules);
+    return tagTransactions(transactions, tagRules, addDebug);
 }
 
 export function hashString(str: string): number {

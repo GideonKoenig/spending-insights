@@ -16,41 +16,30 @@ export type TypedOperator =
     | FilterOperator<Date>;
 
 export type FilterRule = z.infer<typeof FilterRuleSchema>;
-export const FilterRuleSchema = z
-    .object({
-        attribute: z.enum([
-            "accountName",
-            "accountIban",
-            "accountBic",
-            "bankName",
-            "bookingDate",
-            "valueDate",
-            "paymentParticipant",
-            "paymentParticipantIban",
-            "paymentParticipantBic",
-            "transactionType",
-            "purpose",
-            "amount",
-            "currency",
-            "balanceAfterTransaction",
-            "note",
-            "markedTransaction",
-            "creditorId",
-            "mandateReference",
-        ]),
-        operator: z.string(),
-        value: z.union([z.string(), z.number(), z.date()]),
-    })
-    .transform((data) => {
-        if (data.operator.includes("date")) {
-            const date = new Date(data.value);
-            return {
-                ...data,
-                value: date,
-            };
-        }
-        return data;
-    });
+export const FilterRuleSchema = z.object({
+    attribute: z.enum([
+        "accountName",
+        "accountIban",
+        "accountBic",
+        "bankName",
+        "bookingDate",
+        "valueDate",
+        "paymentParticipant",
+        "paymentParticipantIban",
+        "paymentParticipantBic",
+        "transactionType",
+        "purpose",
+        "amount",
+        "currency",
+        "balanceAfterTransaction",
+        "note",
+        "markedTransaction",
+        "creditorId",
+        "mandateReference",
+    ]),
+    operator: z.string(),
+    value: z.union([z.string(), z.number(), z.date()]),
+});
 
 export type FilterOption = {
     attribute: keyof Omit<Transaction, "tag">;

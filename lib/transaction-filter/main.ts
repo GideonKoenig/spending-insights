@@ -67,9 +67,11 @@ export function splitTransactions(
 ) {
     if (rules.length === 0) return { matches: transactions, unmatches: [] };
 
-    const matches = filter(transactions, rules, options);
-    const unmatches = transactions.filter((transaction) => {
-        return rules.some((rule) => {
+    const matches: Transaction[] = [];
+    const unmatches: Transaction[] = [];
+
+    for (const transaction of transactions) {
+        const isMatch = rules.every((rule) => {
             const value = transaction[rule.attribute];
             const operators = getOperatorsForFilterOption(
                 rule.attribute,
@@ -78,12 +80,14 @@ export function splitTransactions(
             );
 
             const operator = operators.find((op) => op.name === rule.operator);
-            if (!operator) return true;
+            if (!operator) return false;
 
-            // Type assertion is safe here because we've checked the types match
-            return !(operator as any).compare(rule.value, value);
+            return (operator as any).compare(rule.value, value);
         });
-    });
+
+        if (isMatch) matches.push(transaction);
+        else unmatches.push(transaction);
+    }
 
     return { matches, unmatches };
 }

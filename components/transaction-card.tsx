@@ -1,6 +1,6 @@
 "use client";
 
-import { TagBadge } from "@/components/ui/tag-badge";
+import { TagBadge } from "@/components/tag-badge";
 import {
     Tooltip,
     TooltipContent,

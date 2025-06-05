@@ -7,46 +7,63 @@ export type Datapoint = {
     fullDate: Date;
 };
 
+const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+];
+
 export function summarize(
     transactions: Transaction[],
     mode: "monthly" | "yearly"
 ) {
-    const summaries = transactions
-        .map((t) => ({ amount: t.amount, bookingDate: t.bookingDate }))
-        .reduce((acc, curr) => {
-            const month = curr.bookingDate.toLocaleDateString("en-US", {
-                month: "long",
-            });
-            const year = curr.bookingDate.toLocaleDateString("en-US", {
-                year: "numeric",
-            });
-            const title = mode === "monthly" ? `${month} ${year}` : year;
-            const isPositive = curr.amount > 0;
-            const amount = Math.abs(curr.amount);
+    const summaryMap = new Map<string, { income: number; expense: number }>();
+    let totalSum = 0;
 
-            const existing = acc.find((item) => item.title === title);
-            if (existing) {
-                existing.income += isPositive ? amount : 0;
-                existing.expense += !isPositive ? amount : 0;
+    for (const transaction of transactions) {
+        const date = transaction.bookingDate;
+        const title =
+            mode === "monthly"
+                ? `${monthNames[date.getMonth()]} ${date.getFullYear()}`
+                : String(date.getFullYear());
+
+        const amount = Math.abs(transaction.amount);
+        const isIncome = transaction.amount > 0;
+
+        const existing = summaryMap.get(title);
+        if (existing) {
+            if (isIncome) {
+                existing.income += amount;
             } else {
-                acc.push({
-                    title,
-                    income: isPositive ? amount : 0,
-                    expense: !isPositive ? amount : 0,
-                    average: 0,
-                });
+                existing.expense += amount;
             }
+        } else {
+            summaryMap.set(title, {
+                income: isIncome ? amount : 0,
+                expense: isIncome ? 0 : amount,
+            });
+        }
 
-            return acc;
-        }, [] as Summary[]);
+        totalSum += transaction.amount;
+    }
 
-    const sum = summaries.reduce(
-        (acc, curr) => acc + curr.income - curr.expense,
-        0
-    );
-    const average = sum / summaries.length;
+    const summaries = Array.from(summaryMap.entries()).map(([title, data]) => ({
+        title,
+        income: data.income,
+        expense: data.expense,
+        average: totalSum / summaryMap.size,
+    }));
 
-    return summaries.map((summary) => ({ ...summary, average }));
+    return summaries;
 }
 
 function orderTransactionsByDomino(
@@ -134,66 +151,74 @@ function orderTransactionsByDomino(
 }
 
 function getDateKey(date: Date) {
-    return date.toDateString();
+    return date.getTime();
 }
 
 function getDayClosingBalances(
     transactions: Transaction[],
     addWarning?: (origin: string, message: string) => void,
-    addError?: (origin: string, message: string) => void
+    addError?: (origin: string, message: string) => void,
+    addDebug?: (origin: string, message: string) => void
 ) {
     const orderedTransactions = orderTransactionsByDomino(
         transactions,
         addWarning,
         addError
     );
-    const dayBalances = new Map<string, number>();
+    const dayBalances = new Map<number, number>();
+    const dayToDate = new Map<number, Date>();
 
     for (const transaction of orderedTransactions) {
         const dateKey = getDateKey(transaction.bookingDate);
         dayBalances.set(dateKey, transaction.balanceAfterTransaction);
+        if (!dayToDate.has(dateKey)) {
+            dayToDate.set(dateKey, transaction.bookingDate);
+        }
     }
 
-    return dayBalances;
+    return { dayBalances, dayToDate };
 }
 
 export function transformDatapoints(
     datasets: Dataset[],
     addWarning?: (origin: string, message: string) => void,
-    addError?: (origin: string, message: string) => void
+    addError?: (origin: string, message: string) => void,
+    addDebug?: (origin: string, message: string) => void
 ) {
-    const allDates = new Set<string>();
-    const datasetDayBalances = new Map<string, Map<string, number>>();
+    const allDateKeys = new Set<number>();
+    const datasetDayBalances = new Map<string, Map<number, number>>();
+    const dayToDate = new Map<number, Date>();
 
     for (const dataset of datasets) {
-        const dayBalances = getDayClosingBalances(
+        const result = getDayClosingBalances(
             dataset.transactions,
             addWarning,
-            addError
+            addError,
+            addDebug
         );
-        datasetDayBalances.set(dataset.name, dayBalances);
+        datasetDayBalances.set(dataset.name, result.dayBalances);
 
-        for (const date of dayBalances.keys()) {
-            allDates.add(date);
+        for (const [dateKey, date] of result.dayToDate) {
+            allDateKeys.add(dateKey);
+            dayToDate.set(dateKey, date);
         }
     }
 
-    const sortedDates = Array.from(allDates).sort(
-        (a, b) => new Date(a).getTime() - new Date(b).getTime()
-    );
+    const sortedDateKeys = Array.from(allDateKeys).sort((a, b) => a - b);
 
     const datapoints: Datapoint[] = [];
     const lastKnownBalance = new Map<string, number>();
 
     for (const dataset of datasets) {
         const dayBalances = datasetDayBalances.get(dataset.name)!;
-        const firstDate = Array.from(dayBalances.keys()).sort(
-            (a, b) => new Date(a).getTime() - new Date(b).getTime()
-        )[0];
+        if (dayBalances.size === 0) continue;
 
-        if (firstDate) {
+        const firstDateKey = sortedDateKeys.find((dateKey) =>
+            dayBalances.has(dateKey)
+        );
+        if (firstDateKey) {
             const firstTransaction = dataset.transactions.find(
-                (t) => getDateKey(t.bookingDate) === firstDate
+                (t) => getDateKey(t.bookingDate) === firstDateKey
             );
             if (firstTransaction) {
                 lastKnownBalance.set(
@@ -205,15 +230,15 @@ export function transformDatapoints(
         }
     }
 
-    for (const dateStr of sortedDates) {
-        const date = new Date(dateStr);
+    for (const dateKey of sortedDateKeys) {
+        const dateObj = dayToDate.get(dateKey)!;
         let totalBalance = 0;
 
         for (const dataset of datasets) {
             const dayBalances = datasetDayBalances.get(dataset.name)!;
 
-            if (dayBalances.has(dateStr)) {
-                const balance = dayBalances.get(dateStr)!;
+            if (dayBalances.has(dateKey)) {
+                const balance = dayBalances.get(dateKey)!;
                 lastKnownBalance.set(dataset.name, balance);
                 totalBalance += balance;
             } else {
@@ -222,20 +247,33 @@ export function transformDatapoints(
         }
 
         datapoints.push({
-            date: formatDate(date),
+            date: formatDate(dateObj),
             balance: totalBalance,
-            fullDate: date,
+            fullDate: dateObj,
         });
     }
 
     return datapoints;
 }
 
+const monthAbbrs = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+];
+
 export function formatDate(date: Date) {
     return (
-        date.toLocaleDateString("en-US", {
-            month: "short",
-        }) +
+        monthAbbrs[date.getMonth()] +
         " " +
         date.getFullYear().toString().slice(-2)
     );

@@ -12,9 +12,9 @@ import {
     getActiveDatasets,
     getActiveTransactions,
     preprocessDatasets,
-    preprocessTransactions,
 } from "@/lib/utils";
-import { useTagRules } from "@/app/tags/use-tag-rules";
+import { useTagRules } from "@/contexts/tag-rules/provider";
+import { useNotifications } from "@/contexts/notification/provider";
 
 export default function AnalyticsPage() {
     const {
@@ -25,6 +25,7 @@ export default function AnalyticsPage() {
         activeDataset,
     } = useData();
     const { tagRules } = useTagRules();
+    const { addDebug } = useNotifications();
 
     if (needsFileHandle || needsPermission || loading) {
         return <FileSelector />;
@@ -32,7 +33,8 @@ export default function AnalyticsPage() {
 
     const activeDatasets = preprocessDatasets(
         getActiveDatasets(datasets, activeDataset),
-        tagRules
+        tagRules,
+        addDebug
     );
     const transactions = getActiveTransactions(datasets, activeDataset).sort(
         (a, b) =>

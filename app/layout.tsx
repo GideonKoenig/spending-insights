@@ -3,7 +3,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { DataProvider } from "@/contexts/data/provider";
 import { NotificationProvider } from "@/contexts/notification/provider";
-import { NavBar } from "@/components/nav-bar";
+import { TagRulesProvider } from "@/contexts/tag-rules/provider";
+import { NavBar } from "@/components/nav-bar/nav-bar";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -21,14 +22,16 @@ export default function RootLayout({
     return (
         <html lang="en" className={inter.className} suppressHydrationWarning>
             <NotificationProvider>
-                <DataProvider>
-                    <body className="h-dvh w-dvw bg-background text-foreground flex flex-col">
-                        <NavBar />
-                        <div className="flex-grow overflow-hidden">
-                            {children}
-                        </div>
-                    </body>
-                </DataProvider>
+                <TagRulesProvider>
+                    <DataProvider>
+                        <body className="h-dvh w-dvw bg-background text-foreground flex flex-col">
+                            <NavBar />
+                            <div className="flex-grow overflow-hidden">
+                                {children}
+                            </div>
+                        </body>
+                    </DataProvider>
+                </TagRulesProvider>
             </NotificationProvider>
         </html>
     );
