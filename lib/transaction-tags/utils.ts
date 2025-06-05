@@ -1,4 +1,8 @@
-import { PartialTagRule, TagRule } from "@/lib/transaction-tags/types";
+import {
+    MAIN_CATEGORIES,
+    PartialTagRule,
+    TagRule,
+} from "@/lib/transaction-tags/types";
 import { Transaction } from "@/lib/types";
 
 export function getTaggedTransactions(transactions: Transaction[]) {
@@ -61,4 +65,21 @@ export function getIssues(tagRule: PartialTagRule, other: TagRule[]) {
     }
 
     return issues;
+}
+
+export function generateCategoryColor(category: string) {
+    const isCategory = (
+        category: string
+    ): category is (typeof MAIN_CATEGORIES)[number] => {
+        return MAIN_CATEGORIES.includes(category as any);
+    };
+
+    if (!isCategory(category)) return "hsl(0, 0%, 50%)";
+    const index = MAIN_CATEGORIES.indexOf(category);
+
+    const hue = (360 / MAIN_CATEGORIES.length) * index;
+    const saturation = 50;
+    const lightness = 40;
+
+    return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 }

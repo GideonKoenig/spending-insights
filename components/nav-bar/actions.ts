@@ -34,6 +34,11 @@ export function createExportTagRules(dependencies: ActionDependencies) {
         linkElement.setAttribute("download", exportFileDefaultName);
         linkElement.click();
 
+        dependencies.notifications.addDebug(
+            "Export Tag Rules",
+            `Successfully exported ${dependencies.tagRules.tagRules.length} tag rules`
+        );
+
         dependencies.closePopover?.();
     };
 }

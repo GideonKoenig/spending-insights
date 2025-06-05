@@ -102,22 +102,3 @@ export function preprocessTransactions(
 ) {
     return tagTransactions(transactions, tagRules, addDebug);
 }
-
-export function hashString(str: string): number {
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-        const char = str.charCodeAt(i);
-        hash = (hash << 5) - hash + char;
-        hash = hash & hash;
-    }
-    return Math.abs(hash);
-}
-
-export function generateCategoryColor(category: string): string {
-    const hash = hashString(category);
-    const hue = hash % 360;
-    const saturation = 50 + (hash % 30);
-    const lightness = 35;
-
-    return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-}
