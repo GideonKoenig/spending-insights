@@ -85,6 +85,20 @@ export function TagsHeader(props: {
         props.updateTagRule(updatedRules.id, updatedRules);
     };
 
+    const exportTagRules = () => {
+        const dataStr = JSON.stringify(props.tagRules, null, 4);
+        const dataUri =
+            "data:application/json;charset=utf-8," +
+            encodeURIComponent(dataStr);
+
+        const exportFileDefaultName = "tag-rules.json";
+
+        const linkElement = document.createElement("a");
+        linkElement.setAttribute("href", dataUri);
+        linkElement.setAttribute("download", exportFileDefaultName);
+        linkElement.click();
+    };
+
     return (
         <div className="p-2 bg-card flex flex-col gap-4 rounded-md border border-border shadow-sm">
             <Select
@@ -142,6 +156,14 @@ export function TagsHeader(props: {
                     className="flex-1"
                 >
                     Update All Categories
+                </Button>
+                <Button
+                    variant="outline"
+                    onClick={exportTagRules}
+                    disabled={props.tagRules.length === 0}
+                    className="flex-1"
+                >
+                    Export Tag Rules
                 </Button>
                 <Button
                     variant="destructive"
