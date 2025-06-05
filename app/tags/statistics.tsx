@@ -1,7 +1,10 @@
 import { Badge } from "@/components/ui/badge";
-import { cn, generateCategoryColor } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { Transaction } from "@/lib/types";
-import { getTaggedTransactions } from "@/lib/transaction-tags/utils";
+import {
+    getTaggedTransactions,
+    generateCategoryColor,
+} from "@/lib/transaction-tags/utils";
 import { MAIN_CATEGORIES } from "@/lib/transaction-tags/types";
 import { Fragment } from "react";
 
@@ -17,7 +20,6 @@ export function TagStatistics(props: {
         ).length;
         return { category, count };
     });
-    const sortedCategories = categoryCounts.sort((a, b) => b.count - a.count);
 
     return (
         <div
@@ -42,7 +44,7 @@ export function TagStatistics(props: {
 
                 <div className="col-span-2 border-t border-border mt-2" />
 
-                {sortedCategories.map(({ category, count }) => (
+                {categoryCounts.map(({ category, count }) => (
                     <Fragment key={category}>
                         <div className="flex items-center gap-2">
                             <Badge

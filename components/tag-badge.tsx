@@ -6,7 +6,7 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Tag } from "@/lib/transaction-tags/types";
-import { generateCategoryColor } from "@/lib/utils";
+import { generateCategoryColor } from "@/lib/transaction-tags/utils";
 
 export function TagBadge({ tag }: { tag: Tag }) {
     const backgroundColor = generateCategoryColor(tag.category);
