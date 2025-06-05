@@ -7,13 +7,13 @@ import { getActiveTransactions, preprocessTransactions } from "@/lib/utils";
 import { filter } from "@/lib/transaction-filter/main";
 import { FILTER_OPTIONS } from "@/lib/transaction-filter/transaction-filter-options";
 import { PartialTagRule } from "@/lib/transaction-tags/types";
-import { useTagRules } from "@/app/tags/use-tag-rules";
-import { TagPanel } from "@/app/tags/tags-tag-panel";
-import { TagsHeadlessList } from "@/app/tags/tags-headless-list";
+import { useTagRules } from "@/contexts/tag-rules/provider";
+import { TagPanel } from "@/app/tags/tag-panel";
+import { TagsHeadlessList } from "@/app/tags/headless-list";
 import { TransactionHeader } from "@/components/transaction-header";
-import { TagsHeader } from "@/app/tags/tags-header";
+import { TagsHeader } from "@/app/tags/header";
 import { TransactionCard } from "@/components/transaction-card";
-import { TagStatistics } from "@/app/tags/tags-statistics";
+import { TagStatistics } from "@/app/tags/statistics";
 import {
     getTaggedTransactions,
     getUntaggedTransactions,
@@ -70,7 +70,7 @@ export default function TagsPage() {
                 />
             )}
 
-            <div className="flex w-xl h-full flex-col gap-4">
+            <div className="flex w-xl h-full flex-col gap-2">
                 <TagsHeader
                     currentRule={currentRule}
                     setCurrentRule={setCurrentRule}

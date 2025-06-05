@@ -6,7 +6,7 @@ import { TransactionList } from "@/components/transaction-list";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useRef } from "react";
 import { getActiveTransactions, preprocessTransactions } from "@/lib/utils";
-import { useTagRules } from "@/app/tags/use-tag-rules";
+import { useTagRules } from "@/contexts/tag-rules/provider";
 
 export default function HomePage() {
     const containerRef = useRef<HTMLDivElement>(null);

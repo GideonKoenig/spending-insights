@@ -11,6 +11,7 @@ import { fileHandleStore } from "@/lib/file-handle-store";
 import { tryCatchAsync } from "@/lib/utils";
 import { type Dataset } from "@/lib/types";
 import { useNotifications } from "@/contexts/notification/provider";
+import superjson from "superjson";
 import {
     createHandles,
     loadDatasetsFromHandles,
@@ -94,7 +95,7 @@ export function DataProvider(props: { children: ReactNode }) {
 
             const activeDataset = localStorage.getItem(ACTIVE_DATASET_KEY);
             if (activeDataset) {
-                setActiveDataset(JSON.parse(activeDataset));
+                setActiveDataset(superjson.parse<string | true>(activeDataset));
             }
 
             const datasetNamesJson = localStorage.getItem(
@@ -105,7 +106,7 @@ export function DataProvider(props: { children: ReactNode }) {
                 return;
             }
 
-            const datasetNames: string[] = JSON.parse(datasetNamesJson);
+            const datasetNames = superjson.parse<string[]>(datasetNamesJson);
             const handles: FileSystemFileHandle[] = [];
 
             for (const name of datasetNames) {
@@ -225,7 +226,7 @@ export function DataProvider(props: { children: ReactNode }) {
         );
         localStorage.setItem(
             ALL_DATASET_NAMES_KEY,
-            JSON.stringify(datasetNames)
+            superjson.stringify(datasetNames)
         );
 
         await setNewFileHandles(handles);
@@ -236,7 +237,7 @@ export function DataProvider(props: { children: ReactNode }) {
         const datasetNamesJson = localStorage.getItem(ALL_DATASET_NAMES_KEY);
         if (!datasetNamesJson) return;
 
-        const datasetNames: string[] = JSON.parse(datasetNamesJson);
+        const datasetNames = superjson.parse<string[]>(datasetNamesJson);
         for (const name of datasetNames) {
             await fileHandleStore.remove(`dataset_${name}`);
         }
@@ -248,7 +249,7 @@ export function DataProvider(props: { children: ReactNode }) {
 
     function handleSetActiveDataset(dataset: string | true) {
         setActiveDataset(dataset);
-        localStorage.setItem(ACTIVE_DATASET_KEY, JSON.stringify(dataset));
+        localStorage.setItem(ACTIVE_DATASET_KEY, superjson.stringify(dataset));
     }
 
     const value: DataContextType = {
