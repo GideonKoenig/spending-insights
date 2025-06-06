@@ -47,7 +47,7 @@ export function TransactionHeader(props: {
         const newFilter: FilterRule = {
             attribute: option.attribute,
             operator: operator.name,
-            value,
+            value: typeof value === "string" ? value.trim() : value,
         };
 
         props.onFiltersChange([...props.filters, newFilter]);

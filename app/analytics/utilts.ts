@@ -1,5 +1,5 @@
 import { Summary } from "@/components/analytics-card-summary";
-import { type Dataset, type Transaction } from "@/lib/types";
+import { type Account, type Transaction } from "@/lib/types";
 
 export type Datapoint = {
     date: string;
@@ -180,23 +180,23 @@ function getDayClosingBalances(
 }
 
 export function transformDatapoints(
-    datasets: Dataset[],
+    accounts: Account[],
     addWarning?: (origin: string, message: string) => void,
     addError?: (origin: string, message: string) => void,
     addDebug?: (origin: string, message: string) => void
 ) {
     const allDateKeys = new Set<number>();
-    const datasetDayBalances = new Map<string, Map<number, number>>();
+    const accountDayBalances = new Map<string, Map<number, number>>();
     const dayToDate = new Map<number, Date>();
 
-    for (const dataset of datasets) {
+    for (const account of accounts) {
         const result = getDayClosingBalances(
-            dataset.transactions,
+            account.transactions,
             addWarning,
             addError,
             addDebug
         );
-        datasetDayBalances.set(dataset.name, result.dayBalances);
+        accountDayBalances.set(account.name, result.dayBalances);
 
         for (const [dateKey, date] of result.dayToDate) {
             allDateKeys.add(dateKey);
@@ -209,20 +209,20 @@ export function transformDatapoints(
     const datapoints: Datapoint[] = [];
     const lastKnownBalance = new Map<string, number>();
 
-    for (const dataset of datasets) {
-        const dayBalances = datasetDayBalances.get(dataset.name)!;
+    for (const account of accounts) {
+        const dayBalances = accountDayBalances.get(account.name)!;
         if (dayBalances.size === 0) continue;
 
         const firstDateKey = sortedDateKeys.find((dateKey) =>
             dayBalances.has(dateKey)
         );
         if (firstDateKey) {
-            const firstTransaction = dataset.transactions.find(
+            const firstTransaction = account.transactions.find(
                 (t) => getDateKey(t.bookingDate) === firstDateKey
             );
             if (firstTransaction) {
                 lastKnownBalance.set(
-                    dataset.name,
+                    account.name,
                     firstTransaction.balanceAfterTransaction -
                         firstTransaction.amount
                 );
@@ -234,15 +234,15 @@ export function transformDatapoints(
         const dateObj = dayToDate.get(dateKey)!;
         let totalBalance = 0;
 
-        for (const dataset of datasets) {
-            const dayBalances = datasetDayBalances.get(dataset.name)!;
+        for (const account of accounts) {
+            const dayBalances = accountDayBalances.get(account.name)!;
 
             if (dayBalances.has(dateKey)) {
                 const balance = dayBalances.get(dateKey)!;
-                lastKnownBalance.set(dataset.name, balance);
+                lastKnownBalance.set(account.name, balance);
                 totalBalance += balance;
             } else {
-                totalBalance += lastKnownBalance.get(dataset.name) || 0;
+                totalBalance += lastKnownBalance.get(account.name) || 0;
             }
         }
 

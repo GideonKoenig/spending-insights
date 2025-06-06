@@ -1,6 +1,6 @@
 "use client";
 
-import { useData } from "@/contexts/data/provider";
+import { useAccounts } from "@/contexts/accounts/provider";
 import { useNotifications } from "@/contexts/notification/provider";
 import { useTagRules } from "@/contexts/tag-rules/provider";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,7 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover";
 import { NotificationButton } from "@/components/notification-button";
+import { LoadDataModal } from "@/components/load-data-modal";
 import {
     TriangleAlert,
     OctagonX,
@@ -24,24 +25,30 @@ import {
     Download,
     Upload,
     RefreshCcw,
+    FileText,
+    FolderOpen,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import {
+    type ActionDependencies,
     createExportTagRules,
     createImportTagRules,
     createUpdateAllCategories,
-    type ActionDependencies,
+    createLoadData,
+    createExportAccounts,
+    createImportAccounts,
 } from "./actions";
 
 export function NavBar() {
-    const data = useData();
+    const accounts = useAccounts();
     const notifications = useNotifications();
     const tagRules = useTagRules();
     const pathname = usePathname();
     const [isActionsOpen, setIsActionsOpen] = useState(false);
+    const [isLoadDataOpen, setIsLoadDataOpen] = useState(false);
 
     const links = [
         { href: "/", label: "Transactions" },
@@ -51,13 +58,17 @@ export function NavBar() {
 
     const actionDependencies: ActionDependencies = {
         tagRules,
+        accounts,
         notifications,
         closePopover: () => setIsActionsOpen(false),
+        openLoadDataModal: () => setIsLoadDataOpen(true),
     };
-
     const exportTagRules = createExportTagRules(actionDependencies);
     const importTagRules = createImportTagRules(actionDependencies);
+    const exportAccounts = createExportAccounts(actionDependencies);
+    const importAccounts = createImportAccounts(actionDependencies);
     const updateAllCategories = createUpdateAllCategories(actionDependencies);
+    const loadData = createLoadData(actionDependencies);
 
     return (
         <nav className="border-b min-h-12 px-4 flex items-center justify-between bg-background">
@@ -78,39 +89,21 @@ export function NavBar() {
                 ))}
             </div>
             <div className="flex items-center gap-2">
-                {data.loading ? (
+                {accounts.loading ? (
                     <p className="text-muted-foreground text-sm">Loading...</p>
-                ) : data.needsPermission ? (
-                    <Button
-                        size="sm"
-                        variant="outline"
-                        className="rounded-sm"
-                        onClick={data.requestPermissions}
-                    >
-                        Grant Permission
-                    </Button>
-                ) : data.needsFileHandle ? (
-                    <Button
-                        size="sm"
-                        variant="outline"
-                        className="rounded-sm"
-                        onClick={data.selectFiles}
-                    >
-                        Select Files
-                    </Button>
                 ) : (
                     <>
                         <Select
                             value={
-                                data.activeDataset === true
+                                accounts.activeAccount === true
                                     ? "all"
-                                    : data.activeDataset ?? ""
+                                    : accounts.activeAccount ?? ""
                             }
                             onValueChange={(value) => {
                                 if (value === "all") {
-                                    data.setActiveDataset(true);
+                                    accounts.setActiveAccount(true);
                                 } else {
-                                    data.setActiveDataset(value);
+                                    accounts.setActiveAccount(value);
                                 }
                             }}
                         >
@@ -122,36 +115,28 @@ export function NavBar() {
                                     {"All Accounts "}
                                     <span className="text-xs text-muted-foreground">
                                         (
-                                        {data.datasets.reduce(
-                                            (total, dataset) =>
+                                        {accounts.accounts.reduce(
+                                            (total, account) =>
                                                 total +
-                                                dataset.transactions.length,
+                                                account.transactions.length,
                                             0
                                         )}
                                         )
                                     </span>
                                 </SelectItem>
-                                {data.datasets.map((dataset) => (
+                                {accounts.accounts.map((account) => (
                                     <SelectItem
-                                        key={dataset.name}
-                                        value={dataset.name}
+                                        key={account.name}
+                                        value={account.name}
                                     >
-                                        {dataset.name}{" "}
+                                        {account.name}{" "}
                                         <span className="text-xs text-muted-foreground">
-                                            ({dataset.transactions.length})
+                                            ({account.transactions.length})
                                         </span>
                                     </SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
-                        <Button
-                            variant="destructive"
-                            size="sm"
-                            className="rounded-sm"
-                            onClick={data.clearFiles}
-                        >
-                            Clear Data
-                        </Button>
 
                         <Popover
                             open={isActionsOpen}
@@ -167,6 +152,34 @@ export function NavBar() {
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-56 p-1" align="end">
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="w-full justify-start"
+                                    onClick={loadData}
+                                >
+                                    <FolderOpen className="h-4 w-4 mr-2" />
+                                    Load Data
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="w-full justify-start"
+                                    onClick={exportAccounts}
+                                    disabled={accounts.accounts.length === 0}
+                                >
+                                    <FileText className="h-4 w-4 mr-2" />
+                                    Export Accounts
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="w-full justify-start"
+                                    onClick={importAccounts}
+                                >
+                                    <Upload className="h-4 w-4 mr-2" />
+                                    Import Accounts
+                                </Button>
                                 <Button
                                     variant="ghost"
                                     size="sm"
@@ -248,6 +261,11 @@ export function NavBar() {
                     />
                 </div>
             </div>
+
+            <LoadDataModal
+                isOpen={isLoadDataOpen}
+                onClose={() => setIsLoadDataOpen(false)}
+            />
         </nav>
     );
 }

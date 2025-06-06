@@ -1,46 +1,43 @@
 "use client";
 
-import { useData } from "@/contexts/data/provider";
-import { FileSelector } from "@/components/file-selector";
+import { useAccounts } from "@/contexts/accounts/provider";
 import { AnalyticsCardSummary } from "@/components/analytics-card-summary";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Calendar } from "lucide-react";
 import { summarize } from "@/app/analytics/utilts";
 import { AnalyticsHeader } from "@/app/analytics/header";
 import { BalanceChart } from "@/app/analytics/balance-chart";
-import {
-    getActiveDatasets,
-    getActiveTransactions,
-    preprocessDatasets,
-} from "@/lib/utils";
 import { useTagRules } from "@/contexts/tag-rules/provider";
 import { useNotifications } from "@/contexts/notification/provider";
+import { LoadingState } from "@/components/loading-state";
 
 export default function AnalyticsPage() {
-    const {
-        needsFileHandle,
-        needsPermission,
-        loading,
-        datasets,
-        activeDataset,
-    } = useData();
-    const { tagRules } = useTagRules();
-    const { addDebug } = useNotifications();
+    const accountContext = useAccounts();
+    const tagRuleContext = useTagRules();
+    const notificationContext = useNotifications();
 
-    if (needsFileHandle || needsPermission || loading) {
-        return <FileSelector />;
+    if (accountContext.loading || tagRuleContext.loading) {
+        return <LoadingState />;
     }
 
-    const activeDatasets = preprocessDatasets(
-        getActiveDatasets(datasets, activeDataset),
-        tagRules,
-        addDebug
-    );
-    const transactions = getActiveTransactions(datasets, activeDataset).sort(
-        (a, b) =>
-            new Date(a.bookingDate).getTime() -
-            new Date(b.bookingDate).getTime()
-    );
+    const accounts = accountContext.accounts
+        .getActive(accountContext.activeAccount)
+        .preprocessAccounts(tagRuleContext.tagRules);
+
+    if (accounts.warnings) {
+        notificationContext.addWarning(
+            "Transaction Processing",
+            accounts.warnings
+        );
+    }
+
+    const transactions = accounts.value
+        .getTransactions()
+        .sort(
+            (a, b) =>
+                new Date(a.bookingDate).getTime() -
+                new Date(b.bookingDate).getTime()
+        );
     const monthlySummaries = summarize(transactions, "monthly");
     const yearlySummaries = summarize(transactions, "yearly");
 
@@ -99,7 +96,7 @@ export default function AnalyticsPage() {
                         ))}
                 </div>
 
-                <BalanceChart datasets={activeDatasets} />
+                <BalanceChart accounts={accounts.value} />
             </div>
         </ScrollArea>
     );

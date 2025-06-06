@@ -12,14 +12,14 @@ import {
     createDebug,
 } from "@/contexts/notification/utils";
 
-interface NotificationContextType {
+export interface NotificationContextType {
     warnings: WarningNotification[];
     errors: ErrorNotification[];
     debugs: DebugNotification[];
 
-    addWarning: (origin: string, message: string) => void;
-    addError: (origin: string, message: string) => void;
-    addDebug: (origin: string, message: string) => void;
+    addWarning: (origin: string, message: string | string[]) => void;
+    addError: (origin: string, message: string | string[]) => void;
+    addDebug: (origin: string, message: string | string[]) => void;
 
     clearWarnings: () => void;
     clearErrors: () => void;
@@ -47,19 +47,40 @@ export function NotificationProvider(props: { children: ReactNode }) {
     const [errors, setErrors] = useState<ErrorNotification[]>([]);
     const [debugs, setDebugs] = useState<DebugNotification[]>([]);
 
-    function addWarning(origin: string, message: string) {
-        const warning = createWarning(origin, message);
-        setWarnings((prev) => [...prev, warning]);
+    function addWarning(origin: string, message: string | string[]) {
+        if (Array.isArray(message)) {
+            message.forEach((m) => {
+                const warning = createWarning(origin, m);
+                setWarnings((prev) => [...prev, warning]);
+            });
+        } else {
+            const warning = createWarning(origin, message);
+            setWarnings((prev) => [...prev, warning]);
+        }
     }
 
-    function addError(origin: string, message: string) {
-        const error = createError(origin, message);
-        setErrors((prev) => [...prev, error]);
+    function addError(origin: string, message: string | string[]) {
+        if (Array.isArray(message)) {
+            message.forEach((m) => {
+                const error = createError(origin, m);
+                setErrors((prev) => [...prev, error]);
+            });
+        } else {
+            const error = createError(origin, message);
+            setErrors((prev) => [...prev, error]);
+        }
     }
 
-    function addDebug(origin: string, message: string) {
-        const debug = createDebug(origin, message);
-        setDebugs((prev) => [...prev, debug]);
+    function addDebug(origin: string, message: string | string[]) {
+        if (Array.isArray(message)) {
+            message.forEach((m) => {
+                const debug = createDebug(origin, m);
+                setDebugs((prev) => [...prev, debug]);
+            });
+        } else {
+            const debug = createDebug(origin, message);
+            setDebugs((prev) => [...prev, debug]);
+        }
     }
 
     function clearWarnings() {

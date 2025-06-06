@@ -3,6 +3,7 @@
 import { Dispatch, SetStateAction } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import {
     Select,
     SelectContent,
@@ -10,7 +11,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { MAIN_CATEGORIES, PartialTagRule } from "@/lib/transaction-tags/types";
+import { MAIN_CATEGORIES, PartialTagRule } from "@/lib/tag-rule-engine/types";
 import React from "react";
 
 export function TagPanel(props: {
@@ -132,6 +133,33 @@ export function TagPanel(props: {
                         ))}
                     </SelectContent>
                 </Select>
+
+                <Label
+                    htmlFor="ignore-toggle"
+                    className={`text-sm ${
+                        !props.selectedRule.tag?.ignore === true
+                            ? "text-muted-foreground"
+                            : ""
+                    }`}
+                >
+                    Ignore
+                </Label>
+                <div className="flex pl-1 h-9 items-center">
+                    <Switch
+                        id="ignore-toggle"
+                        checked={props.selectedRule.tag?.ignore || false}
+                        onCheckedChange={(checked) => {
+                            props.setCurrentRule((prev) => ({
+                                ...prev,
+                                tag: {
+                                    ...prev.tag,
+                                    ignore: checked,
+                                },
+                            }));
+                        }}
+                        className="data-[state=unchecked]:bg-muted-foreground"
+                    />
+                </div>
             </div>
         </div>
     );

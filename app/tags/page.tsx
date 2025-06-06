@@ -1,12 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useData } from "@/contexts/data/provider";
-import { FileSelector } from "@/components/file-selector";
-import { getActiveTransactions, preprocessTransactions } from "@/lib/utils";
-import { filter } from "@/lib/transaction-filter/main";
+import { useAccounts } from "@/contexts/accounts/provider";
 import { FILTER_OPTIONS } from "@/lib/transaction-filter/transaction-filter-options";
-import { PartialTagRule } from "@/lib/transaction-tags/types";
+import { PartialTagRule } from "@/lib/tag-rule-engine/types";
 import { useTagRules } from "@/contexts/tag-rules/provider";
 import { TagPanel } from "@/app/tags/tag-panel";
 import { TagsHeadlessList } from "@/app/tags/headless-list";
@@ -14,44 +11,39 @@ import { TransactionHeader } from "@/components/transaction-header";
 import { TagsHeader } from "@/app/tags/header";
 import { TransactionCard } from "@/components/transaction-card";
 import { TagStatistics } from "@/app/tags/statistics";
-import {
-    getTaggedTransactions,
-    getUntaggedTransactions,
-} from "@/lib/transaction-tags/utils";
+import { useNotifications } from "@/contexts/notification/provider";
+import { LoadingState } from "@/components/loading-state";
 
 export default function TagsPage() {
-    const {
-        needsFileHandle,
-        needsPermission,
-        loading,
-        datasets,
-        activeDataset,
-    } = useData();
-    const { tagRules, isLoaded, addTagRule, removeTagRule, updateTagRule } =
-        useTagRules();
+    const accountContext = useAccounts();
+    const tagRuleContext = useTagRules();
+    const notificationContext = useNotifications();
     const [showOnlyTagged, setShowOnlyTagged] = useState(false);
     const [currentRule, setCurrentRule] = useState<PartialTagRule>({
         filters: [],
     });
 
-    if (needsFileHandle || needsPermission || loading) return <FileSelector />;
-
-    if (!isLoaded) {
-        return <p className="p-4 text-muted-foreground">Loading...</p>;
+    if (accountContext.loading || tagRuleContext.loading) {
+        return <LoadingState />;
     }
 
-    const transactions = preprocessTransactions(
-        getActiveTransactions(datasets, activeDataset),
-        tagRules
-    );
-    const filteredTransactions = filter(
-        transactions,
+    const accounts = accountContext.accounts
+        .getActive(accountContext.activeAccount)
+        .preprocessAccounts(tagRuleContext.tagRules);
+
+    if (accounts.warnings) {
+        notificationContext.addWarning(
+            "Transaction Processing",
+            accounts.warnings
+        );
+    }
+
+    const transactions = accounts.value.getTransactions();
+    const filteredTransactions = transactions.filterTransactions(
         currentRule.filters,
         FILTER_OPTIONS
     );
-    const taggedTransactions = getTaggedTransactions(filteredTransactions);
-    const untaggedTransactions = getUntaggedTransactions(transactions);
-
+    const untaggedTransactions = filteredTransactions.getUntagged();
     const firstUntaggedTransaction = untaggedTransactions[0];
 
     return (
@@ -60,7 +52,6 @@ export default function TagsPage() {
                 <TagsHeadlessList
                     className="flex-grow"
                     transactions={filteredTransactions}
-                    taggedTransactions={taggedTransactions}
                     showTagged={showOnlyTagged}
                 />
             ) : (
@@ -76,10 +67,7 @@ export default function TagsPage() {
                     setCurrentRule={setCurrentRule}
                     showOnlyTagged={showOnlyTagged}
                     setShowOnlyTagged={setShowOnlyTagged}
-                    tagRules={tagRules}
-                    addTagRule={addTagRule}
-                    removeTagRule={removeTagRule}
-                    updateTagRule={updateTagRule}
+                    tagRuleContext={tagRuleContext}
                 />
 
                 <div className="bg-card flex items-end flex-grow rounded-md p-2 border border-border shadow-sm">

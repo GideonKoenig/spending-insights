@@ -1,7 +1,3 @@
-import { tagTransactions } from "@/lib/transaction-tags/main";
-import { TagRule } from "@/lib/transaction-tags/types";
-import { Transaction } from "@/lib/types";
-import { Dataset } from "@/lib/types";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -22,9 +18,9 @@ export function formatEuro(amount: number) {
     return `${isNegative ? "-" : "+"}${formatted} EUR`;
 }
 
-export type Result<T> =
-    | { success: true; value: T }
-    | { success: false; error: string };
+export type CustomError = { success: false; error: string };
+export type CustomSuccess<T> = { success: true; value: T; warnings?: string[] };
+export type Result<T> = CustomSuccess<T> | CustomError;
 
 export function tryCatch<T>(fn: () => T): Result<T> {
     try {
@@ -52,53 +48,10 @@ export async function tryCatchAsync<T>(
     }
 }
 
-export function newError<T>(error: string): Result<T> {
+export function newError<T>(error: string): CustomError {
     return { success: false, error };
 }
 
-export function getActiveTransactions(
-    datasets: Dataset[],
-    activeDataset: string | true | null
-) {
-    if (activeDataset === true)
-        return datasets.flatMap((dataset) => dataset.transactions);
-
-    if (activeDataset === null) return [];
-
-    const dataset = datasets.find((d) => d.name === activeDataset);
-    if (!dataset) return [];
-
-    return dataset.transactions;
-}
-
-export function getActiveDatasets(
-    datasets: Dataset[],
-    activeDataset: string | true | null
-) {
-    if (activeDataset === true) return datasets;
-    if (activeDataset === null) return [];
-    return datasets.filter((d) => d.name === activeDataset);
-}
-
-export function preprocessDatasets(
-    datasets: Dataset[],
-    tagRules: TagRule[],
-    addDebug?: (origin: string, message: string) => void
-) {
-    return datasets.map((dataset) => ({
-        ...dataset,
-        transactions: preprocessTransactions(
-            dataset.transactions,
-            tagRules,
-            addDebug
-        ),
-    }));
-}
-
-export function preprocessTransactions(
-    transactions: Transaction[],
-    tagRules: TagRule[],
-    addDebug?: (origin: string, message: string) => void
-) {
-    return tagTransactions(transactions, tagRules, addDebug);
+export function newSuccess<T>(value: T, warnings?: string[]): CustomSuccess<T> {
+    return { success: true, value, ...(warnings && { warnings }) };
 }

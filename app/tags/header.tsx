@@ -11,14 +11,15 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { TagRule, Tag, PartialTagRule } from "@/lib/transaction-tags/types";
+import { TagRule, Tag, PartialTagRule } from "@/lib/tag-rule-engine/types";
 import { useNotifications } from "@/contexts/notification/provider";
 import { cn } from "@/lib/utils";
 import {
     createRuleName,
     getIssues,
     hasNoIssues,
-} from "@/lib/transaction-tags/utils";
+} from "@/lib/tag-rule-engine/utils";
+import { TagRulesContextType } from "@/contexts/tag-rules/provider";
 
 let index = 0;
 
@@ -27,15 +28,15 @@ export function TagsHeader(props: {
     setCurrentRule: Dispatch<SetStateAction<PartialTagRule>>;
     showOnlyTagged: boolean;
     setShowOnlyTagged: Dispatch<SetStateAction<boolean>>;
-    tagRules: TagRule[];
-    addTagRule: (rule: TagRule) => void;
-    removeTagRule: (id: string) => void;
-    updateTagRule: (id: string, rule: TagRule) => void;
+    tagRuleContext: TagRulesContextType;
 }) {
     const { addWarning, addDebug } = useNotifications();
 
     const saveRule = () => {
-        const issues = getIssues(props.currentRule, props.tagRules);
+        const issues = getIssues(
+            props.currentRule,
+            props.tagRuleContext.tagRules
+        );
         if (issues.length > 0) {
             addWarning(
                 "TagsHeader",
@@ -44,13 +45,17 @@ export function TagsHeader(props: {
             return;
         }
 
-        if (!hasNoIssues(props.currentRule, props.tagRules)) return;
+        if (!hasNoIssues(props.currentRule, props.tagRuleContext.tagRules))
+            return;
         const ruleName = createRuleName(props.currentRule)!;
 
         const tag: Tag = {
             category: props.currentRule.tag.category.toLowerCase(),
             subCategory: props.currentRule.tag.subCategory?.toLowerCase(),
             spreadOverMonths: props.currentRule.tag.spreadOverMonths,
+            ignore: props.currentRule.tag.ignore,
+            ruleId: props.currentRule.id,
+            ruleName: ruleName,
         };
 
         const newRule: TagRule = {
@@ -61,9 +66,9 @@ export function TagsHeader(props: {
         };
 
         if (props.currentRule.id) {
-            props.updateTagRule(props.currentRule.id, newRule);
+            props.tagRuleContext.updateTagRule(props.currentRule.id, newRule);
         } else {
-            props.addTagRule(newRule);
+            props.tagRuleContext.addTagRule(newRule);
         }
         props.setCurrentRule({ filters: [] });
     };
@@ -74,7 +79,9 @@ export function TagsHeader(props: {
                 value={props.currentRule.id || ""}
                 onValueChange={(value) => {
                     props.setCurrentRule(
-                        props.tagRules.find((m) => m.id === value) ?? {
+                        props.tagRuleContext.tagRules.find(
+                            (m) => m.id === value
+                        ) ?? {
                             filters: [],
                         }
                     );
@@ -84,12 +91,12 @@ export function TagsHeader(props: {
                     <SelectValue placeholder="Select saved rule..." />
                 </SelectTrigger>
                 <SelectContent>
-                    {props.tagRules.length === 0 ? (
+                    {props.tagRuleContext.tagRules.length === 0 ? (
                         <SelectItem value="no-rules" disabled>
                             No rules available
                         </SelectItem>
                     ) : (
-                        props.tagRules.map((rule) => (
+                        props.tagRuleContext.tagRules.map((rule) => (
                             <SelectItem key={rule.id} value={rule.id}>
                                 {rule.name}
                             </SelectItem>
@@ -122,7 +129,9 @@ export function TagsHeader(props: {
                     variant="destructive"
                     onClick={() => {
                         if (!props.currentRule.id) return;
-                        props.removeTagRule(props.currentRule.id);
+                        props.tagRuleContext.removeTagRule(
+                            props.currentRule.id
+                        );
                         props.setCurrentRule({ filters: [] });
                     }}
                     disabled={!props.currentRule.id}
@@ -134,7 +143,10 @@ export function TagsHeader(props: {
                     onClick={saveRule}
                     className={cn(
                         "flex-2",
-                        hasNoIssues(props.currentRule, props.tagRules)
+                        hasNoIssues(
+                            props.currentRule,
+                            props.tagRuleContext.tagRules
+                        )
                             ? ""
                             : "opacity-50"
                     )}

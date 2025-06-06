@@ -18,6 +18,7 @@ export type TypedOperator =
 export type FilterRule = z.infer<typeof FilterRuleSchema>;
 export const FilterRuleSchema = z.object({
     attribute: z.enum([
+        "hash",
         "accountName",
         "accountIban",
         "accountBic",
@@ -32,10 +33,6 @@ export const FilterRuleSchema = z.object({
         "amount",
         "currency",
         "balanceAfterTransaction",
-        "note",
-        "markedTransaction",
-        "creditorId",
-        "mandateReference",
     ]),
     operator: z.string(),
     value: z.union([z.string(), z.number(), z.date()]),
