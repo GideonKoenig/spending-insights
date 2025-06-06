@@ -9,7 +9,7 @@ import { filter } from "@/lib/transaction-filter/main";
 import { type FilterRule } from "@/lib/transaction-filter/types";
 import { FILTER_OPTIONS } from "@/lib/transaction-filter/transaction-filter-options";
 import { cn } from "@/lib/utils";
-import { useVirtualizer, Virtualizer } from "@tanstack/react-virtual";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import {
     sortTransactions,
     type SortOption,

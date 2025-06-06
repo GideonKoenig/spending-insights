@@ -2,22 +2,32 @@ import {
     MAIN_CATEGORIES,
     PartialTagRule,
     TagRule,
-} from "@/lib/transaction-tags/types";
+} from "@/lib/tag-rule-engine/types";
 import { Transaction } from "@/lib/types";
-
-export function getTaggedTransactions(transactions: Transaction[]) {
-    return transactions.filter((transaction) => transaction.tag);
-}
-
-export function getUntaggedTransactions(transactions: Transaction[]) {
-    return transactions.filter((transaction) => !transaction.tag);
-}
+import { newSuccess } from "@/lib/utils";
 
 export function applyTagRule(transactions: Transaction[], tagRule: TagRule) {
-    return transactions.map((transaction) => ({
-        ...transaction,
-        tag: tagRule.tag,
-    }));
+    const warnings: string[] = [];
+    const taggedTransactions = transactions.map((transaction) => {
+        if (transaction.tag) {
+            queueMicrotask(() => {
+                warnings.push(
+                    `A transaction is captured by more than one tag rule.\nThe transaction is already matched by "${
+                        transaction.tag!.ruleName
+                    }" (${transaction.tag!.ruleId}) but rule "${
+                        tagRule.name
+                    }" (${tagRule.id}) also applies.`
+                );
+            });
+            return transaction;
+        }
+
+        return {
+            ...transaction,
+            tag: tagRule.tag,
+        };
+    });
+    return newSuccess(taggedTransactions, warnings);
 }
 
 export function createRuleName(tagRule: PartialTagRule) {

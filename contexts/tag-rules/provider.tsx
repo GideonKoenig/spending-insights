@@ -7,18 +7,26 @@ import {
     useEffect,
     type ReactNode,
 } from "react";
-import { TagRule, TagRuleListSchema } from "@/lib/transaction-tags/types";
+import { TagRule, TagRuleSchema } from "@/lib/tag-rule-engine/types";
 import { useNotifications } from "@/contexts/notification/provider";
 import superjson from "superjson";
+import {
+    TagRuleDependencies,
+    createExportTagRules,
+    createImportTagRules,
+} from "@/contexts/tag-rules/utils";
+import { z } from "zod";
 
 const STORAGE_KEY = "bank-history-tag-rules";
 
-interface TagRulesContextType {
+export interface TagRulesContextType {
     tagRules: TagRule[];
     addTagRule: (tagRule: TagRule) => void;
     updateTagRule: (id: string, updatedTagRule: TagRule) => void;
     removeTagRule: (id: string) => void;
-    isLoaded: boolean;
+    importTagRules: () => void;
+    exportTagRules: () => void;
+    loading: boolean;
 }
 
 const TagRulesContext = createContext<TagRulesContextType | null>(null);
@@ -32,39 +40,40 @@ export function useTagRules() {
 }
 
 export function TagRulesProvider(props: { children: ReactNode }) {
-    const { addError } = useNotifications();
-    const [tagRules, setTagRulesRaw] = useState<TagRule[]>([]);
-    const [isLoaded, setIsLoaded] = useState(false);
+    const { addError, addDebug } = useNotifications();
+    const [tagRules, setTagRules] = useState<TagRule[]>([]);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
+        setLoading(true);
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
-            const parsed = TagRuleListSchema.safeParse(
-                superjson.parse<TagRule[]>(stored)
-            );
+            const parsed = z
+                .array(TagRuleSchema)
+                .safeParse(superjson.parse<TagRule[]>(stored));
             if (parsed.success) {
-                setTagRulesRaw(parsed.data);
+                setTagRules(parsed.data);
             } else {
                 addError("Failed to parse tag rules", parsed.error.message);
             }
         }
-        setIsLoaded(true);
+        setLoading(false);
     }, [addError]);
 
-    const setTagRules = (
-        rules: TagRule[] | ((prev: TagRule[]) => TagRule[])
-    ) => {
-        const newRules = typeof rules === "function" ? rules(tagRules) : rules;
-        localStorage.setItem(STORAGE_KEY, superjson.stringify(newRules));
-        setTagRulesRaw(newRules);
-    };
+    function saveTagRules(updater: (rules: TagRule[]) => TagRule[]) {
+        setTagRules((prev) => {
+            const newRules = updater(prev);
+            localStorage.setItem(STORAGE_KEY, superjson.stringify(newRules));
+            return newRules;
+        });
+    }
 
     const addTagRule = (tagRule: TagRule) => {
-        setTagRules((prev) => [...prev, tagRule]);
+        saveTagRules((prev) => [...prev, tagRule]);
     };
 
     const updateTagRule = (id: string, updatedTagRule: TagRule) => {
-        setTagRules((prev) =>
+        saveTagRules((prev) =>
             prev.map((rule) => (rule.id === id ? updatedTagRule : rule))
         );
     };
@@ -73,12 +82,23 @@ export function TagRulesProvider(props: { children: ReactNode }) {
         setTagRules((prev) => prev.filter((rule) => rule.id !== id));
     };
 
+    const dependencies: TagRuleDependencies = {
+        addError,
+        addDebug,
+        saveTagRules,
+        tagRules,
+    };
+    const importTagRules = createImportTagRules(dependencies);
+    const exportTagRules = createExportTagRules(dependencies);
+
     const value: TagRulesContextType = {
         tagRules,
         addTagRule,
         updateTagRule,
         removeTagRule,
-        isLoaded,
+        importTagRules,
+        exportTagRules,
+        loading: loading,
     };
 
     return (

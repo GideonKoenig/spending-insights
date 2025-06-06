@@ -7,7 +7,7 @@ import {
     ChartTooltip,
     ChartTooltipContent,
 } from "@/components/ui/chart";
-import { Dataset } from "@/lib/types";
+import { Account } from "@/lib/types";
 import {
     Card,
     CardContent,
@@ -25,16 +25,16 @@ const chartConfig = {
     },
 } satisfies ChartConfig;
 
-export function BalanceChart(props: { datasets: Dataset[] }) {
+export function BalanceChart(props: { accounts: Account[] }) {
     const { addWarning, addError, addDebug } = useNotifications();
     const chartData = transformDatapoints(
-        props.datasets,
+        props.accounts,
         addWarning,
         addError,
         addDebug
     );
-    const transactions = props.datasets.flatMap(
-        (dataset) => dataset.transactions
+    const transactions = props.accounts.flatMap(
+        (account) => account.transactions
     );
 
     const maxBalance = Math.max(...chartData.map((d) => d.balance));

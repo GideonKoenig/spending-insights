@@ -6,12 +6,11 @@ export const TagSchema = z.object({
     category: z.string(),
     subCategory: z.string().optional(),
     spreadOverMonths: z.number().optional(),
+    ignore: z.boolean().optional(),
+    ruleId: z.string().optional(),
+    ruleName: z.string().optional(),
 });
 
-export type PartialTagRule = Partial<Omit<TagRule, "tag" | "filters">> & {
-    filters: TagRule["filters"];
-    tag?: Partial<Tag>;
-};
 export type TagRule = z.infer<typeof TagRuleSchema>;
 export const TagRuleSchema = z.object({
     id: z.string(),
@@ -20,20 +19,22 @@ export const TagRuleSchema = z.object({
     tag: TagSchema,
 });
 
-export type TagRuleList = z.infer<typeof TagRuleListSchema>;
-export const TagRuleListSchema = z.array(TagRuleSchema);
+export type PartialTagRule = Partial<Omit<TagRule, "tag" | "filters">> & {
+    filters: TagRule["filters"];
+    tag?: Partial<Tag>;
+};
 
 export const MAIN_CATEGORIES = [
     "advance-money",
     "entertainment",
-    "fitness",
     "groceries",
-    "healthcare",
     "housing",
+    "household-items",
     "income",
     "insurance",
     "investments",
     "other",
+    "personal-care",
     "professional",
     "reimbursements",
     "transportation",

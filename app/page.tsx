@@ -1,41 +1,40 @@
 "use client";
 
-import { useData } from "@/contexts/data/provider";
-import { FileSelector } from "@/components/file-selector";
+import { useAccounts } from "@/contexts/accounts/provider";
 import { TransactionList } from "@/components/transaction-list";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useRef } from "react";
-import { getActiveTransactions, preprocessTransactions } from "@/lib/utils";
 import { useTagRules } from "@/contexts/tag-rules/provider";
+import { useNotifications } from "@/contexts/notification/provider";
+import { LoadingState } from "@/components/loading-state";
 
 export default function HomePage() {
     const containerRef = useRef<HTMLDivElement>(null);
-    const {
-        needsFileHandle,
-        needsPermission,
-        loading,
-        datasets,
-        activeDataset,
-    } = useData();
-    const { tagRules } = useTagRules();
+    const accountContext = useAccounts();
+    const tagRuleContext = useTagRules();
+    const notificationContext = useNotifications();
 
-    if (needsFileHandle || needsPermission || loading) {
-        return <FileSelector />;
+    if (accountContext.loading || tagRuleContext.loading) {
+        return <LoadingState />;
     }
 
-    const transactions = preprocessTransactions(
-        getActiveTransactions(datasets, activeDataset).sort(
-            (a, b) =>
-                new Date(b.bookingDate).getTime() -
-                new Date(a.bookingDate).getTime()
-        ),
-        tagRules
-    );
+    const result = accountContext.accounts
+        .getActive(accountContext.activeAccount)
+        .preprocessAccounts(tagRuleContext.tagRules);
+
+    if (result.warnings) {
+        notificationContext.addWarning(
+            "Transaction Processing",
+            result.warnings
+        );
+    }
+
+    const accounts = result;
 
     return (
         <ScrollArea ref={containerRef} className="h-full">
             <TransactionList
-                transactions={transactions}
+                transactions={accounts.value.getTransactions()}
                 containerRef={containerRef}
             />
         </ScrollArea>

@@ -7,17 +7,15 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import { useEffect, useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
-import { getTaggedTransactions } from "@/lib/transaction-tags/utils";
 
 export function TagsHeadlessList(props: {
     transactions: Transaction[];
-    taggedTransactions: Transaction[];
     showTagged: boolean;
     className?: string;
 }) {
     const containerRef = useRef<HTMLDivElement>(null);
     const selectedTransactions = props.showTagged
-        ? props.taggedTransactions
+        ? props.transactions.getTagged()
         : props.transactions;
     const virtualizer = useVirtualizer({
         count: selectedTransactions.length,
@@ -31,7 +29,7 @@ export function TagsHeadlessList(props: {
         virtualizer._willUpdate();
     }, [containerRef.current]);
 
-    const taggedCount = props.taggedTransactions.length;
+    const taggedCount = selectedTransactions.getTagged().length;
     const untaggedCount = props.transactions.length - taggedCount;
 
     return (

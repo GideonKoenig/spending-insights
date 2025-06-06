@@ -5,11 +5,11 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Tag } from "@/lib/transaction-tags/types";
-import { generateCategoryColor } from "@/lib/transaction-tags/utils";
+import { Tag } from "@/lib/tag-rule-engine/types";
+import { generateCategoryColor } from "@/lib/tag-rule-engine/utils";
 
-export function TagBadge({ tag }: { tag: Tag }) {
-    const backgroundColor = generateCategoryColor(tag.category);
+export function TagBadge(props: { tag: Tag }) {
+    const backgroundColor = generateCategoryColor(props.tag.category);
 
     return (
         <TooltipProvider>
@@ -22,21 +22,25 @@ export function TagBadge({ tag }: { tag: Tag }) {
                         }}
                         className="text-xs font-medium cursor-pointer text-foreground"
                     >
-                        {tag.category}
+                        {props.tag.category}
                     </Badge>
                 </TooltipTrigger>
                 <TooltipContent>
-                    <div className="space-y-1">
-                        <div className="font-semibold">{tag.category}</div>
-                        <div className="text-sm opacity-80">
-                            {tag.subCategory}
-                        </div>
-                        {tag.spreadOverMonths && (
-                            <div className="text-xs opacity-70 border-t pt-1 mt-2">
-                                Spread over {tag.spreadOverMonths} month
-                                {tag.spreadOverMonths !== 1 ? "s" : ""}
-                            </div>
+                    <p className="font-semibold mb-1">{props.tag.category}</p>
+
+                    <div className="bg-card/30 p-2 pb-2 mb-1 rounded-md text-xs flex flex-col gap-1">
+                        {props.tag.subCategory && (
+                            <p>Subcategory: {props.tag.subCategory}</p>
                         )}
+                        <p>Rule: {props.tag.ruleName}</p>
+                        <p>ID: {props.tag.ruleId}</p>
+                        {props.tag.spreadOverMonths && (
+                            <p>
+                                Spread over {props.tag.spreadOverMonths} month
+                                {props.tag.spreadOverMonths !== 1 ? "s" : ""}
+                            </p>
+                        )}
+                        {props.tag.ignore && <p>Ignored</p>}
                     </div>
                 </TooltipContent>
             </Tooltip>

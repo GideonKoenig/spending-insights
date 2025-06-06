@@ -4,8 +4,8 @@ import { Transaction } from "@/lib/types";
 import {
     getTaggedTransactions,
     generateCategoryColor,
-} from "@/lib/transaction-tags/utils";
-import { MAIN_CATEGORIES } from "@/lib/transaction-tags/types";
+} from "@/lib/tag-rule-engine/utils";
+import { MAIN_CATEGORIES } from "@/lib/tag-rule-engine/types";
 import { Fragment } from "react";
 
 export function TagStatistics(props: {

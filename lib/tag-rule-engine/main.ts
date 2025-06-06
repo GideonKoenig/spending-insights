@@ -1,16 +1,14 @@
-import { TagRule } from "@/lib/transaction-tags/types";
-import { Transaction } from "@/lib/types";
+import { TagRule } from "@/lib/tag-rule-engine/types";
+import { Account } from "@/lib/types";
 import { splitTransactions } from "@/lib/transaction-filter/main";
 import { FILTER_OPTIONS } from "@/lib/transaction-filter/transaction-filter-options";
-import { applyTagRule } from "@/lib/transaction-tags/utils";
+import { newSuccess } from "@/lib/utils";
+import { applyTagRule } from "@/lib/tag-rule-engine/utils";
 
-export function tagTransactions(
-    transactions: Transaction[],
-    tagRules: TagRule[],
-    addDebug?: (origin: string, message: string) => void
-) {
-    if (tagRules.length === 0) return transactions;
-    const result = transactions.slice();
+function tagAccount(account: Account, tagRules: TagRule[]) {
+    if (tagRules.length === 0) return newSuccess(account);
+    const result = account.transactions.slice();
+    const warnings: string[] = [];
 
     for (const tagRule of tagRules) {
         const { matches, unmatches } = splitTransactions(
@@ -21,6 +19,8 @@ export function tagTransactions(
 
         if (matches.length > 0) {
             const taggedMatches = applyTagRule(matches, tagRule);
+            if (taggedMatches.warnings)
+                warnings.push(...taggedMatches.warnings);
 
             let unmatchIndex = 0;
             let matchIndex = 0;
@@ -28,7 +28,7 @@ export function tagTransactions(
             for (let i = 0; i < result.length; i++) {
                 const transaction = result[i];
                 if (matches.includes(transaction)) {
-                    result[i] = taggedMatches[matchIndex++];
+                    result[i] = taggedMatches.value[matchIndex++];
                 } else {
                     result[i] = unmatches[unmatchIndex++];
                 }
@@ -36,5 +36,9 @@ export function tagTransactions(
         }
     }
 
-    return result;
+    return newSuccess(result, warnings);
 }
+
+export const TagRuleEngine = {
+    tagAccount,
+};
