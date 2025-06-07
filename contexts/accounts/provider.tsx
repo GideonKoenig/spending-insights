@@ -28,7 +28,7 @@ export interface AccountsContextType {
     setActiveAccount: (account: string | true) => void;
     addAccount: (account: Account) => void;
     renameAccount: (oldName: string, newName: string) => void;
-    mergeAccounts: (sourceId: string, targetId: string) => void;
+    mergeAccounts: (targetId: string, account: Account) => void;
     deleteAccount: (name: string) => void;
     importAccounts: () => void;
     exportAccounts: () => void;
@@ -54,7 +54,10 @@ export function AccountProvider(props: { children: ReactNode }) {
         setLoading(true);
 
         const storedAccounts = localStorage.getItem(ACCOUNTS_KEY);
-        if (!storedAccounts) return;
+        if (!storedAccounts) {
+            setLoading(false);
+            return;
+        }
 
         const accounts = tryCatch(() =>
             SuperJSON.parse<Account[]>(storedAccounts)
@@ -70,7 +73,10 @@ export function AccountProvider(props: { children: ReactNode }) {
         setAccounts(accounts.value);
 
         const storedActiveAccount = localStorage.getItem(ACTIVE_ACCOUNT_KEY);
-        if (!storedActiveAccount) return;
+        if (!storedActiveAccount) {
+            setLoading(false);
+            return;
+        }
 
         const activeAccount = tryCatch(() =>
             SuperJSON.parse<string | true>(storedActiveAccount)

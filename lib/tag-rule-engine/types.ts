@@ -4,7 +4,7 @@ import { FilterRuleSchema } from "@/lib/transaction-filter/types";
 export type Tag = z.infer<typeof TagSchema>;
 export const TagSchema = z.object({
     category: z.string(),
-    subCategory: z.string().optional(),
+    subCategory: z.string(),
     spreadOverMonths: z.number().optional(),
     ignore: z.boolean().optional(),
     ruleId: z.string().optional(),

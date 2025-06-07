@@ -1,4 +1,4 @@
-import { Summary } from "@/components/analytics-card-summary";
+import { Summary } from "@/components/analytics/analytics-card-summary";
 import { type Account, type Transaction } from "@/lib/types";
 
 export type Datapoint = {

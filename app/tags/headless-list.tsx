@@ -1,8 +1,7 @@
 "use client";
 
 import { Transaction } from "@/lib/types";
-import { TransactionCard } from "@/components/transaction-card";
-import { getKey } from "@/components/utils";
+import { TransactionCard } from "@/components/transactions/transaction-card";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useEffect, useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -51,7 +50,7 @@ export function TagsHeadlessList(props: {
                         <TransactionCard
                             className="p-3"
                             purposeLineClamp={3}
-                            key={getKey(selectedTransactions[item.index])}
+                            key={selectedTransactions[item.index].hash}
                             transaction={selectedTransactions[item.index]}
                             style={{
                                 position: "absolute",

@@ -2,8 +2,9 @@ import { newError, newSuccess } from "@/lib/utils";
 import { z } from "zod";
 import { createRecord, parseLine } from "@/lib/csv-parser/utils";
 
-function getHeaders(line: string) {
-    const headers = parseLine(line);
+function getHeaders(text: string) {
+    const firstLine = text.split("\n")[0];
+    const headers = parseLine(firstLine);
 
     if (headers.length === 0) {
         return newError("The CSV file is missing headers.");
@@ -11,6 +12,8 @@ function getHeaders(line: string) {
 
     const uniqueHeaders = new Set(headers);
     if (uniqueHeaders.size !== headers.length) {
+        console.log(headers);
+        console.log(uniqueHeaders);
         return newError("The CSV file contains duplicate headers.");
     }
 

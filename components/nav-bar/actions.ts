@@ -14,7 +14,14 @@ export interface ActionDependencies {
 export function createUpdateAllCategories(dependencies: ActionDependencies) {
     return () => {
         dependencies.tagRules.tagRules.forEach((rule) => {
-            dependencies.tagRules.updateTagRule(rule.id, rule);
+            dependencies.tagRules.updateTagRule(rule.id, {
+                ...rule,
+                tag: {
+                    ...rule.tag,
+                    ruleId: rule.id,
+                    ruleName: rule.name,
+                },
+            });
         });
 
         dependencies.notifications.addDebug(
@@ -58,5 +65,15 @@ export function createLoadData(dependencies: ActionDependencies) {
     return () => {
         dependencies.closePopover?.();
         dependencies.openLoadDataModal?.();
+    };
+}
+
+export function createClearAllAccounts(dependencies: ActionDependencies) {
+    return () => {
+        dependencies.accounts.accounts.forEach((account) => {
+            dependencies.accounts.deleteAccount(account.id);
+        });
+        dependencies.accounts.setActiveAccount(true);
+        dependencies.closePopover?.();
     };
 }

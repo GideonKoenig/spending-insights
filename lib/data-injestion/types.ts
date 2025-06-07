@@ -11,3 +11,13 @@ export type DataInjestFormat<T extends z.ZodObject<any>> = {
     schema: T;
     map: (element: z.infer<T>) => Omit<Transaction, "hash">;
 };
+
+export type PreparedFile = {
+    file: File;
+    name: string;
+    fileName: string;
+    format: DataInjestFormat<any> | null;
+    error: string | null;
+    action: "add" | "merge";
+    mergeAccount?: string;
+};

@@ -6,7 +6,7 @@ import {
 import { Transaction } from "@/lib/types";
 import { newSuccess } from "@/lib/utils";
 
-export function applyTagRule(transactions: Transaction[], tagRule: TagRule) {
+export function applyTag(transactions: Transaction[], tagRule: TagRule) {
     const warnings: string[] = [];
     const taggedTransactions = transactions.map((transaction) => {
         if (transaction.tag) {
@@ -33,17 +33,12 @@ export function applyTagRule(transactions: Transaction[], tagRule: TagRule) {
 export function createRuleName(tagRule: PartialTagRule) {
     if (!tagRule.tag) return undefined;
     if (!tagRule.tag.category) return undefined;
-    if (!tagRule.tag.subCategory && !tagRule.name) return undefined;
+    if (!tagRule.tag.subCategory) return undefined;
+    if (tagRule.name) return tagRule.name;
 
-    const hasName = tagRule.name?.trim();
-    const hasCategory = tagRule.tag.category;
-    const hasSubCategory = tagRule.tag.subCategory?.trim();
-
-    let baseName = "";
-    if (hasName && tagRule.id) baseName = hasName;
-    if (hasName && !tagRule.id) baseName = `${hasCategory}-${hasName}`;
-    if (!hasName) baseName = `${hasCategory}-${hasSubCategory}`;
-    return baseName.toLowerCase().replace(/\s+/g, "-");
+    return `${tagRule.tag.category}-${tagRule.tag.subCategory}`
+        .toLowerCase()
+        .replace(/\s+/g, "-");
 }
 
 export function hasNoIssues(
@@ -54,24 +49,22 @@ export function hasNoIssues(
 }
 
 export function getIssues(tagRule: PartialTagRule, other: TagRule[]) {
-    const hasName = tagRule.name?.trim();
-    const hasCategory = tagRule.tag?.category;
+    const hasCategory = tagRule.tag?.category?.trim();
     const hasSubCategory = tagRule.tag?.subCategory?.trim();
+    const hasFilters = tagRule.filters.length > 0;
 
     const issues = [];
 
-    if (!hasName && !hasSubCategory) {
-        issues.push(
-            "provide a name or subcategory (name will be auto-generated if subcategory is provided)"
-        );
-    }
-
-    if (tagRule.filters.length < 1) {
-        issues.push("add at least one filter");
-    }
-
     if (!hasCategory) {
-        issues.push("select a category for the tag");
+        issues.push("A tag must define a category");
+    }
+
+    if (!hasSubCategory) {
+        issues.push("A tag must define a subcategory");
+    }
+
+    if (!hasFilters) {
+        issues.push("A tag must define at least one filter");
     }
 
     return issues;

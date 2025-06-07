@@ -40,7 +40,7 @@ export function createImportAccounts(dependencies: AccountDependencies) {
                 );
                 if (!accounts.success) {
                     dependencies.addError(
-                        "Internal Error",
+                        "Internal Error - SuperJSON",
                         "Failed to parse accounts. Did you maybe select the wrong file?"
                     );
                     return;
@@ -50,9 +50,10 @@ export function createImportAccounts(dependencies: AccountDependencies) {
                 );
                 if (!parsedAccounts.success) {
                     dependencies.addError(
-                        "Internal Error",
-                        "Failed to parse accounts. Did you maybe select the wrong file?"
+                        "Internal Error - Zod",
+                        `Failed to parse accounts. Did you maybe select the wrong file?\n${parsedAccounts.error.message}`
                     );
+                    console.dir(accounts.value, { depth: null });
                     return;
                 }
                 dependencies.saveAccounts((accounts) => {
@@ -96,17 +97,7 @@ export function createExportAccounts(dependencies: AccountDependencies) {
 }
 
 export function createMergeAccounts(dependencies: AccountDependencies) {
-    return (sourceId: string, targetId: string) => {
-        const sourceAccount = dependencies.accounts.find(
-            (acc) => acc.id === sourceId
-        );
-        if (!sourceAccount) {
-            dependencies.addError(
-                "Merge Accounts",
-                "Merge unsuccessful. Source account not found."
-            );
-            return;
-        }
+    return (targetId: string, account: Account) => {
         const targetAccount = dependencies.accounts.find(
             (acc) => acc.id === targetId
         );
@@ -125,10 +116,7 @@ export function createMergeAccounts(dependencies: AccountDependencies) {
             targetAccount.transactions.map((t) => t.hash)
         );
 
-        const sourceTransactions = hashTransaction(
-            sourceAccount.transactions,
-            name
-        );
+        const sourceTransactions = hashTransaction(account.transactions, name);
         const newTransactions = sourceTransactions.filter(
             (t) => !existingHashes.has(t.hash)
         );
@@ -142,10 +130,8 @@ export function createMergeAccounts(dependencies: AccountDependencies) {
         };
 
         dependencies.saveAccounts((accounts) => {
-            const newAccounts = accounts.filter(
-                (a) => a.id !== targetId && a.id !== sourceId
-            );
-            return [...newAccounts, newAccount];
+            const otherAccounts = accounts.filter((a) => a.id !== targetId);
+            return [...otherAccounts, newAccount];
         });
     };
 }

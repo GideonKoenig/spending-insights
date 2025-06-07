@@ -1,10 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Transaction } from "@/lib/types";
-import {
-    getTaggedTransactions,
-    generateCategoryColor,
-} from "@/lib/tag-rule-engine/utils";
+import { generateCategoryColor } from "@/lib/tag-rule-engine/utils";
 import { MAIN_CATEGORIES } from "@/lib/tag-rule-engine/types";
 import { Fragment } from "react";
 
@@ -12,14 +9,17 @@ export function TagStatistics(props: {
     transactions: Transaction[];
     className?: string;
 }) {
-    const taggedTransactions = getTaggedTransactions(props.transactions);
-    const untaggedCount = props.transactions.length - taggedTransactions.length;
-    const categoryCounts = MAIN_CATEGORIES.map((category) => {
-        const count = taggedTransactions.filter(
+    const taggedTransactions = props.transactions.getTagged();
+
+    const taggedCount = taggedTransactions.length;
+    const untaggedCount = props.transactions.length - taggedCount;
+
+    const categoryCounts = MAIN_CATEGORIES.map((category) => ({
+        category,
+        count: taggedTransactions.filter(
             (transaction) => transaction.tag?.category === category
-        ).length;
-        return { category, count };
-    });
+        ).length,
+    }));
 
     return (
         <div
