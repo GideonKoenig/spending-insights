@@ -15,6 +15,7 @@ import { useNotifications } from "@/contexts/notification/provider";
 import { LoadingState } from "@/components/loading-state";
 import "@/lib/operations-account";
 import "@/lib/operations-transaction";
+import { handleResult } from "@/contexts/notification/utils";
 
 export default function TagsPage() {
     const accountContext = useAccounts();
@@ -29,18 +30,17 @@ export default function TagsPage() {
         return <LoadingState />;
     }
 
-    const accounts = accountContext.accounts
+    const result = accountContext.accounts
         .getActive(accountContext.activeAccount)
         .preprocessAccounts(tagRuleContext.tagRules);
+    const accounts = handleResult(
+        result,
+        "Transaction Processing",
+        notificationContext,
+        []
+    );
 
-    if (accounts.warnings) {
-        notificationContext.addWarning(
-            "Transaction Processing",
-            accounts.warnings
-        );
-    }
-
-    const transactions = accounts.value.getTransactions();
+    const transactions = accounts.getTransactions();
     const filteredTransactions = transactions.filterTransactions(
         currentRule.filters,
         FILTER_OPTIONS
