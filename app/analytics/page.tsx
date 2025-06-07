@@ -1,11 +1,9 @@
 "use client";
 
 import { useAccounts } from "@/contexts/accounts/provider";
-import { AnalyticsCardSummary } from "@/components/analytics/analytics-card-summary";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Calendar } from "lucide-react";
-import { summarize } from "@/app/analytics/utilts";
-import { AnalyticsHeader } from "@/app/analytics/header";
+import { getInsights } from "@/lib/analytics-tools/insights";
+import { AnalyticsInsights } from "@/app/analytics/insights";
 import { BalanceChart } from "@/app/analytics/balance-chart";
 import { useTagRules } from "@/contexts/tag-rules/provider";
 import { useNotifications } from "@/contexts/notification/provider";
@@ -13,6 +11,7 @@ import { LoadingState } from "@/components/loading-state";
 import { EmptyAccountsState } from "@/components/empty-accounts-state";
 import "@/lib/operations-account";
 import "@/lib/operations-transaction";
+import { handleResult } from "@/contexts/notification/utils";
 
 export default function AnalyticsPage() {
     const accountContext = useAccounts();
@@ -22,88 +21,35 @@ export default function AnalyticsPage() {
     if (accountContext.loading || tagRuleContext.loading) {
         return <LoadingState />;
     }
-
     if (accountContext.accounts.length === 0) {
         return <EmptyAccountsState />;
     }
 
-    const accounts = accountContext.accounts
+    const result = accountContext.accounts
         .getActive(accountContext.activeAccount)
         .preprocessAccounts(tagRuleContext.tagRules);
+    const accounts = handleResult(
+        result,
+        "Processing accounts",
+        notificationContext,
+        []
+    );
 
-    if (accounts.warnings) {
-        notificationContext.addWarning(
-            "Transaction Processing",
-            accounts.warnings
-        );
-    }
-
-    const transactions = accounts.value
+    const transactions = accounts
         .getTransactions()
         .sort(
             (a, b) =>
                 new Date(a.bookingDate).getTime() -
                 new Date(b.bookingDate).getTime()
         );
-    const monthlySummaries = summarize(transactions, "monthly");
-    const yearlySummaries = summarize(transactions, "yearly");
+
+    const insights = getInsights(accounts);
 
     return (
         <ScrollArea className="h-full">
             <div className="mx-auto flex flex-col gap-6 max-w-7xl px-4 py-8">
-                <div>
-                    <h1 className="text-3xl font-bold">Analytics</h1>
-                    <p className="text-muted-foreground">
-                        Overview of your transaction data and spending patterns
-                    </p>
-                </div>
-
-                {/* Meta Information Row */}
-                <AnalyticsHeader
-                    transactions={transactions}
-                    monthSummaries={monthlySummaries}
-                    yearSummaries={yearlySummaries}
-                />
-
-                {/* Months Row */}
-                <div className="grid grid-cols-3 gap-4">
-                    {monthlySummaries
-                        .slice(0, 3)
-                        .reverse()
-                        .map((month) => (
-                            <AnalyticsCardSummary
-                                key={month.title}
-                                summary={{
-                                    title: month.title,
-                                    income: month.income,
-                                    expense: month.expense,
-                                    average: month.average,
-                                }}
-                                icon={<Calendar />}
-                            />
-                        ))}
-                </div>
-
-                {/* Years Row */}
-                <div className="grid grid-cols-3 gap-4">
-                    {yearlySummaries
-                        .slice(0, 3)
-                        .reverse()
-                        .map((year) => (
-                            <AnalyticsCardSummary
-                                key={year.title}
-                                summary={{
-                                    title: year.title,
-                                    income: year.income,
-                                    expense: year.expense,
-                                    average: year.average,
-                                }}
-                                icon={<Calendar />}
-                            />
-                        ))}
-                </div>
-
-                <BalanceChart accounts={accounts.value} />
+                <AnalyticsInsights insights={insights} />
+                <BalanceChart accounts={accounts} />
             </div>
         </ScrollArea>
     );

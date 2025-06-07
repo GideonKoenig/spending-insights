@@ -16,7 +16,9 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { useNotifications } from "@/contexts/notification/provider";
-import { transformDatapoints, formatDate } from "@/app/analytics/utilts";
+import { transformDatapoints } from "@/lib/analytics-tools/grouping";
+import { formatDate } from "@/lib/analytics-tools/utilts";
+import { handleResult } from "@/contexts/notification/utils";
 
 const chartConfig = {
     balance: {
@@ -26,13 +28,15 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function BalanceChart(props: { accounts: Account[] }) {
-    const { addWarning, addError, addDebug } = useNotifications();
-    const chartData = transformDatapoints(
-        props.accounts,
-        addWarning,
-        addError,
-        addDebug
+    const notificationContext = useNotifications();
+    const transformResult = transformDatapoints(props.accounts);
+    const chartData = handleResult(
+        transformResult,
+        "Transforming datapoints",
+        notificationContext,
+        []
     );
+
     const transactions = props.accounts.flatMap(
         (account) => account.transactions
     );

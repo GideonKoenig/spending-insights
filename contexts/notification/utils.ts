@@ -1,9 +1,10 @@
+import { NotificationContextType } from "@/contexts/notification/provider";
 import type {
     WarningNotification,
     ErrorNotification,
     DebugNotification,
 } from "@/contexts/notification/types";
-import { tryCatch, tryCatchAsync } from "@/lib/utils";
+import { CustomSuccess, Result, tryCatch, tryCatchAsync } from "@/lib/utils";
 
 let globalIndex = 0;
 
@@ -164,4 +165,20 @@ export function profileFunction<T extends (...args: any[]) => any>(
             return result.value;
         }
     }) as T;
+}
+
+export function handleResult<T>(
+    result: Result<T> | CustomSuccess<T>,
+    origin: string,
+    notificationContext: NotificationContextType,
+    defaultValue: T
+) {
+    if (!result.success) {
+        notificationContext.addError(origin, result.error);
+        return defaultValue;
+    }
+    if (result.success && result.warnings) {
+        notificationContext.addWarning(origin, result.warnings);
+    }
+    return result.value;
 }

@@ -10,6 +10,7 @@ import { LoadingState } from "@/components/loading-state";
 import { EmptyAccountsState } from "@/components/empty-accounts-state";
 import "@/lib/operations-account";
 import "@/lib/operations-transaction";
+import { handleResult } from "@/contexts/notification/utils";
 
 export default function HomePage() {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -28,14 +29,13 @@ export default function HomePage() {
         .getActive(accountContext.activeAccount)
         .preprocessAccounts(tagRuleContext.tagRules);
 
-    if (result.warnings) {
-        notificationContext.addWarning(
-            "Transaction Processing",
-            result.warnings
-        );
-    }
+    const accounts = handleResult(
+        result,
+        "Transaction Processing",
+        notificationContext,
+        []
+    );
 
-    const accounts = result.value;
     return (
         <ScrollArea ref={containerRef} className="h-full">
             <TransactionList
