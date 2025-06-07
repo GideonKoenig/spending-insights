@@ -6,6 +6,8 @@ import { NotificationProvider } from "@/contexts/notification/provider";
 import { TagRulesProvider } from "@/contexts/tag-rules/provider";
 import { NavBar } from "@/components/nav-bar/nav-bar";
 import "./globals.css";
+import "@/lib/operations-account";
+import "@/lib/operations-transaction";
 
 const inter = Inter({ subsets: ["latin"] });
 

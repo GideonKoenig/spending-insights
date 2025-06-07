@@ -1,5 +1,5 @@
-import { AnalyticsCardGeneral } from "@/components/analytics-card-general";
-import { type Summary } from "@/components/analytics-card-summary";
+import { AnalyticsCardGeneral } from "@/components/analytics/analytics-card-general";
+import { type Summary } from "@/components/analytics/analytics-card-summary";
 import { Transaction } from "@/lib/types";
 import { formatEuro } from "@/lib/utils";
 import { BarChart3, Hash, Target } from "lucide-react";

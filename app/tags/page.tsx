@@ -7,12 +7,14 @@ import { PartialTagRule } from "@/lib/tag-rule-engine/types";
 import { useTagRules } from "@/contexts/tag-rules/provider";
 import { TagPanel } from "@/app/tags/tag-panel";
 import { TagsHeadlessList } from "@/app/tags/headless-list";
-import { TransactionHeader } from "@/components/transaction-header";
+import { TransactionHeader } from "@/components/transactions/transaction-header";
 import { TagsHeader } from "@/app/tags/header";
-import { TransactionCard } from "@/components/transaction-card";
+import { TransactionCard } from "@/components/transactions/transaction-card";
 import { TagStatistics } from "@/app/tags/statistics";
 import { useNotifications } from "@/contexts/notification/provider";
 import { LoadingState } from "@/components/loading-state";
+import "@/lib/operations-account";
+import "@/lib/operations-transaction";
 
 export default function TagsPage() {
     const accountContext = useAccounts();

@@ -1,5 +1,6 @@
 import { DataInjestFormat } from "@/lib/data-injestion/types";
 import { Transaction } from "@/lib/types";
+import { newError, newSuccess } from "@/lib/utils";
 import { createHash } from "crypto";
 
 export function parseDate(dateStr: string): Date {
@@ -26,7 +27,7 @@ export function findFormat(
     headers: string[],
     formats: DataInjestFormat<any>[]
 ) {
-    return formats.find((format) => {
+    const format = formats.find((format) => {
         const formatHeaders = Object.keys(format.schema.shape);
         const hasAllKeys = headers.every((header) =>
             formatHeaders.includes(header)
@@ -34,6 +35,11 @@ export function findFormat(
         const hasSameLength = formatHeaders.length === headers.length;
         return hasAllKeys && hasSameLength;
     });
+    if (!format)
+        return newError(
+            "The format of this file is not yet supported. If the selected file contains transactions, reach out to the developer to add support for this format."
+        );
+    return newSuccess(format);
 }
 
 export function hashTransaction(

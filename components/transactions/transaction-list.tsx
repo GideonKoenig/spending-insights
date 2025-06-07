@@ -2,9 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { type Transaction } from "@/lib/types";
-import { TransactionCard } from "@/components/transaction-card";
-import { getKey } from "@/components/utils";
-import { TransactionHeader } from "@/components/transaction-header";
+import { TransactionCard } from "@/components/transactions/transaction-card";
+import { TransactionHeader } from "@/components/transactions/transaction-header";
 import { filter } from "@/lib/transaction-filter/main";
 import { type FilterRule } from "@/lib/transaction-filter/types";
 import { FILTER_OPTIONS } from "@/lib/transaction-filter/transaction-filter-options";
@@ -84,26 +83,28 @@ export function TransactionList(props: {
                         </Select>
                     }
                 />
-                <div
-                    className="relative"
-                    style={{ height: `${virtualizer.getTotalSize()}px` }}
-                >
-                    {virtualizer.getVirtualItems().map((item) => (
-                        <TransactionCard
-                            key={getKey(sortedTransactions[item.index])}
-                            transaction={sortedTransactions[item.index]}
-                            style={{
-                                position: "absolute",
-                                top: 0,
-                                left: 0,
+                {props.containerRef.current && (
+                    <div
+                        className="relative"
+                        style={{ height: `${virtualizer.getTotalSize()}px` }}
+                    >
+                        {virtualizer.getVirtualItems().map((item) => (
+                            <TransactionCard
+                                key={sortedTransactions[item.index].hash}
+                                transaction={sortedTransactions[item.index]}
+                                style={{
+                                    position: "absolute",
+                                    top: 0,
+                                    left: 0,
 
-                                width: "100%",
-                                height: `${item.size}px`,
-                                transform: `translateY(${item.start}px)`,
-                            }}
-                        />
-                    ))}
-                </div>
+                                    width: "100%",
+                                    height: `${item.size}px`,
+                                    transform: `translateY(${item.start}px)`,
+                                }}
+                            />
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );

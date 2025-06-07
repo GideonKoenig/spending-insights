@@ -30,7 +30,7 @@ export function TagsHeader(props: {
     setShowOnlyTagged: Dispatch<SetStateAction<boolean>>;
     tagRuleContext: TagRulesContextType;
 }) {
-    const { addWarning, addDebug } = useNotifications();
+    const { addWarning } = useNotifications();
 
     const saveRule = () => {
         const issues = getIssues(
@@ -45,10 +45,11 @@ export function TagsHeader(props: {
             return;
         }
 
-        if (!hasNoIssues(props.currentRule, props.tagRuleContext.tagRules))
+        if (!hasNoIssues(props.currentRule, props.tagRuleContext.tagRules)) {
             return;
-        const ruleName = createRuleName(props.currentRule)!;
+        }
 
+        const ruleName = createRuleName(props.currentRule)!;
         const tag: Tag = {
             category: props.currentRule.tag.category.toLowerCase(),
             subCategory: props.currentRule.tag.subCategory?.toLowerCase(),

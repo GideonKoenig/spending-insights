@@ -17,7 +17,7 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover";
 import { NotificationButton } from "@/components/notification-button";
-import { LoadDataModal } from "@/components/load-data-modal";
+import { LoadDataModal } from "@/components/load-data-modal/dialog";
 import {
     TriangleAlert,
     OctagonX,
@@ -27,19 +27,20 @@ import {
     RefreshCcw,
     FileText,
     FolderOpen,
+    Trash,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import {
-    type ActionDependencies,
     createExportTagRules,
     createImportTagRules,
     createUpdateAllCategories,
     createLoadData,
     createExportAccounts,
     createImportAccounts,
+    createClearAllAccounts,
 } from "./actions";
 
 export function NavBar() {
@@ -56,7 +57,7 @@ export function NavBar() {
         { href: "/tags", label: "Tags" },
     ];
 
-    const actionDependencies: ActionDependencies = {
+    const actionDependencies = {
         tagRules,
         accounts,
         notifications,
@@ -69,6 +70,7 @@ export function NavBar() {
     const importAccounts = createImportAccounts(actionDependencies);
     const updateAllCategories = createUpdateAllCategories(actionDependencies);
     const loadData = createLoadData(actionDependencies);
+    const clearAllAccounts = createClearAllAccounts(actionDependencies);
 
     return (
         <nav className="border-b min-h-12 px-4 flex items-center justify-between bg-background">
@@ -160,6 +162,15 @@ export function NavBar() {
                                 >
                                     <FolderOpen className="h-4 w-4 mr-2" />
                                     Load Data
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="w-full justify-start"
+                                    onClick={clearAllAccounts}
+                                >
+                                    <Trash className="h-4 w-4 mr-2" />
+                                    Clear All Accounts
                                 </Button>
                                 <Button
                                     variant="ghost"
@@ -264,7 +275,7 @@ export function NavBar() {
 
             <LoadDataModal
                 isOpen={isLoadDataOpen}
-                onClose={() => setIsLoadDataOpen(false)}
+                closeDialog={() => setIsLoadDataOpen(false)}
             />
         </nav>
     );

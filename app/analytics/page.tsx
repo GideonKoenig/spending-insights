@@ -1,7 +1,7 @@
 "use client";
 
 import { useAccounts } from "@/contexts/accounts/provider";
-import { AnalyticsCardSummary } from "@/components/analytics-card-summary";
+import { AnalyticsCardSummary } from "@/components/analytics/analytics-card-summary";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Calendar } from "lucide-react";
 import { summarize } from "@/app/analytics/utilts";
@@ -10,6 +10,9 @@ import { BalanceChart } from "@/app/analytics/balance-chart";
 import { useTagRules } from "@/contexts/tag-rules/provider";
 import { useNotifications } from "@/contexts/notification/provider";
 import { LoadingState } from "@/components/loading-state";
+import { EmptyAccountsState } from "@/components/empty-accounts-state";
+import "@/lib/operations-account";
+import "@/lib/operations-transaction";
 
 export default function AnalyticsPage() {
     const accountContext = useAccounts();
@@ -18,6 +21,10 @@ export default function AnalyticsPage() {
 
     if (accountContext.loading || tagRuleContext.loading) {
         return <LoadingState />;
+    }
+
+    if (accountContext.accounts.length === 0) {
+        return <EmptyAccountsState />;
     }
 
     const accounts = accountContext.accounts

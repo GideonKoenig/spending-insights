@@ -1,12 +1,15 @@
 "use client";
 
 import { useAccounts } from "@/contexts/accounts/provider";
-import { TransactionList } from "@/components/transaction-list";
+import { TransactionList } from "@/components/transactions/transaction-list";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useRef } from "react";
 import { useTagRules } from "@/contexts/tag-rules/provider";
 import { useNotifications } from "@/contexts/notification/provider";
 import { LoadingState } from "@/components/loading-state";
+import { EmptyAccountsState } from "@/components/empty-accounts-state";
+import "@/lib/operations-account";
+import "@/lib/operations-transaction";
 
 export default function HomePage() {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -16,6 +19,9 @@ export default function HomePage() {
 
     if (accountContext.loading || tagRuleContext.loading) {
         return <LoadingState />;
+    }
+    if (accountContext.accounts.length === 0) {
+        return <EmptyAccountsState />;
     }
 
     const result = accountContext.accounts
@@ -29,12 +35,11 @@ export default function HomePage() {
         );
     }
 
-    const accounts = result;
-
+    const accounts = result.value;
     return (
         <ScrollArea ref={containerRef} className="h-full">
             <TransactionList
-                transactions={accounts.value.getTransactions()}
+                transactions={accounts.getTransactions()}
                 containerRef={containerRef}
             />
         </ScrollArea>

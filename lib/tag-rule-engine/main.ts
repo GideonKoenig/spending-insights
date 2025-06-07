@@ -3,40 +3,48 @@ import { Account } from "@/lib/types";
 import { splitTransactions } from "@/lib/transaction-filter/main";
 import { FILTER_OPTIONS } from "@/lib/transaction-filter/transaction-filter-options";
 import { newSuccess } from "@/lib/utils";
-import { applyTagRule } from "@/lib/tag-rule-engine/utils";
+import { applyTag } from "@/lib/tag-rule-engine/utils";
 
 function tagAccount(account: Account, tagRules: TagRule[]) {
     if (tagRules.length === 0) return newSuccess(account);
-    const result = account.transactions.slice();
+    const transactions = account.transactions.slice();
     const warnings: string[] = [];
 
     for (const tagRule of tagRules) {
         const { matches, unmatches } = splitTransactions(
-            result,
+            transactions,
             tagRule.filters,
             FILTER_OPTIONS
         );
 
         if (matches.length > 0) {
-            const taggedMatches = applyTagRule(matches, tagRule);
+            const taggedMatches = applyTag(matches, tagRule);
             if (taggedMatches.warnings)
                 warnings.push(...taggedMatches.warnings);
 
-            let unmatchIndex = 0;
-            let matchIndex = 0;
+            const taggedByHash = new Map(
+                taggedMatches.value.map((transaction) => [
+                    transaction.hash,
+                    transaction,
+                ])
+            );
 
-            for (let i = 0; i < result.length; i++) {
-                const transaction = result[i];
-                if (matches.includes(transaction)) {
-                    result[i] = taggedMatches.value[matchIndex++];
-                } else {
-                    result[i] = unmatches[unmatchIndex++];
+            for (let i = 0; i < transactions.length; i++) {
+                const tagged = taggedByHash.get(transactions[i].hash);
+                if (tagged) {
+                    transactions[i] = tagged;
                 }
             }
         }
     }
 
-    return newSuccess(result, warnings);
+    return newSuccess(
+        {
+            ...account,
+            transactions,
+        },
+        warnings
+    );
 }
 
 export const TagRuleEngine = {
