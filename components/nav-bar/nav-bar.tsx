@@ -16,7 +16,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
-import { NotificationButton } from "@/components/notification-button";
+import { NotificationButton } from "@/components/nav-bar/notification-button";
 import { LoadDataModal } from "@/components/load-data-modal/dialog";
 import {
     TriangleAlert,
@@ -128,8 +128,8 @@ export function NavBar() {
                                 </SelectItem>
                                 {accounts.accounts.map((account) => (
                                     <SelectItem
-                                        key={account.name}
-                                        value={account.name}
+                                        key={account.id}
+                                        value={account.id}
                                     >
                                         {account.name}{" "}
                                         <span className="text-xs text-muted-foreground">

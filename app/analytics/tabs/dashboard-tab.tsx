@@ -1,54 +1,42 @@
 "use client";
 
+import { Insights } from "@/lib/analytics-tools/grouping";
 import { AnalyticsCardSummary } from "@/components/analytics/analytics-card-summary";
 import { AnalyticsCardGeneral } from "@/components/analytics/analytics-card-general";
-import { Calendar, BarChart3, Hash, Target } from "lucide-react";
-import { Insights } from "@/lib/analytics-tools/insights";
+import { BarChart3, Calendar, Hash, Target } from "lucide-react";
 import { formatEuro } from "@/lib/utils";
 
-export function AnalyticsInsights(props: { insights: Insights }) {
-    const allMonthly = props.insights.monthly;
-    const allYearly = props.insights.yearly;
-    const totalBalance = props.insights.overall.balance;
+export function DashboardTab(props: { insights: Insights }) {
+    const { overall, monthly, yearly } = props.insights;
 
-    const monthlySummaries = allMonthly.map((monthly) => ({
-        title: `${monthly.month.name} ${monthly.year}`,
-        income: monthly.income,
-        expense: monthly.expense,
-        average: totalBalance / (allMonthly.length || 1),
+    const monthlySummaries = monthly.map((monthData) => ({
+        title: `${monthData.month.name} ${monthData.year}`,
+        income: monthData.income,
+        expense: monthData.expense,
+        average: overall.avgBalancePerMonth,
     }));
 
-    const yearlySummaries = allYearly.map((yearly) => ({
-        title: String(yearly.year),
-        income: yearly.income,
-        expense: yearly.expense,
-        average: totalBalance / (allYearly.length || 1),
+    const yearlySummaries = yearly.map((yearData) => ({
+        title: String(yearData.year),
+        income: yearData.income,
+        expense: yearData.expense,
+        average: overall.avgBalancePerYear,
     }));
-
-    const totalIncome = props.insights.overall.income;
-    const totalExpense = props.insights.overall.expense;
-    const totalTransactions = props.insights.overall.transactionCount;
-    const incomeTransactions = props.insights.overall.incomeTransactionCount;
-    const expenseTransactions = props.insights.overall.expenseTransactionCount;
 
     const balanceLast12Months =
-        monthlySummaries
-            .slice(0, 12)
-            .reduce((sum, month) => sum + month.income - month.expense, 0) / 12;
-
-    const avgYearlyBalance =
-        yearlySummaries.reduce(
-            (sum, year) => sum + year.income - year.expense,
-            0
-        ) / yearlySummaries.length;
-
-    const transactionsPerMonth =
-        props.insights.overall.countMonths > 0
-            ? Math.round(totalTransactions / props.insights.overall.countMonths)
+        monthly.length > 0
+            ? monthly
+                  .slice(-12)
+                  .reduce((sum, month) => sum + month.balance, 0) /
+              Math.min(monthly.length, 12)
             : 0;
+    const avgYearlyBalance = overall.avgBalancePerYear;
+    const transactionsPerMonth = Math.round(
+        overall.transactionCount / overall.countMonths
+    );
 
     return (
-        <>
+        <div className="flex flex-col gap-4">
             <div className="grid grid-cols-4 gap-4">
                 <AnalyticsCardGeneral
                     title="Total Overview"
@@ -57,30 +45,32 @@ export function AnalyticsInsights(props: { insights: Insights }) {
                     <div className="grid grid-cols-[4.25rem_auto] gap-2 text-sm text-muted-foreground">
                         <p>Income:</p>
                         <p className="text-right text-positive">
-                            {formatEuro(totalIncome)}
+                            {formatEuro(overall.income)}
                         </p>
                         <p>Expenses:</p>
                         <p className="text-right text-negative">
-                            {formatEuro(-totalExpense)}
+                            {formatEuro(-overall.expense)}
                         </p>
                         <div className="border-t border-border col-span-2" />
                         <p>Net:</p>
                         <p
                             className={`text-right ${
-                                totalIncome - totalExpense >= 0
+                                overall.balance >= 0
                                     ? "text-positive"
                                     : "text-negative"
                             }`}
                         >
-                            {formatEuro(totalIncome - totalExpense)}
+                            {formatEuro(overall.balance)}
                         </p>
                     </div>
                 </AnalyticsCardGeneral>
 
                 <AnalyticsCardGeneral title="Transaction Count" icon={<Hash />}>
-                    <p className="text-xl font-bold">{totalTransactions}</p>
+                    <p className="text-xl font-bold">
+                        {overall.transactionCount}
+                    </p>
                     <p className="text-xs mb-1 text-muted-foreground">
-                        {`${incomeTransactions} income, ${expenseTransactions} expenses`}
+                        {`${overall.incomeTransactionCount} income, ${overall.expenseTransactionCount} expenses`}
                     </p>
                     <p className="text-xl font-bold">{transactionsPerMonth}</p>
                     <p className="text-xs text-muted-foreground">
@@ -102,8 +92,8 @@ export function AnalyticsInsights(props: { insights: Insights }) {
                         {formatEuro(avgYearlyBalance)}
                     </div>
                     <p className="text-xs text-muted-foreground">
-                        Based on {yearlySummaries.length} year
-                        {yearlySummaries.length !== 1 ? "s" : ""}
+                        Based on {overall.countYears} year
+                        {overall.countYears !== 1 ? "s" : ""}
                     </p>
                 </AnalyticsCardGeneral>
 
@@ -121,7 +111,7 @@ export function AnalyticsInsights(props: { insights: Insights }) {
                         {formatEuro(balanceLast12Months)}
                     </div>
                     <p className="text-xs text-muted-foreground">
-                        Based on last 12 months
+                        Based on {overall.countMonths} months
                     </p>
                 </AnalyticsCardGeneral>
             </div>
@@ -167,6 +157,6 @@ export function AnalyticsInsights(props: { insights: Insights }) {
                     />
                 ))}
             </div>
-        </>
+        </div>
     );
 }

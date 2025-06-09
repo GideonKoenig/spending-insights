@@ -193,7 +193,7 @@ export function TransactionHeader(props: {
                 {option.inputType === "date" && (
                     <DateInput
                         className={cn(
-                            "bg-background",
+                            "bg-background hover:bg-background",
                             !props.sortSelector ? "flex-grow" : ""
                         )}
                         tabIndex={3}

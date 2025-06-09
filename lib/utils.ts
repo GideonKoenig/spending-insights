@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { SuperJSON } from "superjson";
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -48,10 +49,35 @@ export async function tryCatchAsync<T>(
     }
 }
 
-export function newError<T>(error: string): CustomError {
-    return { success: false, error };
+export function newError(error: string) {
+    return { success: false, error } as CustomError;
 }
 
-export function newSuccess<T>(value: T, warnings?: string[]): CustomSuccess<T> {
-    return { success: true, value, ...(warnings && { warnings }) };
+export function newSuccess<T>(value: T, warnings?: string[]) {
+    return {
+        success: true,
+        value,
+        ...(warnings && { warnings }),
+    } as CustomSuccess<T>;
+}
+
+export function storeLocal<T>(key: string, value: T) {
+    if (typeof window === "undefined")
+        return newError("You tryed to store a local value on the server");
+    return tryCatch(() => {
+        localStorage.setItem(key, SuperJSON.stringify(value));
+    });
+}
+
+export function getLocal<T>(key: string): Result<T> {
+    if (typeof window === "undefined")
+        return newError("You tryed to get a local value on the server");
+    const stored = tryCatch(() => localStorage.getItem(key));
+    if (!stored.success) return stored;
+    if (stored.value === null)
+        return newError("No value found for key: " + key);
+
+    const result = tryCatch(() => SuperJSON.parse<T>(stored.value!));
+    if (!result.success) return result;
+    return newSuccess(result.value);
 }

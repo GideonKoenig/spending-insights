@@ -49,7 +49,7 @@ function getActiveAccounts(
 ) {
     if (activeAccount === true) return accounts;
     if (activeAccount === null) return [];
-    return accounts.filter((d) => d.name === activeAccount);
+    return accounts.filter((d) => d.id === activeAccount);
 }
 
 function preprocessAccounts(accounts: Account[], tagRules: TagRule[]) {

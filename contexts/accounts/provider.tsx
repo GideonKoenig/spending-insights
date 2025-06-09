@@ -11,12 +11,14 @@ import { type Account } from "@/lib/types";
 import { useNotifications } from "@/contexts/notification/provider";
 import { SuperJSON } from "superjson";
 import { tryCatch } from "@/lib/utils";
+import { dominoSort } from "@/lib/analytics-tools/sortings";
 import {
     AccountDependencies,
     createExportAccounts,
     createImportAccounts,
     createMergeAccounts,
 } from "@/contexts/accounts/utils";
+import { handleResult } from "@/contexts/notification/utils";
 
 const ACCOUNTS_KEY = "bank-history_accounts";
 const ACTIVE_ACCOUNT_KEY = "bank-history_active_account";
@@ -48,7 +50,7 @@ export function AccountProvider(props: { children: ReactNode }) {
     const [accounts, setAccounts] = useState<Account[]>([]);
     const [activeAccount, setActiveAccount] = useState<string | true>(true);
     const [loading, setLoading] = useState(true);
-    const { addError, addWarning } = useNotifications();
+    const notificationContext = useNotifications();
 
     useEffect(() => {
         setLoading(true);
@@ -59,48 +61,63 @@ export function AccountProvider(props: { children: ReactNode }) {
             return;
         }
 
-        const accounts = tryCatch(() =>
+        const parseResult = tryCatch(() =>
             SuperJSON.parse<Account[]>(storedAccounts)
         );
-        if (!accounts.success) {
-            addError(
-                "Internal Error",
-                "Failed to parse stored accounts. Local storage may be corrupted. Contact the me if this persists."
-            );
-            setLoading(false);
-            return;
-        }
-        setAccounts(accounts.value);
+        const accounts = handleResult(
+            parseResult,
+            "Parsing accounts",
+            notificationContext,
+            []
+        );
+
+        const sortedResult = dominoSort(accounts);
+        const sortedAccounts = handleResult(
+            sortedResult,
+            "Sorting accounts",
+            notificationContext,
+            []
+        );
+        setAccounts(sortedAccounts);
 
         const storedActiveAccount = localStorage.getItem(ACTIVE_ACCOUNT_KEY);
         if (!storedActiveAccount) {
             setLoading(false);
             return;
         }
-
-        const activeAccount = tryCatch(() =>
+        const activeResult = tryCatch(() =>
             SuperJSON.parse<string | true>(storedActiveAccount)
         );
-        if (!activeAccount.success) {
-            setLoading(false);
-            return;
-        }
-
-        setActiveAccount(activeAccount.value);
+        const activeAccount = handleResult(
+            activeResult,
+            "Parsing active account",
+            notificationContext,
+            true
+        );
+        setActiveAccount(activeAccount);
         setLoading(false);
-    }, [addError]);
+    }, [notificationContext]);
 
     function saveAccounts(updater: (accounts: Account[]) => Account[]) {
         setAccounts((prev) => {
             const newAccounts = updater(prev);
+
+            const sortedResult = dominoSort(newAccounts);
+            const sortedAccounts = handleResult(
+                sortedResult,
+                "Sorting accounts",
+                notificationContext,
+                []
+            );
+
             localStorage.setItem(
                 ACCOUNTS_KEY,
-                SuperJSON.stringify(newAccounts)
+                SuperJSON.stringify(sortedAccounts)
             );
-            if (!newAccounts.find((acc) => acc.id === activeAccount)) {
+            if (!sortedAccounts.find((acc) => acc.id === activeAccount)) {
                 handleSetActiveAccount(true);
             }
-            return newAccounts;
+            return sortedAccounts;
         });
     }
 
@@ -126,8 +143,7 @@ export function AccountProvider(props: { children: ReactNode }) {
     }
 
     const dependencies: AccountDependencies = {
-        addError,
-        addWarning,
+        notificationContext,
         saveAccounts,
         accounts,
     };
