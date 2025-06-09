@@ -118,10 +118,10 @@ export function RelativeBalanceChart(props: { insights: Insights }) {
                     axisLine={false}
                     tickMargin={8}
                     tickFormatter={(value) => {
-                        const absoluteValue = startingBalance + value;
-                        return Math.round(absoluteValue).toLocaleString(
+                        const sign = value >= 0 ? "+" : "";
+                        return `${sign}${Math.round(value).toLocaleString(
                             "de-DE"
-                        );
+                        )}`;
                     }}
                 />
                 <ChartTooltip
