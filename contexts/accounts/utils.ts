@@ -1,11 +1,11 @@
+import { NotificationContextType } from "@/contexts/notification/provider";
 import { hashTransaction } from "@/lib/data-injestion/utils";
 import { type Account, AccountSchema } from "@/lib/types";
 import { tryCatch } from "@/lib/utils";
 import SuperJSON from "superjson";
 
 export type AccountDependencies = {
-    addError: (origin: string, message: string) => void;
-    addWarning: (origin: string, message: string) => void;
+    notificationContext: NotificationContextType;
     saveAccounts: (updater: (accounts: Account[]) => Account[]) => void;
     accounts: Account[];
 };
@@ -19,7 +19,7 @@ export function createImportAccounts(dependencies: AccountDependencies) {
             const files = (event.target as HTMLInputElement).files;
             if (files) {
                 if (files.length > 1) {
-                    dependencies.addError(
+                    dependencies.notificationContext.addError(
                         "Import Accounts",
                         "Only one file can be imported at a time"
                     );
@@ -27,7 +27,7 @@ export function createImportAccounts(dependencies: AccountDependencies) {
                 }
                 const file = files[0];
                 if (!file) {
-                    dependencies.addError(
+                    dependencies.notificationContext.addError(
                         "Import Accounts",
                         "No file provided"
                     );
@@ -39,7 +39,7 @@ export function createImportAccounts(dependencies: AccountDependencies) {
                     SuperJSON.parse<Account[]>(text)
                 );
                 if (!accounts.success) {
-                    dependencies.addError(
+                    dependencies.notificationContext.addError(
                         "Internal Error - SuperJSON",
                         "Failed to parse accounts. Did you maybe select the wrong file?"
                     );
@@ -49,7 +49,7 @@ export function createImportAccounts(dependencies: AccountDependencies) {
                     accounts.value
                 );
                 if (!parsedAccounts.success) {
-                    dependencies.addError(
+                    dependencies.notificationContext.addError(
                         "Internal Error - Zod",
                         `Failed to parse accounts. Did you maybe select the wrong file?\n${parsedAccounts.error.message}`
                     );
@@ -61,7 +61,7 @@ export function createImportAccounts(dependencies: AccountDependencies) {
                         accounts.some((a) => a.id === p.id)
                     );
                     if (matches.length > 0) {
-                        dependencies.addWarning(
+                        dependencies.notificationContext.addWarning(
                             "Import Accounts",
                             `Skipped ${
                                 matches.length
@@ -102,7 +102,7 @@ export function createMergeAccounts(dependencies: AccountDependencies) {
             (acc) => acc.id === targetId
         );
         if (!targetAccount) {
-            dependencies.addError(
+            dependencies.notificationContext.addError(
                 "Merge Accounts",
                 "Merge unsuccessful. Target account not found."
             );

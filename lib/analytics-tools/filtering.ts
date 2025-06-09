@@ -1,0 +1,112 @@
+import { Insights } from "./grouping";
+import { TimeRange } from "@/components/analytics/selector-time-range";
+import {
+    subMonths,
+    subYears,
+    startOfYear,
+    startOfMonth,
+    endOfMonth,
+    endOfYear,
+} from "date-fns";
+
+export function getDateRangeFromTimeRange(timeRange: TimeRange) {
+    const now = new Date();
+
+    if (
+        timeRange.type === "custom" &&
+        timeRange.startDate &&
+        timeRange.endDate
+    ) {
+        return { start: timeRange.startDate, end: timeRange.endDate };
+    }
+
+    switch (timeRange.value) {
+        case "all":
+            return { start: new Date(1900, 0, 1), end: now };
+        case "last-year":
+            return { start: subYears(now, 1), end: now };
+        case "last-6-months":
+            return { start: subMonths(now, 6), end: now };
+        case "last-3-months":
+            return { start: subMonths(now, 3), end: now };
+        case "last-month":
+            return { start: subMonths(now, 1), end: now };
+        case "this-year":
+            return { start: startOfYear(now), end: endOfYear(now) };
+        case "this-month":
+            return { start: startOfMonth(now), end: endOfMonth(now) };
+        default:
+            return { start: new Date(1900, 0, 1), end: now };
+    }
+}
+
+export function filterInsightsByTimeRange(
+    insights: Insights,
+    timeRange: TimeRange
+) {
+    const { start, end } = getDateRangeFromTimeRange(timeRange);
+
+    const filteredDaily = insights.daily.filter(
+        (day) => day.date >= start && day.date <= end
+    );
+
+    const filteredMonthly = insights.monthly.filter((month) => {
+        const monthDate = new Date(month.year, month.month.id);
+        return monthDate >= start && monthDate <= end;
+    });
+
+    const filteredYearly = insights.yearly.filter(
+        (year) =>
+            year.year >= start.getFullYear() && year.year <= end.getFullYear()
+    );
+
+    const recalculateOverall = () => {
+        let income = 0;
+        let expense = 0;
+        let transactionCount = 0;
+        let incomeTransactionCount = 0;
+        let expenseTransactionCount = 0;
+
+        filteredDaily.forEach((day) => {
+            income += day.income;
+            expense += day.expense;
+            transactionCount += day.transactionCount;
+            incomeTransactionCount += day.incomeTransactionCount;
+            expenseTransactionCount += day.expenseTransactionCount;
+        });
+
+        const balance = income - expense;
+        const countMonths = filteredMonthly.length;
+        const countYears = filteredYearly.length;
+
+        return {
+            income,
+            expense,
+            balance,
+            transactionCount,
+            incomeTransactionCount,
+            expenseTransactionCount,
+            countMonths,
+            countYears,
+            avgIncomePerMonth: countMonths > 0 ? income / countMonths : 0,
+            avgExpensePerMonth: countMonths > 0 ? expense / countMonths : 0,
+            avgBalancePerMonth: countMonths > 0 ? balance / countMonths : 0,
+            avgIncomePerYear: countYears > 0 ? income / countYears : 0,
+            avgExpensePerYear: countYears > 0 ? expense / countYears : 0,
+            avgBalancePerYear: countYears > 0 ? balance / countYears : 0,
+            balanceBefore:
+                filteredDaily.length > 0 ? filteredDaily[0].balanceBefore : 0,
+            balanceAfter:
+                filteredDaily.length > 0
+                    ? filteredDaily[filteredDaily.length - 1].balanceAfter
+                    : 0,
+        };
+    };
+
+    return {
+        overall: recalculateOverall(),
+        daily: filteredDaily,
+        monthly: filteredMonthly,
+        yearly: filteredYearly,
+    };
+}

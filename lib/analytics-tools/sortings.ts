@@ -1,74 +1,106 @@
-import { getDateKey } from "@/lib/analytics-tools/utilts";
-import { Transaction } from "@/lib/types";
+import { Account, Transaction } from "@/lib/types";
 import { newError, newSuccess } from "@/lib/utils";
 
-export function orderTransactionsByDomino(transactions: Transaction[]) {
-    if (transactions.length === 0) return newSuccess([]);
+export function dominoSort(accounts: Account[]) {
+    if (accounts.length === 0) return newSuccess([]);
+    const accountsSorted: Account[] = [];
     const warnings: string[] = [];
 
-    const sortedTransactions = [...transactions].sort(
-        (a, b) => a.bookingDate.getTime() - b.bookingDate.getTime()
-    );
+    for (const account of accounts) {
+        const transactions = account.transactions;
 
-    const oldestDate = sortedTransactions[0].bookingDate;
-    const firstDayTransactions = sortedTransactions.filter(
-        (t) => t.bookingDate.getTime() === oldestDate.getTime()
-    );
-    const startTransaction = firstDayTransactions.reduce((lowest, curr) => {
-        const lowestBefore = lowest.balanceAfterTransaction - lowest.amount;
-        const currBefore = curr.balanceAfterTransaction - curr.amount;
-        return currBefore < lowestBefore ? curr : lowest;
-    });
-
-    const remaining = sortedTransactions.filter((t) => t !== startTransaction);
-    const ordered: Transaction[] = [startTransaction];
-    let current = startTransaction;
-
-    while (remaining.length > 0) {
-        const currentAfterBalance = current.balanceAfterTransaction;
-
-        const nextIndex = remaining.findIndex(
-            (t) =>
-                Math.abs(
-                    t.balanceAfterTransaction - t.amount - currentAfterBalance
-                ) < 0.01
+        const sorted = transactions.sort(
+            (a, b) => a.bookingDate.getTime() - b.bookingDate.getTime()
+        );
+        const oldestDate = sorted[0].bookingDate;
+        const firstOfSecondDay = sorted.findIndex(
+            (t) => t.bookingDate.getTime() !== oldestDate.getTime()
         );
 
-        if (nextIndex !== -1) {
-            const candidate = remaining[nextIndex];
+        const remaining = sorted.slice(firstOfSecondDay);
+        const ordered: Transaction[] = [sorted[firstOfSecondDay - 1]];
+        const skipped = sorted.slice(0, firstOfSecondDay - 1);
 
-            if (
-                candidate.bookingDate.getTime() < current.bookingDate.getTime()
-            ) {
+        const forwardResult = processTransactionChain(
+            remaining,
+            ordered[0],
+            true
+        );
+        if (forwardResult.warnings) warnings.push(...forwardResult.warnings);
+        ordered.push(...forwardResult.value.chain);
+
+        const backwardResult = processTransactionChain(
+            skipped,
+            ordered[0],
+            false
+        );
+        if (backwardResult.warnings) warnings.push(...backwardResult.warnings);
+        ordered.unshift(...backwardResult.value.chain);
+
+        const totalRemaining =
+            forwardResult.value.remaining.length +
+            backwardResult.value.remaining.length;
+
+        if (totalRemaining > 0) {
+            return newError(
+                `Unable to sort transactions for account ${account.name}.\nFound ${totalRemaining} transactions that don't fit the domino chain.`
+            );
+        }
+
+        accountsSorted.push({
+            ...account,
+            transactions: ordered,
+        });
+    }
+
+    return newSuccess(accountsSorted, warnings);
+}
+
+function processTransactionChain(
+    remaining: Transaction[],
+    current: Transaction,
+    isForward: boolean
+) {
+    const chain: Transaction[] = [];
+    const warnings: string[] = [];
+
+    while (remaining.length > 0) {
+        const targetBalance = isForward
+            ? current.balanceAfterTransaction
+            : current.balanceAfterTransaction - current.amount;
+
+        const matchIndex = remaining.findIndex((t) => {
+            const candidateBalance = isForward
+                ? t.balanceAfterTransaction - t.amount
+                : t.balanceAfterTransaction;
+            return Math.abs(candidateBalance - targetBalance) < 0.01;
+        });
+
+        if (matchIndex !== -1) {
+            const candidate = remaining[matchIndex];
+            const dateComparison = isForward
+                ? candidate.bookingDate.getTime() <
+                  current.bookingDate.getTime()
+                : candidate.bookingDate.getTime() >
+                  current.bookingDate.getTime();
+
+            if (dateComparison) {
+                const direction = isForward ? "before" : "after";
+                const operator = isForward ? "<" : ">";
                 warnings.push(
-                    `Skipping transaction that should have come before current transaction: ${candidate.bookingDate.toDateString()} < ${current.bookingDate.toDateString()}`
+                    `Skipping transaction that should have come ${direction} current transaction: ${candidate.bookingDate.toDateString()} ${operator} ${current.bookingDate.toDateString()}`
                 );
-                remaining.splice(nextIndex, 1);
+                remaining.splice(matchIndex, 1);
                 continue;
             }
 
             current = candidate;
-            ordered.push(current);
-            remaining.splice(nextIndex, 1);
+            chain.push(current);
+            remaining.splice(matchIndex, 1);
         } else {
             break;
         }
     }
 
-    for (const remainingTransaction of remaining) {
-        if (
-            getDateKey(remainingTransaction.bookingDate) ===
-            getDateKey(oldestDate)
-        ) {
-            warnings.push(
-                `Disregarding transaction from start date that doesn't fit the domino chain: ${remainingTransaction.bookingDate.toDateString()}`
-            );
-        } else {
-            return newError(
-                `Unexpected transaction from ${remainingTransaction.bookingDate.toDateString()}. Expected all remaining transactions to be from start date ${oldestDate.toDateString()}`
-            );
-        }
-    }
-
-    return newSuccess(ordered, warnings);
+    return newSuccess({ chain, remaining }, warnings);
 }

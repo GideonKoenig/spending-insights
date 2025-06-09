@@ -171,10 +171,16 @@ export function handleResult<T>(
     result: Result<T> | CustomSuccess<T>,
     origin: string,
     notificationContext: NotificationContextType,
-    defaultValue: T
+    defaultValue: T,
+    ignoredErrors?: string[]
 ) {
     if (!result.success) {
-        notificationContext.addError(origin, result.error);
+        const isIgnored = ignoredErrors
+            ? ignoredErrors.some((error) =>
+                  result.error.toLowerCase().includes(error.toLowerCase())
+              )
+            : false;
+        if (!isIgnored) notificationContext.addError(origin, result.error);
         return defaultValue;
     }
     if (result.success && result.warnings) {
