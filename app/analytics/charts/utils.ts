@@ -43,9 +43,6 @@ export function calculateYTicks(chartData: { balance: number }[]) {
 export function calculateRelativeYTicks(
     chartData: { relativeBalance: number }[]
 ) {
-    const stepOptions = [100, 500, 1000, 2000, 5000, 10000];
-    const targetTicks = 10;
-
     const relativeBalances = chartData.map((d) => d.relativeBalance);
     const minRelative = Math.min(...relativeBalances);
     const maxRelative = Math.max(...relativeBalances);
@@ -54,19 +51,20 @@ export function calculateRelativeYTicks(
         Math.abs(maxRelative)
     );
 
+    const stepOptions = [100, 500, 1000, 2000, 5000, 10000];
+    const targetTicks = 10;
     const idealStepSize = (maxAbsoluteChange * 2) / targetTicks;
-
-    const STEP_SIZE = stepOptions.reduce((prev, curr) =>
+    const stepSize = stepOptions.reduce((prev, curr) =>
         Math.abs(curr - idealStepSize) < Math.abs(prev - idealStepSize)
             ? curr
             : prev
     );
 
-    const maxTick = Math.ceil(maxAbsoluteChange / STEP_SIZE) * STEP_SIZE;
+    const maxTick = Math.ceil(maxAbsoluteChange / stepSize) * stepSize;
     const minTick = -maxTick;
 
     const ticks = [];
-    for (let i = minTick; i <= maxTick; i += STEP_SIZE) {
+    for (let i = minTick; i <= maxTick; i += stepSize) {
         ticks.push(i);
     }
     return ticks;
