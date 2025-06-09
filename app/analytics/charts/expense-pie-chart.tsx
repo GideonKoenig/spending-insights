@@ -15,11 +15,11 @@ import { useGraph } from "@/contexts/graph/provider";
 import { filterInsightsByTimeRange } from "@/lib/analytics-tools/filtering";
 
 const colors = [
-    "hsl(var(--chart-1))",
-    "hsl(var(--chart-2))",
-    "hsl(var(--chart-3))",
-    "hsl(var(--chart-4))",
-    "hsl(var(--chart-5))",
+    "var(--chart-1)",
+    "var(--chart-2)",
+    "var(--chart-3)",
+    "var(--chart-4)",
+    "var(--chart-5)",
 ];
 
 export function ExpensePieChart(props: { insights: Insights }) {
@@ -59,13 +59,9 @@ export function ExpensePieChart(props: { insights: Insights }) {
         filteredInsights.overall.expense === 0
     ) {
         return (
-            <>
-                <CardContent>
-                    <div className="flex h-[400px] items-center justify-center text-muted-foreground">
-                        No expense data available for the selected time range
-                    </div>
-                </CardContent>
-            </>
+            <div className="flex h-[400px] items-center justify-center text-muted-foreground">
+                No expense data available for the selected time range
+            </div>
         );
     }
 
@@ -111,7 +107,7 @@ export function ExpensePieChart(props: { insights: Insights }) {
                                 {mockExpenseData.map((entry, index) => (
                                     <Cell
                                         key={`cell-${index}`}
-                                        fill={colors[index % colors.length]}
+                                        fill={`var(--color-${entry.name.toLowerCase()})`}
                                     />
                                 ))}
                             </Pie>

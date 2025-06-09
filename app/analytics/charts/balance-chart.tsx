@@ -66,13 +66,9 @@ export function BalanceChart(props: { insights: Insights }) {
 
     if (chartData.length === 0) {
         return (
-            <>
-                <CardContent>
-                    <div className="flex h-[400px] items-center justify-center text-muted-foreground">
-                        No data available for the selected time range
-                    </div>
-                </CardContent>
-            </>
+            <div className="flex h-[400px] items-center justify-center text-muted-foreground">
+                No data available for the selected time range
+            </div>
         );
     }
 
