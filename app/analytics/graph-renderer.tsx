@@ -2,6 +2,7 @@
 
 import { Insights } from "@/lib/analytics-tools/grouping";
 import { BalanceChart } from "@/app/analytics/charts/balance-chart";
+import { RelativeBalanceChart } from "@/app/analytics/charts/relative-balance-chart";
 import { IncomeExpenseChart } from "@/app/analytics/charts/income-expense-chart";
 import { ExpensePieChart } from "@/app/analytics/charts/expense-pie-chart";
 import { SankeyDiagram } from "@/app/analytics/charts/sankey-diagram";
@@ -23,6 +24,9 @@ export function GraphRenderer(props: { insights: Insights }) {
     switch (graphContext.settings.type) {
         case "balance":
             graph = <BalanceChart insights={props.insights} />;
+            break;
+        case "relative-balance":
+            graph = <RelativeBalanceChart insights={props.insights} />;
             break;
         case "income-expense":
             graph = <IncomeExpenseChart insights={props.insights} />;

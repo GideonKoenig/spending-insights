@@ -14,7 +14,7 @@ import { filterInsightsByTimeRange } from "@/lib/analytics-tools/filtering";
 import { format } from "date-fns";
 import { useGraph } from "@/contexts/graph/provider";
 import {
-    calculateYTicks,
+    calculateRelativeYTicks,
     calculateXTicks,
     createLabelFormatter,
 } from "@/app/analytics/charts/utils";
@@ -26,7 +26,7 @@ const chartConfig = {
     },
 } satisfies ChartConfig;
 
-export function BalanceChart(props: { insights: Insights }) {
+export function RelativeBalanceChart(props: { insights: Insights }) {
     const graphContext = useGraph();
     const filteredInsights = filterInsightsByTimeRange(
         props.insights,
@@ -34,32 +34,46 @@ export function BalanceChart(props: { insights: Insights }) {
     );
 
     const getChartData = () => {
+        let baseData;
         switch (graphContext.settings.aggregation) {
             case "daily":
-                return filteredInsights.daily.map((dailyData) => ({
+                baseData = filteredInsights.daily.map((dailyData) => ({
                     date: formatDate(dailyData.date),
                     balance: dailyData.balanceAfter,
                     fullDate: dailyData.date,
                 }));
+                break;
             case "weekly":
-                return filteredInsights.weekly.map((weekData) => ({
+                baseData = filteredInsights.weekly.map((weekData) => ({
                     date: `Week ${weekData.week}/${weekData.year}`,
                     balance: weekData.balanceAfter,
                     fullDate: weekData.weekStartDate,
                 }));
+                break;
             case "monthly":
-                return filteredInsights.monthly.map((monthData) => ({
+                baseData = filteredInsights.monthly.map((monthData) => ({
                     date: `${monthData.month.name} ${monthData.year}`,
                     balance: monthData.balanceAfter,
                     fullDate: new Date(monthData.year, monthData.month.id),
                 }));
+                break;
             case "yearly":
-                return filteredInsights.yearly.map((yearData) => ({
+                baseData = filteredInsights.yearly.map((yearData) => ({
                     date: String(yearData.year),
                     balance: yearData.balanceAfter,
                     fullDate: new Date(yearData.year, 0),
                 }));
+                break;
         }
+
+        if (baseData.length === 0) return [];
+
+        const startingBalance = baseData[0].balance;
+        return baseData.map((item) => ({
+            ...item,
+            relativeBalance: item.balance - startingBalance,
+            absoluteBalance: item.balance,
+        }));
     };
 
     const chartData = getChartData();
@@ -76,8 +90,9 @@ export function BalanceChart(props: { insights: Insights }) {
         );
     }
 
-    const yTicks = calculateYTicks(chartData);
+    const yTicks = calculateRelativeYTicks(chartData);
     const xTickData = calculateXTicks(chartData);
+    const startingBalance = chartData[0].absoluteBalance;
 
     return (
         <ChartContainer config={chartConfig} className="w-full">
@@ -106,9 +121,12 @@ export function BalanceChart(props: { insights: Insights }) {
                     tickLine={false}
                     axisLine={false}
                     tickMargin={8}
-                    tickFormatter={(value) =>
-                        Math.round(value).toLocaleString("de-DE")
-                    }
+                    tickFormatter={(value) => {
+                        const absoluteValue = startingBalance + value;
+                        return Math.round(absoluteValue).toLocaleString(
+                            "de-DE"
+                        );
+                    }}
                 />
                 <ChartTooltip
                     content={
@@ -116,17 +134,38 @@ export function BalanceChart(props: { insights: Insights }) {
                             labelFormatter={createLabelFormatter(
                                 graphContext.settings.aggregation
                             )}
-                            formatter={(value) => [
-                                Math.round(Number(value)).toLocaleString(
-                                    "de-DE"
-                                ) + " EUR",
-                                "",
-                            ]}
+                            formatter={(value, name, props) => {
+                                const relativeValue = Number(value);
+                                const absoluteValue =
+                                    props.payload.absoluteBalance;
+                                const sign = relativeValue >= 0 ? "+" : "";
+                                const colorClass =
+                                    relativeValue >= 0
+                                        ? "text-positive"
+                                        : "text-negative";
+
+                                return [
+                                    <p key="balance-tooltip">
+                                        {Math.round(
+                                            absoluteValue
+                                        ).toLocaleString("de-DE")}{" "}
+                                        EUR{" "}
+                                        <span className={colorClass}>
+                                            ({sign}
+                                            {Math.round(
+                                                relativeValue
+                                            ).toLocaleString("de-DE")}{" "}
+                                            EUR)
+                                        </span>
+                                    </p>,
+                                    "",
+                                ];
+                            }}
                         />
                     }
                 />
                 <Line
-                    dataKey="balance"
+                    dataKey="relativeBalance"
                     type="monotone"
                     stroke="var(--color-balance)"
                     strokeWidth={2}

@@ -23,18 +23,24 @@ export function getDateRangeFromTimeRange(timeRange: TimeRange) {
     switch (timeRange.value) {
         case "all":
             return { start: new Date(1900, 0, 1), end: now };
-        case "last-year":
-            return { start: subYears(now, 1), end: now };
-        case "last-6-months":
-            return { start: subMonths(now, 6), end: now };
-        case "last-3-months":
-            return { start: subMonths(now, 3), end: now };
-        case "last-month":
-            return { start: subMonths(now, 1), end: now };
-        case "this-year":
-            return { start: startOfYear(now), end: endOfYear(now) };
         case "this-month":
             return { start: startOfMonth(now), end: endOfMonth(now) };
+        case "this-year":
+            return { start: startOfYear(now), end: endOfYear(now) };
+        case "last-3-months":
+            return { start: subMonths(now, 3), end: now };
+        case "last-6-months":
+            return { start: subMonths(now, 6), end: now };
+        case "last-month":
+            return {
+                start: subMonths(startOfMonth(now), 1),
+                end: subMonths(endOfMonth(now), 1),
+            };
+        case "last-year":
+            return {
+                start: subYears(startOfYear(now), 1),
+                end: subYears(endOfYear(now), 1),
+            };
         default:
             return { start: new Date(1900, 0, 1), end: now };
     }
@@ -48,6 +54,10 @@ export function filterInsightsByTimeRange(
 
     const filteredDaily = insights.daily.filter(
         (day) => day.date >= start && day.date <= end
+    );
+
+    const filteredWeekly = insights.weekly.filter(
+        (week) => week.weekStartDate <= end && week.weekEndDate >= start
     );
 
     const filteredMonthly = insights.monthly.filter((month) => {
@@ -78,6 +88,7 @@ export function filterInsightsByTimeRange(
         const balance = income - expense;
         const countMonths = filteredMonthly.length;
         const countYears = filteredYearly.length;
+        const countWeeks = filteredWeekly.length;
 
         return {
             income,
@@ -88,12 +99,16 @@ export function filterInsightsByTimeRange(
             expenseTransactionCount,
             countMonths,
             countYears,
+            countWeeks,
             avgIncomePerMonth: countMonths > 0 ? income / countMonths : 0,
             avgExpensePerMonth: countMonths > 0 ? expense / countMonths : 0,
             avgBalancePerMonth: countMonths > 0 ? balance / countMonths : 0,
             avgIncomePerYear: countYears > 0 ? income / countYears : 0,
             avgExpensePerYear: countYears > 0 ? expense / countYears : 0,
             avgBalancePerYear: countYears > 0 ? balance / countYears : 0,
+            avgIncomePerWeek: countWeeks > 0 ? income / countWeeks : 0,
+            avgExpensePerWeek: countWeeks > 0 ? expense / countWeeks : 0,
+            avgBalancePerWeek: countWeeks > 0 ? balance / countWeeks : 0,
             balanceBefore:
                 filteredDaily.length > 0 ? filteredDaily[0].balanceBefore : 0,
             balanceAfter:
@@ -106,6 +121,7 @@ export function filterInsightsByTimeRange(
     return {
         overall: recalculateOverall(),
         daily: filteredDaily,
+        weekly: filteredWeekly,
         monthly: filteredMonthly,
         yearly: filteredYearly,
     };

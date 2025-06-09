@@ -1,6 +1,7 @@
 import { Month } from "@/lib/analytics-tools/types";
 import { getMonthById } from "@/lib/analytics-tools/utilts";
 import { Transaction, Account } from "@/lib/types";
+import { startOfWeek, getISOWeek, getISOWeekYear, endOfWeek } from "date-fns";
 
 export type Insights = {
     overall: {
@@ -9,12 +10,16 @@ export type Insights = {
         balance: number;
         countMonths: number;
         countYears: number;
+        countWeeks: number;
         avgIncomePerMonth: number;
         avgExpensePerMonth: number;
         avgBalancePerMonth: number;
         avgIncomePerYear: number;
         avgExpensePerYear: number;
         avgBalancePerYear: number;
+        avgIncomePerWeek: number;
+        avgExpensePerWeek: number;
+        avgBalancePerWeek: number;
         transactionCount: number;
         incomeTransactionCount: number;
         expenseTransactionCount: number;
@@ -23,6 +28,20 @@ export type Insights = {
     };
     daily: {
         date: Date;
+        income: number;
+        expense: number;
+        balance: number;
+        transactionCount: number;
+        incomeTransactionCount: number;
+        expenseTransactionCount: number;
+        balanceBefore: number;
+        balanceAfter: number;
+    }[];
+    weekly: {
+        weekStartDate: Date;
+        weekEndDate: Date;
+        year: number;
+        week: number;
         income: number;
         expense: number;
         balance: number;
@@ -70,12 +89,29 @@ export function getInsights(accounts: Account[]): Insights {
     let totalExpenseTransactionCount = 0;
     const allYears = new Set<number>();
     const allMonths = new Set<number>();
+    const allWeeks = new Set<number>();
     const allDays = new Set<number>();
 
     const dailyMap = new Map<
         number,
         {
             date: Date;
+            income: number;
+            expense: number;
+            balance: number;
+            transactionCount: number;
+            incomeTransactionCount: number;
+            expenseTransactionCount: number;
+        }
+    >();
+
+    const weeklyMap = new Map<
+        number,
+        {
+            weekStartDate: Date;
+            weekEndDate: Date;
+            year: number;
+            week: number;
             income: number;
             expense: number;
             balance: number;
@@ -114,6 +150,7 @@ export function getInsights(accounts: Account[]): Insights {
 
     // Track balance info per account for each period
     const accountDailyBalances: AccountBalanceMap = new Map();
+    const accountWeeklyBalances: AccountBalanceMap = new Map();
     const accountMonthlyBalances: AccountBalanceMap = new Map();
     const accountYearlyBalances: AccountBalanceMap = new Map();
     const accountFirstTransaction = new Map<string, Transaction>();
@@ -122,6 +159,10 @@ export function getInsights(accounts: Account[]): Insights {
     // Process each account to collect transaction data and balance info
     for (const account of accounts) {
         const dailyBalances = new Map<
+            number,
+            { first: Transaction; last: Transaction }
+        >();
+        const weeklyBalances = new Map<
             number,
             { first: Transaction; last: Transaction }
         >();
@@ -154,6 +195,18 @@ export function getInsights(accounts: Account[]): Insights {
                 dailyBalances.get(dayKey)!.last = transaction;
             }
 
+            const weekStartDate = startOfWeek(date, { weekStartsOn: 1 });
+            // Monday = 1
+            const weekKey = weekStartDate.getTime();
+            if (!weeklyBalances.has(weekKey)) {
+                weeklyBalances.set(weekKey, {
+                    first: transaction,
+                    last: transaction,
+                });
+            } else {
+                weeklyBalances.get(weekKey)!.last = transaction;
+            }
+
             const monthKey = date.getFullYear() * 100 + date.getMonth();
             if (!monthlyBalances.has(monthKey)) {
                 monthlyBalances.set(monthKey, {
@@ -176,12 +229,27 @@ export function getInsights(accounts: Account[]): Insights {
 
             allYears.add(yearKey);
             allMonths.add(monthKey);
+            allWeeks.add(weekKey);
             allDays.add(dayKey);
 
             // Aggregation initialization
             if (!dailyMap.has(dayKey)) {
                 dailyMap.set(dayKey, {
                     date: date,
+                    income: 0,
+                    expense: 0,
+                    balance: 0,
+                    transactionCount: 0,
+                    incomeTransactionCount: 0,
+                    expenseTransactionCount: 0,
+                });
+            }
+            if (!weeklyMap.has(weekKey)) {
+                weeklyMap.set(weekKey, {
+                    weekStartDate: weekStartDate,
+                    weekEndDate: endOfWeek(weekStartDate, { weekStartsOn: 1 }),
+                    year: getISOWeekYear(date),
+                    week: getISOWeek(date),
                     income: 0,
                     expense: 0,
                     balance: 0,
@@ -237,6 +305,15 @@ export function getInsights(accounts: Account[]): Insights {
             dayData.incomeTransactionCount += isIncome ? 1 : 0;
             dayData.expenseTransactionCount += isIncome ? 0 : 1;
 
+            // Weekly aggregation
+            const weekData = weeklyMap.get(weekKey)!;
+            weekData.income += isIncome ? amount : 0;
+            weekData.expense += isIncome ? 0 : amount;
+            weekData.balance = weekData.income - weekData.expense;
+            weekData.transactionCount += 1;
+            weekData.incomeTransactionCount += isIncome ? 1 : 0;
+            weekData.expenseTransactionCount += isIncome ? 0 : 1;
+
             // Monthly aggregation
             const monthData = monthlyMap.get(monthKey)!;
             monthData.income += isIncome ? amount : 0;
@@ -257,12 +334,14 @@ export function getInsights(accounts: Account[]): Insights {
         }
 
         accountDailyBalances.set(account.id, dailyBalances);
+        accountWeeklyBalances.set(account.id, weeklyBalances);
         accountMonthlyBalances.set(account.id, monthlyBalances);
         accountYearlyBalances.set(account.id, yearlyBalances);
     }
 
     // Sort period keys chronologically
     const sortedDayKeys = Array.from(allDays).sort();
+    const sortedWeekKeys = Array.from(allWeeks).sort();
     const sortedMonthKeys = Array.from(allMonths).sort();
     const sortedYearKeys = Array.from(allYears).sort((a, b) => a - b);
 
@@ -270,6 +349,12 @@ export function getInsights(accounts: Account[]): Insights {
     const dailyBalanceResults = calculatePeriodBalances(
         sortedDayKeys,
         accountDailyBalances,
+        accountFirstTransaction
+    );
+
+    const weeklyBalanceResults = calculatePeriodBalances(
+        sortedWeekKeys,
+        accountWeeklyBalances,
         accountFirstTransaction
     );
 
@@ -292,6 +377,14 @@ export function getInsights(accounts: Account[]): Insights {
             const dayKey = dayData.date.getTime();
             const balanceInfo = dailyBalanceResults.get(dayKey)!;
             return { ...dayData, ...balanceInfo };
+        });
+
+    const weekly = Array.from(weeklyMap.values())
+        .sort((a, b) => a.weekStartDate.getTime() - b.weekStartDate.getTime())
+        .map((weekData) => {
+            const weekKey = weekData.weekStartDate.getTime();
+            const balanceInfo = weeklyBalanceResults.get(weekKey)!;
+            return { ...weekData, ...balanceInfo };
         });
 
     const monthly = Array.from(monthlyMap.values())
@@ -338,6 +431,7 @@ export function getInsights(accounts: Account[]): Insights {
             transactionCount: totalTransactionCount,
             countMonths: allMonths.size,
             countYears: allYears.size,
+            countWeeks: allWeeks.size,
             avgIncomePerMonth:
                 allMonths.size > 0 ? totalIncome / allMonths.size : 0,
             avgExpensePerMonth:
@@ -350,12 +444,19 @@ export function getInsights(accounts: Account[]): Insights {
                 allYears.size > 0 ? totalExpense / allYears.size : 0,
             avgBalancePerYear:
                 allYears.size > 0 ? totalBalance / allYears.size : 0,
+            avgIncomePerWeek:
+                allWeeks.size > 0 ? totalIncome / allWeeks.size : 0,
+            avgExpensePerWeek:
+                allWeeks.size > 0 ? totalExpense / allWeeks.size : 0,
+            avgBalancePerWeek:
+                allWeeks.size > 0 ? totalBalance / allWeeks.size : 0,
             incomeTransactionCount: totalIncomeTransactionCount,
             expenseTransactionCount: totalExpenseTransactionCount,
             balanceBefore: overallBalanceBefore,
             balanceAfter: overallBalanceAfter,
         },
         daily,
+        weekly,
         monthly,
         yearly,
     };

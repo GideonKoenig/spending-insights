@@ -39,12 +39,12 @@ export type TimeRange = {
 
 const presetRanges = [
     { value: "all", label: "All Time" },
-    { value: "last-year", label: "Last Year" },
-    { value: "last-6-months", label: "Last 6 Months" },
-    { value: "last-3-months", label: "Last 3 Months" },
+    { value: "this-month", label: "This Month" },
     { value: "last-month", label: "Last Month" },
     { value: "this-year", label: "This Year" },
-    { value: "this-month", label: "This Month" },
+    { value: "last-year", label: "Last Year" },
+    { value: "last-3-months", label: "Last 3 Months" },
+    { value: "last-6-months", label: "Last 6 Months" },
     { value: "custom", label: "Custom Range" },
 ];
 
