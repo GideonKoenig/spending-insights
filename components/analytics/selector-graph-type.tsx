@@ -10,10 +10,16 @@ import {
 import { useGraph } from "@/contexts/graph/provider";
 import { LoadingState } from "@/components/loading-state";
 
-export type GraphType = "balance" | "income-expense" | "pie" | "sankey";
+export type GraphType =
+    | "balance"
+    | "relative-balance"
+    | "income-expense"
+    | "pie"
+    | "sankey";
 
 const graphTypeOptions = [
     { value: "balance", label: "Balance Chart" },
+    { value: "relative-balance", label: "Relative Balance Chart" },
     { value: "income-expense", label: "Income vs Expenses" },
     { value: "pie", label: "Expense Pie Chart" },
     { value: "sankey", label: "Sankey Chart" },

@@ -10,10 +10,11 @@ import {
 } from "@/components/ui/select";
 import { useGraph } from "@/contexts/graph/provider";
 
-export type AggregationLevel = "daily" | "monthly" | "yearly";
+export type AggregationLevel = "daily" | "weekly" | "monthly" | "yearly";
 
 const aggregationOptions = [
     { value: "daily", label: "Daily" },
+    { value: "weekly", label: "Weekly" },
     { value: "monthly", label: "Monthly" },
     { value: "yearly", label: "Yearly" },
 ] as const;
