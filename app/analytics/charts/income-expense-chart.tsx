@@ -95,13 +95,9 @@ export function IncomeExpenseChart(props: { insights: Insights }) {
 
     if (chartData.length === 0) {
         return (
-            <>
-                <CardContent>
-                    <div className="flex h-[400px] items-center justify-center text-muted-foreground">
-                        No data available for the selected time range
-                    </div>
-                </CardContent>
-            </>
+            <div className="flex h-[400px] items-center justify-center text-muted-foreground">
+                No data available for the selected time range
+            </div>
         );
     }
 
@@ -110,7 +106,7 @@ export function IncomeExpenseChart(props: { insights: Insights }) {
 
     return (
         <ChartContainer config={chartConfig} className="w-full">
-            <ComposedChart data={chartData} barGap={-30}>
+            <ComposedChart data={chartData} barGap={-25}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
                     dataKey="fullDate"
@@ -120,7 +116,7 @@ export function IncomeExpenseChart(props: { insights: Insights }) {
                     ticks={xTickData.map((tick) => tick.timestamp)}
                     tickLine={false}
                     axisLine={false}
-                    padding={{ left: 30, right: 30 }}
+                    padding={{ left: 50, right: 50 }}
                     tickMargin={8}
                     tickFormatter={(value) => {
                         const tick = xTickData.find(
@@ -167,13 +163,13 @@ export function IncomeExpenseChart(props: { insights: Insights }) {
                     dataKey="income"
                     fill={chartConfig.income.color}
                     radius={[2, 2, 0, 0]}
-                    barSize={30}
+                    barSize={25}
                 />
                 <Bar
                     dataKey="expense"
                     fill={chartConfig.expense.color}
                     radius={[2, 2, 0, 0]}
-                    barSize={30}
+                    barSize={25}
                 />
                 <Line
                     type="monotone"
