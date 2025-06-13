@@ -3,6 +3,8 @@ import { NotificationContextType } from "@/contexts/notification/provider";
 import { DataInjester } from "@/lib/data-injestion/main";
 import { PreparedFile } from "@/lib/data-injestion/types";
 import { Dispatch, SetStateAction } from "react";
+import { CsvParser } from "@/lib/csv-parser/parser";
+import { notifyDeveloperAboutUnknownCsvFormat } from "@/lib/server-actions";
 
 export interface LoadDataDependencies {
     files: PreparedFile[];
@@ -36,16 +38,25 @@ export function createHandleFileSelect(dependencies: LoadDataDependencies) {
 
         const newFiles: PreparedFile[] = await Promise.all(
             csvFiles.map(async (file) => {
+                const text = await file.text();
+                const headersResult = CsvParser.getHeaders(text);
+                const headers = headersResult.success
+                    ? headersResult.value
+                    : [];
+
                 const result = await DataInjester.getFormat(file);
                 const error = result.success ? null : result.error;
-                const format = result.success ? result.value.value : null;
+                const format = result.success ? result.value : null;
                 return {
                     file,
                     name: file.name.replace(/\.csv$/i, ""),
                     fileName: file.name,
                     error,
                     format,
-                    action: "add" as const,
+                    headers,
+                    action: format
+                        ? ("add" as const)
+                        : ("notify-developer" as const),
                     targetAccount: undefined,
                 };
             })
@@ -87,7 +98,42 @@ export function createRemoveFile(dependencies: LoadDataDependencies) {
 export function createLoadData(dependencies: LoadDataDependencies) {
     return async () => {
         if (!createIsValid(dependencies)()) return;
-        const results = await DataInjester.injest(dependencies.files);
+
+        for (const preparedFile of dependencies.files) {
+            if (preparedFile.action === "notify-developer") {
+                await notifyDeveloperAboutUnknownCsvFormat(
+                    preparedFile.headers,
+                    preparedFile.bankName
+                );
+                dependencies.notificationContext.addDebug(
+                    "Notify Developer",
+                    `CSV headers sent to developer for file: ${
+                        preparedFile.fileName
+                    }${
+                        preparedFile.bankName
+                            ? ` (Bank: ${preparedFile.bankName})`
+                            : ""
+                    }`
+                );
+                continue;
+            }
+
+            if (preparedFile.action === "do-nothing") {
+                dependencies.notificationContext.addDebug(
+                    "Do Nothing",
+                    `Skipped processing file: ${preparedFile.fileName}`
+                );
+                continue;
+            }
+        }
+
+        const filesToProcess = dependencies.files.filter(
+            (file) =>
+                file.action !== "notify-developer" &&
+                file.action !== "do-nothing"
+        );
+        const results = await DataInjester.injest(filesToProcess);
+
         for (let index = 0; index < results.length; index++) {
             const result = results[index];
             if (!result.success) {
@@ -97,7 +143,7 @@ export function createLoadData(dependencies: LoadDataDependencies) {
                 );
                 continue;
             }
-            const preparedFile = dependencies.files[index];
+            const preparedFile = filesToProcess[index];
             if (preparedFile.action === "merge") {
                 if (!preparedFile.mergeAccount) {
                     dependencies.notificationContext.addError(

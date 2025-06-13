@@ -8,15 +8,22 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { PreparedFile } from "@/lib/data-injestion/types";
 import { useAccounts } from "@/contexts/accounts/provider";
+import { Info } from "lucide-react";
 
 export function PreparedFileItem(props: {
     file: PreparedFile;
     updateFile: (newFile: PreparedFile) => void;
     removeFile: () => void;
 }) {
-    const { accounts } = useAccounts();
+    const accountsContext = useAccounts();
 
     return (
         <>
@@ -41,15 +48,46 @@ export function PreparedFileItem(props: {
                     {props.file.format.displayName}
                 </Badge>
             ) : (
-                <Badge variant="outline" className="text-xs h-7 w-full">
-                    Unknown
-                </Badge>
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Badge
+                                variant="destructive"
+                                className="text-xs h-7 w-full cursor-help"
+                            >
+                                <Info className="h-3 w-3 mr-1" />
+                                Unknown
+                            </Badge>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <div className="max-w-xs">
+                                <p className="text-sm font-medium text-foreground">
+                                    CSV format not recognized
+                                </p>
+                                <p className="text-xs text-foreground/80 mt-1">
+                                    This file format is not yet supported. You
+                                    can select "Notify Developer" in the action
+                                    dropdown to send the file structure (headers
+                                    only) so it can be added as an option in the
+                                    future. You'll need to provide the bank name
+                                    when using this option.
+                                </p>
+                            </div>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
             )}
 
             <div className="grid grid-cols-[1fr_1fr] gap-1">
                 <Select
                     value={props.file.action}
-                    onValueChange={(value: "add" | "merge") => {
+                    onValueChange={(
+                        value:
+                            | "add"
+                            | "merge"
+                            | "notify-developer"
+                            | "do-nothing"
+                    ) => {
                         props.updateFile({
                             ...props.file,
                             action: value,
@@ -60,8 +98,21 @@ export function PreparedFileItem(props: {
                         <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="add">Add</SelectItem>
-                        <SelectItem value="merge">Merge</SelectItem>
+                        {props.file.format ? (
+                            <>
+                                <SelectItem value="add">Add</SelectItem>
+                                <SelectItem value="merge">Merge</SelectItem>
+                            </>
+                        ) : (
+                            <>
+                                <SelectItem value="notify-developer">
+                                    Notify Developer
+                                </SelectItem>
+                                <SelectItem value="do-nothing">
+                                    Do Nothing
+                                </SelectItem>
+                            </>
+                        )}
                     </SelectContent>
                 </Select>
 
@@ -79,18 +130,32 @@ export function PreparedFileItem(props: {
                             <SelectValue placeholder="Target" />
                         </SelectTrigger>
                         <SelectContent>
-                            {accounts.length === 0 && (
+                            {accountsContext.accounts.length === 0 && (
                                 <SelectItem disabled value="none">
                                     {"No accounts found"}
                                 </SelectItem>
                             )}
-                            {accounts.map((account) => (
+                            {accountsContext.accounts.map((account) => (
                                 <SelectItem key={account.id} value={account.id}>
                                     {account.name}
                                 </SelectItem>
                             ))}
                         </SelectContent>
                     </Select>
+                )}
+
+                {props.file.action === "notify-developer" && (
+                    <Input
+                        className="text-xs"
+                        value={props.file.bankName ?? ""}
+                        onChange={(event) => {
+                            props.updateFile({
+                                ...props.file,
+                                bankName: event.target.value,
+                            });
+                        }}
+                        placeholder="Bank name..."
+                    />
                 )}
             </div>
 

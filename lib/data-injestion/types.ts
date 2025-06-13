@@ -18,6 +18,8 @@ export type PreparedFile = {
     fileName: string;
     format: DataInjestFormat<any> | null;
     error: string | null;
-    action: "add" | "merge";
+    headers: string[];
+    action: "add" | "merge" | "notify-developer" | "do-nothing";
     mergeAccount?: string;
+    bankName?: string;
 };

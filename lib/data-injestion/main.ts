@@ -53,7 +53,7 @@ async function getFormat(file: File) {
     if (!headers.success) return headers;
     const format = findFormat(headers.value, MAPPING_REGISTRY);
     if (!format.success) return format;
-    return newSuccess(format);
+    return format;
 }
 
 export const DataInjester = {

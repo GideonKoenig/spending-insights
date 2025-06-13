@@ -1,0 +1,5 @@
+Bezeichnung Auftragskonto;IBAN Auftragskonto;BIC Auftragskonto;Bankname Auftragskonto;Buchungstag;Valutadatum;Name Zahlungsbeteiligter;IBAN Zahlungsbeteiligter;BIC (SWIFT-Code) Zahlungsbeteiligter;Buchungstext;Verwendungszweck;Betrag;Waehrung;Saldo nach Buchung;Bemerkung;Gekennzeichneter Umsatz;Glaeubiger ID
+VR-Spar;DE43577615910857075320;GENODED1BNA;VR Bank RheinAhrEifel eG;30.12.2024;31.12.2024;;;;Zinsen;Zinskapitalisierung;21,13;EUR;10021,13;;;
+VR-Spar;DE43577615910857075320;GENODED1BNA;VR Bank RheinAhrEifel eG;01.03.2024;01.03.2024;Gideon König;DE98577615910857075300;GENODED1BNA;Überweisungsgutschr.;;9000,00;EUR;10000,00;;;
+VR-Spar;DE43577615910857075320;GENODED1BNA;VR Bank RheinAhrEifel eG;19.01.2024;19.01.2024;Gideon König;DE98577615910857075300;GENODED1BNA;Überweisungsgutschr.;;989,89;EUR;1000,00;;;
+VR-Spar;DE43577615910857075320;GENODED1BNA;VR Bank RheinAhrEifel eG;29.12.2023;31.12.2023;;;;Zinsen;Zinskapitalisierung;0,01;EUR;10,11;;;
