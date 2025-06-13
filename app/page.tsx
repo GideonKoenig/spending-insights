@@ -38,10 +38,6 @@ export default function Home() {
                             browser. Import CSV files and create rules to
                             automatically categorize your spending.
                         </p>
-                        <p className="text-sm text-muted-foreground">
-                            All data is stored in your browser's local storage -
-                            nothing is uploaded to any server.
-                        </p>
                     </section>
 
                     <section className="space-y-8">
@@ -117,12 +113,17 @@ export default function Home() {
                             top.
                         </p>
 
-                        <Button asChild size="lg">
-                            <Link href="/transactions">
-                                Get Started
-                                <ArrowRight className="ml-2 h-4 w-4" />
-                            </Link>
-                        </Button>
+                        <div className="flex justify-center gap-4">
+                            <Button asChild size="lg">
+                                <Link href="/transactions">
+                                    Get Started
+                                    <ArrowRight className="ml-2 h-4 w-4" />
+                                </Link>
+                            </Button>
+                            <Button asChild size="lg" variant="outline">
+                                <Link href="/guide">Learn More</Link>
+                            </Button>
+                        </div>
                     </section>
 
                     <div className="bg-card border border-border rounded-lg p-8 text-center">
@@ -147,9 +148,9 @@ export default function Home() {
                         </h2>
 
                         <div className="grid gap-6 md:grid-cols-2">
-                            <Card>
+                            <Card className="border-blue-800/50">
                                 <CardHeader>
-                                    <CardTitle className="flex items-center gap-2">
+                                    <CardTitle className="flex items-center gap-2 text-blue-300">
                                         <FileSpreadsheet className="h-5 w-5" />
                                         Transaction Management
                                     </CardTitle>
@@ -171,9 +172,9 @@ export default function Home() {
                                 </CardContent>
                             </Card>
 
-                            <Card>
+                            <Card className="border-green-800/50">
                                 <CardHeader>
-                                    <CardTitle className="flex items-center gap-2">
+                                    <CardTitle className="flex items-center gap-2 text-green-300">
                                         <Tag className="h-5 w-5" />
                                         Smart Categorization
                                     </CardTitle>
@@ -196,9 +197,9 @@ export default function Home() {
                                 </CardContent>
                             </Card>
 
-                            <Card>
+                            <Card className="border-purple-800/50">
                                 <CardHeader>
-                                    <CardTitle className="flex items-center gap-2">
+                                    <CardTitle className="flex items-center gap-2 text-purple-300">
                                         <Filter className="h-5 w-5" />
                                         Advanced Filtering
                                     </CardTitle>
@@ -223,9 +224,9 @@ export default function Home() {
                                 </CardContent>
                             </Card>
 
-                            <Card>
+                            <Card className="border-amber-800/50">
                                 <CardHeader>
-                                    <CardTitle className="flex items-center gap-2">
+                                    <CardTitle className="flex items-center gap-2 text-amber-300">
                                         <BarChart3 className="h-5 w-5" />
                                         Analytics & Insights
                                     </CardTitle>
@@ -246,22 +247,22 @@ export default function Home() {
                                 </CardContent>
                             </Card>
 
-                            <Card>
+                            <Card className="border-cyan-800/50">
                                 <CardHeader>
-                                    <CardTitle className="flex items-center gap-2">
+                                    <CardTitle className="flex items-center gap-2 text-cyan-300">
                                         <Download className="h-5 w-5" />
-                                        Data Export
+                                        Data Management
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-2">
                                     <p className="text-sm">
-                                        • Export categorization rules as JSON
+                                        • Export data and rules as JSON
                                     </p>
                                     <p className="text-sm">
-                                        • Export transaction data as CSV
+                                        • Import data from backups
                                     </p>
                                     <p className="text-sm">
-                                        • Backup and restore your data
+                                        • Save configurations locally
                                     </p>
                                     <p className="text-sm">
                                         • Share rules with others
@@ -269,26 +270,25 @@ export default function Home() {
                                 </CardContent>
                             </Card>
 
-                            <Card>
+                            <Card className="border-orange-800/50">
                                 <CardHeader>
-                                    <CardTitle className="flex items-center gap-2">
-                                        <Upload className="h-5 w-5" />
-                                        Data Import
+                                    <CardTitle className="flex items-center gap-2 text-orange-300">
+                                        <Database className="h-5 w-5" />
+                                        Multi-Account Management
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-2">
                                     <p className="text-sm">
-                                        • Import previously exported rules
+                                        • Switch between individual accounts
                                     </p>
                                     <p className="text-sm">
-                                        • Import transaction data from backups
+                                        • View all accounts simultaneously
                                     </p>
                                     <p className="text-sm">
-                                        • Merge data from multiple sources
+                                        • Merge data from different sources
                                     </p>
                                     <p className="text-sm">
-                                        • Quick setup with existing
-                                        configurations
+                                        • Account-specific analytics
                                     </p>
                                 </CardContent>
                             </Card>

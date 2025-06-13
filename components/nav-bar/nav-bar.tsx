@@ -55,6 +55,7 @@ export function NavBar() {
         { href: "/transactions", label: "Transactions" },
         { href: "/analytics", label: "Analytics" },
         { href: "/categories", label: "Categories" },
+        { href: "/guide", label: "Guide" },
     ];
 
     const actionDependencies = {
@@ -217,7 +218,7 @@ export function NavBar() {
                                     Import Tag Rules
                                 </Button>
 
-                                {process.env.NODE_ENV !== "development" && (
+                                {process.env.NODE_ENV === "development" && (
                                     <>
                                         <div className="border-t border-border my-1" />
 
