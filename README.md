@@ -39,32 +39,6 @@ Visit [http://localhost:3000](http://localhost:3000) to start using the applicat
 2. **Create Rules**: Navigate to Categories to create rules for automatic categorization
 3. **Analyze**: View your categorized transactions and spending analytics
 
-## CSV Schema
-
-Your CSV file must include these fields:
-
-```typescript
-{
-  accountName: string,
-  accountIban: string,
-  accountBic: string,
-  bankName: string,
-  bookingDate: string,        // DD.MM.YYYY
-  valueDate: string,          // DD.MM.YYYY
-  paymentParticipant: string,
-  paymentParticipantIban: string,
-  paymentParticipantBic: string,
-  transactionType: string,
-  purpose: string,
-  amount: string,             // "1234,56"
-  currency: string,
-  balanceAfterTransaction: string,
-  note: string,
-  markedTransaction: string,
-  creditorId: string,
-  mandateReference: string
-}
-```
 
 ## Creating Categorization Rules
 
@@ -116,5 +90,4 @@ Rules let you automatically categorize transactions based on criteria:
 - ❌ Safari (File System Access API not supported)
 
 ## License
-
-Private use only.
+MIT License 
