@@ -1,6 +1,6 @@
 import type { Transaction } from "@/lib/types";
 import type {
-    FilterOption,
+    TransactionFilter,
     FilterRule,
     TypedOperator,
 } from "@/lib/transaction-filter/types";
@@ -38,7 +38,7 @@ export const OPERATORS: TypedOperator[] = [
 export function filter(
     transactions: Transaction[],
     rules: FilterRule[],
-    options: FilterOption[]
+    options: TransactionFilter[]
 ) {
     if (rules.length === 0) return transactions;
 
@@ -63,7 +63,7 @@ export function filter(
 export function splitTransactions(
     transactions: Transaction[],
     rules: FilterRule[],
-    options: FilterOption[]
+    options: TransactionFilter[]
 ) {
     if (rules.length === 0) return { matches: transactions, unmatches: [] };
 

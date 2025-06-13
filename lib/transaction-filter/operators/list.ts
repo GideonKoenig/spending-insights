@@ -5,7 +5,6 @@ export const listEquals: FilterOperator<string> = {
     label: "=",
     type: "list",
     compare: (userValue, valueToCompare) => {
-        if (typeof userValue.toLowerCase !== "function") console.log("ISSUE");
         return valueToCompare.toLowerCase() === userValue.toLowerCase();
     },
 };

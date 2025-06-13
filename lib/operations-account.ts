@@ -43,7 +43,7 @@ if (!Array.prototype.getTransactions) {
     };
 }
 
-function getActiveAccounts(
+export function getActiveAccounts(
     accounts: Account[],
     activeAccount: string | true | null
 ) {
@@ -52,7 +52,7 @@ function getActiveAccounts(
     return accounts.filter((d) => d.id === activeAccount);
 }
 
-function preprocessAccounts(accounts: Account[], tagRules: TagRule[]) {
+export function preprocessAccounts(accounts: Account[], tagRules: TagRule[]) {
     const warnings: string[] = [];
     const processedAccounts = accounts.map((account) => {
         const result = TagRuleEngine.tagAccount(account, tagRules);
@@ -62,6 +62,20 @@ function preprocessAccounts(accounts: Account[], tagRules: TagRule[]) {
     return newSuccess(processedAccounts, warnings);
 }
 
-function getTransactions(accounts: Account[]): Transaction[] {
+export function getTransactions(accounts: Account[]): Transaction[] {
     return accounts.flatMap((account) => account.transactions);
+}
+
+export function getDateRange(accounts: Account[]): { start: Date; end: Date } {
+    let start = new Date();
+    let end = new Date(1900, 0, 1);
+
+    for (const account of accounts) {
+        for (const transaction of account.transactions) {
+            if (transaction.bookingDate < start)
+                start = transaction.bookingDate;
+            if (transaction.bookingDate > end) end = transaction.bookingDate;
+        }
+    }
+    return { start, end };
 }

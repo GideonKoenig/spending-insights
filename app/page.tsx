@@ -3,7 +3,7 @@
 import { useAccounts } from "@/contexts/accounts/provider";
 import { TransactionList } from "@/components/transactions/transaction-list";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useTagRules } from "@/contexts/tag-rules/provider";
 import { useNotifications } from "@/contexts/notification/provider";
 import { LoadingState } from "@/components/loading-state";
@@ -14,6 +14,7 @@ import { handleResult } from "@/contexts/notification/utils";
 
 export default function HomePage() {
     const containerRef = useRef<HTMLDivElement>(null);
+    const [containerReady, setContainerReady] = useState(false);
     const accountContext = useAccounts();
     const tagRuleContext = useTagRules();
     const notificationContext = useNotifications();
@@ -37,10 +38,17 @@ export default function HomePage() {
     );
 
     return (
-        <ScrollArea ref={containerRef} className="h-full">
+        <ScrollArea
+            className="h-full"
+            ref={(node) => {
+                containerRef.current = node;
+                setContainerReady(!!node);
+            }}
+        >
             <TransactionList
                 transactions={accounts.getTransactions()}
                 containerRef={containerRef}
+                containerReady={containerReady}
             />
         </ScrollArea>
     );

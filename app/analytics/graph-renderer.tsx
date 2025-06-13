@@ -5,15 +5,20 @@ import { BalanceChart } from "@/app/analytics/charts/balance-chart";
 import { RelativeBalanceChart } from "@/app/analytics/charts/relative-balance-chart";
 import { IncomeExpenseChart } from "@/app/analytics/charts/income-expense-chart";
 import { ExpensePieChart } from "@/app/analytics/charts/expense-pie-chart";
-import { SankeyDiagram } from "@/app/analytics/charts/sankey-diagram";
+import { SankeyChart } from "@/app/analytics/charts/sankey-chart";
 import { useGraph } from "@/contexts/graph/provider";
 import { LoadingState } from "@/components/loading-state";
 import { ReactNode } from "react";
 import { SelectorGraphType } from "@/components/analytics/selector-graph-type";
 import { SelectorAggregation } from "@/components/analytics/selector-aggregation";
 import { SelectorTimeRange } from "@/components/analytics/selector-time-range";
+import { SelectorGranularity } from "@/components/analytics/selector-granularity";
+import { Account } from "@/lib/types";
 
-export function GraphRenderer(props: { insights: Insights }) {
+export function GraphRenderer(props: {
+    insights: Insights;
+    accounts: Account[];
+}) {
     const graphContext = useGraph();
 
     if (graphContext.isLoading) {
@@ -32,10 +37,10 @@ export function GraphRenderer(props: { insights: Insights }) {
             graph = <IncomeExpenseChart insights={props.insights} />;
             break;
         case "pie":
-            graph = <ExpensePieChart insights={props.insights} />;
+            graph = <ExpensePieChart accounts={props.accounts} />;
             break;
         case "sankey":
-            graph = <SankeyDiagram insights={props.insights} />;
+            graph = <SankeyChart accounts={props.accounts} />;
             break;
     }
 
@@ -46,6 +51,7 @@ export function GraphRenderer(props: { insights: Insights }) {
                 <div className="flex-grow" />
                 <SelectorTimeRange />
                 <SelectorAggregation />
+                <SelectorGranularity />
             </div>
             {graph}
         </div>

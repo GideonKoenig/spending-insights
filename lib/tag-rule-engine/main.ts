@@ -1,7 +1,7 @@
 import { TagRule } from "@/lib/tag-rule-engine/types";
 import { Account } from "@/lib/types";
 import { splitTransactions } from "@/lib/transaction-filter/main";
-import { FILTER_OPTIONS } from "@/lib/transaction-filter/transaction-filter-options";
+import { TRANSACTION_FILTER } from "@/lib/transaction-filter/transaction-filter-options";
 import { newSuccess } from "@/lib/utils";
 import { applyTag } from "@/lib/tag-rule-engine/utils";
 
@@ -14,7 +14,7 @@ function tagAccount(account: Account, tagRules: TagRule[]) {
         const { matches, unmatches } = splitTransactions(
             transactions,
             tagRule.filters,
-            FILTER_OPTIONS
+            TRANSACTION_FILTER
         );
 
         if (matches.length > 0) {

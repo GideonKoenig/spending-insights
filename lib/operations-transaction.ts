@@ -1,13 +1,13 @@
 import { Transaction } from "@/lib/types";
 import { filter } from "@/lib/transaction-filter/main";
-import { FilterRule, FilterOption } from "@/lib/transaction-filter/types";
+import { FilterRule, TransactionFilter } from "@/lib/transaction-filter/types";
 
 declare global {
     interface Array<T> {
         filterTransactions(
             this: T extends Transaction ? Transaction[] : never,
             rules: FilterRule[],
-            options: FilterOption[]
+            options: TransactionFilter[]
         ): Transaction[];
         getTagged(
             this: T extends Transaction ? Transaction[] : never
@@ -22,7 +22,7 @@ if (!Array.prototype.filterTransactions) {
     Array.prototype.filterTransactions = function <T>(
         this: T[],
         rules: FilterRule[],
-        options: FilterOption[]
+        options: TransactionFilter[]
     ) {
         return filterTransactions(this as Transaction[], rules, options);
     };
@@ -43,7 +43,7 @@ if (!Array.prototype.getUntagged) {
 function filterTransactions(
     transactions: Transaction[],
     rules: FilterRule[],
-    options: FilterOption[]
+    options: TransactionFilter[]
 ): Transaction[] {
     return filter(transactions, rules, options);
 }

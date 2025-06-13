@@ -18,6 +18,7 @@ export const TransactionSchema = z.object({
     amount: z.number(),
     currency: z.string(),
     balanceAfterTransaction: z.number(),
+    category: z.string().optional(),
     tag: TagSchema.optional(),
 });
 

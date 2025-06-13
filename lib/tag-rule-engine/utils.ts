@@ -1,10 +1,11 @@
 import {
+    Category,
     MAIN_CATEGORIES,
     PartialTagRule,
     TagRule,
 } from "@/lib/tag-rule-engine/types";
-import { Transaction } from "@/lib/types";
-import { newSuccess } from "@/lib/utils";
+import { Account, Transaction } from "@/lib/types";
+import { newError, newSuccess } from "@/lib/utils";
 
 export function applyTag(transactions: Transaction[], tagRule: TagRule) {
     const warnings: string[] = [];
@@ -13,10 +14,10 @@ export function applyTag(transactions: Transaction[], tagRule: TagRule) {
             queueMicrotask(() => {
                 warnings.push(
                     `A transaction is captured by more than one tag rule.\nThe transaction is already matched by "${
-                        transaction.tag!.ruleName
-                    }" (${transaction.tag!.ruleId}) but rule "${
-                        tagRule.name
-                    }" (${tagRule.id}) also applies.`
+                        transaction.tag!.ruleId
+                    }" (${transaction.tag!.ruleId}) but rule "${tagRule.id}" (${
+                        tagRule.id
+                    }) also applies.`
                 );
             });
             return transaction;
@@ -25,30 +26,13 @@ export function applyTag(transactions: Transaction[], tagRule: TagRule) {
         return {
             ...transaction,
             tag: tagRule.tag,
+            category: tagRule.tag.category,
         };
     });
     return newSuccess(taggedTransactions, warnings);
 }
 
-export function createRuleName(tagRule: PartialTagRule) {
-    if (!tagRule.tag) return undefined;
-    if (!tagRule.tag.category) return undefined;
-    if (!tagRule.tag.subCategory) return undefined;
-    if (tagRule.name) return tagRule.name;
-
-    return `${tagRule.tag.category}-${tagRule.tag.subCategory}`
-        .toLowerCase()
-        .replace(/\s+/g, "-");
-}
-
-export function hasNoIssues(
-    tagRule: PartialTagRule,
-    other: TagRule[]
-): tagRule is TagRule {
-    return getIssues(tagRule, other).length === 0;
-}
-
-export function getIssues(tagRule: PartialTagRule, other: TagRule[]) {
+export function getCleanTagRule(tagRule: PartialTagRule, other: TagRule[]) {
     const hasCategory = tagRule.tag?.category?.trim();
     const hasSubCategory = tagRule.tag?.subCategory?.trim();
     const hasFilters = tagRule.filters.length > 0;
@@ -67,17 +51,16 @@ export function getIssues(tagRule: PartialTagRule, other: TagRule[]) {
         issues.push("A tag must define at least one filter");
     }
 
-    return issues;
+    if (issues.length > 0)
+        return newError(`Cannot create tag rule:\n → ${issues.join("\n → ")}`);
+    return newSuccess(tagRule as TagRule);
 }
 
 export function generateCategoryColor(category: string) {
-    const isCategory = (
-        category: string
-    ): category is (typeof MAIN_CATEGORIES)[number] => {
+    const isCategory = (category: string): category is Category => {
         return MAIN_CATEGORIES.includes(category as any);
     };
-
-    if (!isCategory(category)) return "hsl(0, 0%, 50%)";
+    if (!isCategory(category) || category === "all") return "hsl(0, 0%, 50%)";
     const index = MAIN_CATEGORIES.indexOf(category);
 
     const hue = (360 / MAIN_CATEGORIES.length) * index;
@@ -85,4 +68,21 @@ export function generateCategoryColor(category: string) {
     const lightness = 40;
 
     return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+}
+
+export function getCountPerTagRule(accounts: Account[]) {
+    const resultMap = new Map<string, number>();
+    for (const account of accounts) {
+        for (const transaction of account.transactions) {
+            if (transaction.tag) {
+                const entry = resultMap.get(transaction.tag.ruleId);
+                if (entry) {
+                    resultMap.set(transaction.tag.ruleId, entry + 1);
+                } else {
+                    resultMap.set(transaction.tag.ruleId, 1);
+                }
+            }
+        }
+    }
+    return resultMap;
 }

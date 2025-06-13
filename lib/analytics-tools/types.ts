@@ -1,9 +1,3 @@
-export type GraphDatapoint = {
-    date: string;
-    balance: number;
-    fullDate: Date;
-};
-
 export type Month = {
     id: number;
     name: string;
