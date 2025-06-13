@@ -1,5 +1,6 @@
 import { Account, Transaction } from "@/lib/types";
 import { newError, newSuccess } from "@/lib/utils";
+import { CategoryInsights } from "./grouping-category";
 
 export function dominoSort(accounts: Account[]) {
     if (accounts.length === 0) return newSuccess([]);
@@ -103,4 +104,54 @@ function processTransactionChain(
     }
 
     return newSuccess({ chain, remaining }, warnings);
+}
+
+export function sortCategoryInsights(insights: CategoryInsights) {
+    const sortedIncomeCategories = new Map();
+    const sortedExpenseCategories = new Map();
+
+    const orderS = (a: string, b: string) => a.localeCompare(b);
+    const orderN = (a: number, b: number) => b - a;
+
+    const incomeEntries = Array.from(insights.income.entries()).sort((a, b) =>
+        orderS(a[1].category, b[1].category)
+    );
+
+    for (const [name, categoryStats] of incomeEntries) {
+        const sortedSubcategories = new Map(
+            Array.from(categoryStats.subcategories.entries()).sort((a, b) =>
+                orderN(a[1].amount, b[1].amount)
+            )
+        );
+
+        sortedIncomeCategories.set(name, {
+            ...categoryStats,
+            subcategories: sortedSubcategories,
+        });
+    }
+
+    const expenseEntries = Array.from(insights.expense.entries()).sort((a, b) =>
+        orderS(a[1].category, b[1].category)
+    );
+
+    for (const [name, categoryStats] of expenseEntries) {
+        const sortedSubcategories = new Map(
+            Array.from(categoryStats.subcategories.entries()).sort((a, b) =>
+                orderN(a[1].amount, b[1].amount)
+            )
+        );
+
+        sortedExpenseCategories.set(name, {
+            ...categoryStats,
+            subcategories: sortedSubcategories,
+        });
+    }
+
+    const result: CategoryInsights = {
+        ...insights,
+        income: sortedIncomeCategories,
+        expense: sortedExpenseCategories,
+    };
+
+    return result;
 }

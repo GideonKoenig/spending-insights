@@ -33,12 +33,13 @@ export const FilterRuleSchema = z.object({
         "amount",
         "currency",
         "balanceAfterTransaction",
+        "category",
     ]),
     operator: z.string(),
     value: z.union([z.string(), z.number(), z.date()]),
 });
 
-export type FilterOption = {
+export type TransactionFilter = {
     attribute: keyof Omit<Transaction, "tag">;
     label: string;
     inputType: InputType;

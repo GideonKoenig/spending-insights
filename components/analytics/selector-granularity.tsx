@@ -10,18 +10,18 @@ import {
 } from "@/components/ui/select";
 import { useGraph } from "@/contexts/graph/provider";
 
-export type AggregationLevel = "daily" | "weekly" | "monthly" | "yearly";
+export type Granularity = "day" | "week" | "month" | "year";
 
-const aggregationOptions = [
-    { value: "daily", label: "Daily" },
-    { value: "weekly", label: "Weekly" },
-    { value: "monthly", label: "Monthly" },
-    { value: "yearly", label: "Yearly" },
+const granularityOptions = [
+    { value: "day", label: "Per Day" },
+    { value: "week", label: "Per Week" },
+    { value: "month", label: "Per Month" },
+    { value: "year", label: "Per Year" },
 ] as const;
 
-const ENABLED_GRAPH_TYPES = ["balance", "relative-balance", "income-expense"];
+const ENABLED_GRAPH_TYPES = ["pie", "sankey"];
 
-export function SelectorAggregation() {
+export function SelectorGranularity() {
     const graphContext = useGraph();
 
     if (!ENABLED_GRAPH_TYPES.includes(graphContext.settings.type)) {
@@ -36,11 +36,11 @@ export function SelectorAggregation() {
 
     return (
         <Select
-            value={graphContext.settings.aggregation}
-            onValueChange={(aggregation) =>
+            value={graphContext.settings.granularity}
+            onValueChange={(granularity) =>
                 graphContext.setSettings({
                     ...graphContext.settings,
-                    aggregation: aggregation as AggregationLevel,
+                    granularity: granularity as Granularity,
                 })
             }
         >
@@ -48,7 +48,7 @@ export function SelectorAggregation() {
                 <SelectValue />
             </SelectTrigger>
             <SelectContent>
-                {aggregationOptions.map((option) => (
+                {granularityOptions.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                         {option.label}
                     </SelectItem>

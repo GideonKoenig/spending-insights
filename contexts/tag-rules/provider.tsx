@@ -79,7 +79,7 @@ export function TagRulesProvider(props: { children: ReactNode }) {
     };
 
     const removeTagRule = (id: string) => {
-        setTagRules((prev) => prev.filter((rule) => rule.id !== id));
+        saveTagRules((prev) => prev.filter((rule) => rule.id !== id));
     };
 
     const dependencies: TagRuleDependencies = {

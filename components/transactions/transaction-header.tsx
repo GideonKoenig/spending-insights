@@ -14,7 +14,7 @@ import {
     type FilterRule,
     type TypedOperator,
 } from "@/lib/transaction-filter/types";
-import { FILTER_OPTIONS } from "@/lib/transaction-filter/transaction-filter-options";
+import { TRANSACTION_FILTER } from "@/lib/transaction-filter/transaction-filter-options";
 import { getOperatorsForFilterOption } from "@/lib/transaction-filter/utils";
 import { OPERATORS } from "@/lib/transaction-filter/main";
 import { TextInput } from "@/lib/transaction-filter/input-components/text-input";
@@ -23,7 +23,7 @@ import { DateInput } from "@/lib/transaction-filter/input-components/date-input"
 import { ListInput } from "@/lib/transaction-filter/input-components/list-input";
 import { getListOptions } from "@/lib/transaction-filter/utils";
 import { TransactionFilterBadge } from "@/lib/transaction-filter/badge";
-import { type SortOption } from "@/lib/transaction-sorter";
+import { type TransactionSortOption } from "@/lib/transaction-sorter";
 import { cn } from "@/lib/utils";
 
 type Value = string | number | Date | undefined;
@@ -35,7 +35,7 @@ export function TransactionHeader(props: {
     transactions: Transaction[];
     sortSelector?: React.ReactNode;
 }) {
-    const [option, setOption] = useState(FILTER_OPTIONS[0]);
+    const [option, setOption] = useState(TRANSACTION_FILTER[0]);
     const [operator, setOperator] = useState<TypedOperator>(
         getAvailableOperators(option.attribute)[0]
     );
@@ -110,7 +110,7 @@ export function TransactionHeader(props: {
                 <Select
                     value={option.attribute}
                     onValueChange={(newAttribute) => {
-                        const option = FILTER_OPTIONS.find(
+                        const option = TRANSACTION_FILTER.find(
                             (opt) => opt.attribute === newAttribute
                         );
                         if (option) {
@@ -127,7 +127,7 @@ export function TransactionHeader(props: {
                         <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                        {FILTER_OPTIONS.map((option) => (
+                        {TRANSACTION_FILTER.map((option) => (
                             <SelectItem
                                 key={option.attribute}
                                 value={option.attribute}
@@ -237,5 +237,9 @@ export function TransactionHeader(props: {
 }
 
 function getAvailableOperators(attribute: string) {
-    return getOperatorsForFilterOption(attribute, FILTER_OPTIONS, OPERATORS);
+    return getOperatorsForFilterOption(
+        attribute,
+        TRANSACTION_FILTER,
+        OPERATORS
+    );
 }

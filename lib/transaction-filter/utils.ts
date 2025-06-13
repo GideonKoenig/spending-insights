@@ -1,9 +1,12 @@
-import { FilterOption, TypedOperator } from "@/lib/transaction-filter/types";
+import {
+    TransactionFilter,
+    TypedOperator,
+} from "@/lib/transaction-filter/types";
 import { Transaction } from "@/lib/types";
 
 export function getOperatorsForFilterOption(
     attribute: string,
-    options: FilterOption[],
+    options: TransactionFilter[],
     operators: TypedOperator[]
 ) {
     const option = options.find((o) => o.attribute === attribute);
@@ -12,10 +15,14 @@ export function getOperatorsForFilterOption(
 }
 
 export function getListOptions(
-    filterOption: FilterOption,
+    filterOption: TransactionFilter,
     transactions: Transaction[]
 ) {
     return Array.from(
-        new Set(transactions.map((t) => t[filterOption.attribute]!.toString()))
+        new Set(
+            transactions
+                .map((t) => t[filterOption.attribute]?.toString())
+                .filter((t) => t !== undefined)
+        )
     );
 }

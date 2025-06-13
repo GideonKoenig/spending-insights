@@ -1,5 +1,9 @@
 import { Insights } from "./grouping";
-import { TimeRange } from "@/components/analytics/selector-time-range";
+import {
+    getDateRangeFromTimeRange,
+    TimeRange,
+} from "@/components/analytics/selector-time-range";
+import { Account } from "@/lib/types";
 import {
     subMonths,
     subYears,
@@ -8,43 +12,6 @@ import {
     endOfMonth,
     endOfYear,
 } from "date-fns";
-
-export function getDateRangeFromTimeRange(timeRange: TimeRange) {
-    const now = new Date();
-
-    if (
-        timeRange.type === "custom" &&
-        timeRange.startDate &&
-        timeRange.endDate
-    ) {
-        return { start: timeRange.startDate, end: timeRange.endDate };
-    }
-
-    switch (timeRange.value) {
-        case "all":
-            return { start: new Date(1900, 0, 1), end: now };
-        case "this-month":
-            return { start: startOfMonth(now), end: endOfMonth(now) };
-        case "this-year":
-            return { start: startOfYear(now), end: endOfYear(now) };
-        case "last-3-months":
-            return { start: subMonths(now, 3), end: now };
-        case "last-6-months":
-            return { start: subMonths(now, 6), end: now };
-        case "last-month":
-            return {
-                start: subMonths(startOfMonth(now), 1),
-                end: subMonths(endOfMonth(now), 1),
-            };
-        case "last-year":
-            return {
-                start: subYears(startOfYear(now), 1),
-                end: subYears(endOfYear(now), 1),
-            };
-        default:
-            return { start: new Date(1900, 0, 1), end: now };
-    }
-}
 
 export function filterInsightsByTimeRange(
     insights: Insights,
@@ -125,4 +92,27 @@ export function filterInsightsByTimeRange(
         monthly: filteredMonthly,
         yearly: filteredYearly,
     };
+}
+
+export function filterAccountsByTimeRange(
+    accounts: Account[],
+    timeRange: TimeRange
+) {
+    const { start, end } = getDateRangeFromTimeRange(timeRange);
+    const result: Account[] = [];
+
+    for (const account of accounts) {
+        const filteredTransactions = [];
+        for (const transaction of account.transactions) {
+            const date = transaction.bookingDate;
+            if (date >= start && date <= end) {
+                filteredTransactions.push(transaction);
+            }
+        }
+        result.push({
+            ...account,
+            transactions: filteredTransactions,
+        });
+    }
+    return result;
 }

@@ -1,6 +1,7 @@
 import { AccountsContextType } from "@/contexts/accounts/provider";
 import { NotificationContextType } from "@/contexts/notification/provider";
 import { TagRulesContextType } from "@/contexts/tag-rules/provider";
+import { Tag } from "@/lib/tag-rule-engine/types";
 import { SuperJSON } from "superjson";
 
 export interface ActionDependencies {
@@ -13,14 +14,13 @@ export interface ActionDependencies {
 
 export function createUpdateAllCategories(dependencies: ActionDependencies) {
     return () => {
-        dependencies.tagRules.tagRules.forEach((rule) => {
+        dependencies.tagRules.tagRules.forEach((rule, index) => {
             dependencies.tagRules.updateTagRule(rule.id, {
                 ...rule,
                 tag: {
                     ...rule.tag,
-                    ruleId: rule.id,
-                    ruleName: rule.name,
-                },
+                    spreadOverMonths: null,
+                } as Tag,
             });
         });
 

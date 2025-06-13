@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { FILTER_OPTIONS } from "@/lib/transaction-filter/transaction-filter-options";
+import { TRANSACTION_FILTER } from "@/lib/transaction-filter/transaction-filter-options";
 import { type FilterRule } from "@/lib/transaction-filter/types";
 import { OPERATORS } from "@/lib/transaction-filter/main";
 import { getOperatorsForFilterOption } from "@/lib/transaction-filter/utils";
@@ -33,7 +33,7 @@ export function TransactionFilterBadge(props: {
     onOperatorChange: (newOperator: string) => void;
 }) {
     const optionLabel =
-        FILTER_OPTIONS.find(
+        TRANSACTION_FILTER.find(
             (option) => option.attribute === props.filter.attribute
         )?.label ?? props.filter.attribute;
 
@@ -43,7 +43,7 @@ export function TransactionFilterBadge(props: {
 
     const availableOperators = getOperatorsForFilterOption(
         props.filter.attribute,
-        FILTER_OPTIONS,
+        TRANSACTION_FILTER,
         OPERATORS
     );
 

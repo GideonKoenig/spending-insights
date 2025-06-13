@@ -25,7 +25,6 @@ import {
     Download,
     Upload,
     RefreshCcw,
-    FileText,
     FolderOpen,
     Trash,
 } from "lucide-react";
@@ -54,7 +53,7 @@ export function NavBar() {
     const links = [
         { href: "/", label: "Transactions" },
         { href: "/analytics", label: "Analytics" },
-        { href: "/tags", label: "Tags" },
+        { href: "/categories", label: "Categories" },
     ];
 
     const actionDependencies = {
@@ -172,6 +171,9 @@ export function NavBar() {
                                     <Trash className="h-4 w-4 mr-2" />
                                     Clear All Accounts
                                 </Button>
+
+                                <div className="border-t border-border my-1" />
+
                                 <Button
                                     variant="ghost"
                                     size="sm"
@@ -179,7 +181,7 @@ export function NavBar() {
                                     onClick={exportAccounts}
                                     disabled={accounts.accounts.length === 0}
                                 >
-                                    <FileText className="h-4 w-4 mr-2" />
+                                    <Download className="h-4 w-4 mr-2" />
                                     Export Accounts
                                 </Button>
                                 <Button
@@ -191,6 +193,9 @@ export function NavBar() {
                                     <Upload className="h-4 w-4 mr-2" />
                                     Import Accounts
                                 </Button>
+
+                                <div className="border-t border-border my-1" />
+
                                 <Button
                                     variant="ghost"
                                     size="sm"
@@ -210,15 +215,22 @@ export function NavBar() {
                                     <Upload className="h-4 w-4 mr-2" />
                                     Import Tag Rules
                                 </Button>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="w-full justify-start"
-                                    onClick={updateAllCategories}
-                                >
-                                    <RefreshCcw className="h-4 w-4 mr-2" />
-                                    Update All Categories
-                                </Button>
+
+                                {process.env.NODE_ENV !== "development" && (
+                                    <>
+                                        <div className="border-t border-border my-1" />
+
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="w-full justify-start"
+                                            onClick={updateAllCategories}
+                                        >
+                                            <RefreshCcw className="h-4 w-4 mr-2" />
+                                            Update All Categories
+                                        </Button>
+                                    </>
+                                )}
                             </PopoverContent>
                         </Popover>
                     </>

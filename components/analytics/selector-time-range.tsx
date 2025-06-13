@@ -1,7 +1,5 @@
 "use client";
 
-import { Calendar } from "lucide-react";
-import { format } from "date-fns";
 import {
     Select,
     SelectContent,
@@ -9,16 +7,17 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { LoadingState } from "@/components/loading-state";
 import { useGraph } from "@/contexts/graph/provider";
 import { DatePicker } from "@/components/date-picker";
+import { subYears } from "date-fns";
+import {
+    endOfMonth,
+    endOfYear,
+    startOfMonth,
+    startOfYear,
+    subMonths,
+} from "date-fns";
 
 type PresetTimeRange =
     | "all"
@@ -27,6 +26,7 @@ type PresetTimeRange =
     | "last-3-months"
     | "last-month"
     | "this-year"
+    | "year-to-date"
     | "this-month"
     | "custom";
 
@@ -43,6 +43,7 @@ const presetRanges = [
     { value: "last-month", label: "Last Month" },
     { value: "this-year", label: "This Year" },
     { value: "last-year", label: "Last Year" },
+    { value: "year-to-date", label: "Year to Date" },
     { value: "last-3-months", label: "Last 3 Months" },
     { value: "last-6-months", label: "Last 6 Months" },
     { value: "custom", label: "Custom Range" },
@@ -55,7 +56,6 @@ export function SelectorTimeRange() {
             <LoadingState className="text-sm w-[200px] h-10 border rounded-md bg-background border-border" />
         );
     }
-    console.log(graphContext.settings.timeRange);
 
     return (
         <div className="flex items-center gap-1">
@@ -118,4 +118,46 @@ export function SelectorTimeRange() {
             </Select>
         </div>
     );
+}
+
+export function getDateRangeFromTimeRange(timeRange: TimeRange) {
+    const now = new Date();
+
+    if (
+        timeRange.type === "custom" &&
+        timeRange.startDate &&
+        timeRange.endDate
+    ) {
+        return { start: timeRange.startDate, end: timeRange.endDate };
+    }
+
+    switch (timeRange.value) {
+        case "all":
+            return { start: new Date(1900, 0, 1), end: now };
+        case "this-month":
+            return { start: startOfMonth(now), end: endOfMonth(now) };
+        case "this-year":
+            return { start: startOfYear(now), end: endOfYear(now) };
+        case "year-to-date":
+            return {
+                start: subMonths(startOfMonth(now), 11),
+                end: endOfMonth(now),
+            };
+        case "last-3-months":
+            return { start: subMonths(now, 3), end: now };
+        case "last-6-months":
+            return { start: subMonths(now, 6), end: now };
+        case "last-month":
+            return {
+                start: subMonths(startOfMonth(now), 1),
+                end: subMonths(endOfMonth(now), 1),
+            };
+        case "last-year":
+            return {
+                start: subYears(startOfYear(now), 1),
+                end: subYears(endOfYear(now), 1),
+            };
+        default:
+            return { start: new Date(1900, 0, 1), end: now };
+    }
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { TagBadge } from "@/components/tags/tag-badge";
+import { TagBadge } from "@/components/tag-rules/tag-badge";
 import {
     Tooltip,
     TooltipContent,
@@ -53,7 +53,10 @@ export function TransactionCard(props: {
                 </h3>
                 <div className="flex gap-2 items-center">
                     {props.transaction.tag && (
-                        <TagBadge tag={props.transaction.tag} />
+                        <TagBadge
+                            tag={props.transaction.tag}
+                            showSubCategory={true}
+                        />
                     )}
                     <p className="text-xs text-muted-foreground">
                         {props.transaction.transactionType}

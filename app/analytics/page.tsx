@@ -16,6 +16,7 @@ import { useLocalStorage } from "@/lib/hooks/use-local-storage";
 import "@/lib/operations-account";
 import "@/lib/operations-transaction";
 import { handleResult } from "@/contexts/notification/utils";
+import { getCategoryInsights } from "@/lib/analytics-tools/grouping-category";
 
 // Todo: Tags page should containa tagRule list. the save clear and delete  buttons should be moved to the tab panel, the toggle stuff button should be moved to the list → lowering the state which is also good, and then we have at the top the define tag panel, below the filter panel, and below that the current transaction
 // Todo: transactions should get annotated to enrich them with additional information. currently mainly for paypal to visualize where the money is going (analyzing the vendor id and stuff that is provided)
@@ -53,6 +54,7 @@ export default function AnalyticsPage() {
     );
 
     const insights = getInsights(accounts);
+    const categoryInsights = getCategoryInsights(accounts);
 
     return (
         <ScrollArea className="h-full">
@@ -73,11 +75,11 @@ export default function AnalyticsPage() {
                     </TabsContent>
 
                     <TabsContent value="graphs">
-                        <GraphsTab insights={insights} />
+                        <GraphsTab insights={insights} accounts={accounts} />
                     </TabsContent>
 
                     <TabsContent value="compare">
-                        <CompareTab insights={insights} />
+                        <CompareTab insights={insights} accounts={accounts} />
                     </TabsContent>
                 </Tabs>
             </div>

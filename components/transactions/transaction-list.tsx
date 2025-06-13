@@ -1,18 +1,18 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState, useCallback } from "react";
 import { type Transaction } from "@/lib/types";
 import { TransactionCard } from "@/components/transactions/transaction-card";
 import { TransactionHeader } from "@/components/transactions/transaction-header";
 import { filter } from "@/lib/transaction-filter/main";
 import { type FilterRule } from "@/lib/transaction-filter/types";
-import { FILTER_OPTIONS } from "@/lib/transaction-filter/transaction-filter-options";
+import { TRANSACTION_FILTER } from "@/lib/transaction-filter/transaction-filter-options";
 import { cn } from "@/lib/utils";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import {
     sortTransactions,
-    type SortOption,
-    SORT_OPTIONS,
+    type TransactionSortOption,
+    TRANSACTION_SORT_OPTIONS,
 } from "@/lib/transaction-sorter";
 import {
     Select,
@@ -21,33 +21,38 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-
 export function TransactionList(props: {
     transactions: Transaction[];
     containerRef: React.RefObject<HTMLDivElement | null>;
+    containerReady: boolean;
     className?: string;
 }) {
     const [filters, setFilters] = useState<FilterRule[]>([]);
-    const [sortBy, setSortBy] = useState<SortOption>("newest");
+    const [sortBy, setSortBy] = useState<TransactionSortOption>("newest");
 
     const filteredTransactions = filter(
         props.transactions,
         filters,
-        FILTER_OPTIONS
+        TRANSACTION_FILTER
     );
-    const sortedTransactions = sortTransactions(filteredTransactions, sortBy);
+    console.log(filteredTransactions);
+    const sortResult = sortTransactions(filteredTransactions, sortBy);
+    console.log(sortResult);
+    const sortedTransactions = sortResult;
+    console.log(sortedTransactions);
 
+    const getScrollElement = useCallback(
+        () => props.containerRef.current,
+        [props.containerRef]
+    );
     const virtualizer = useVirtualizer({
         count: sortedTransactions.length,
-        getScrollElement: () => props.containerRef.current,
+        getScrollElement,
         estimateSize: () => 192,
         overscan: 5,
         gap: 16,
+        enabled: props.containerReady,
     });
-
-    useEffect(() => {
-        virtualizer._willUpdate();
-    }, [props.containerRef.current]);
 
     return (
         <div className="p-4 max-w-4xl mx-auto">
@@ -61,7 +66,7 @@ export function TransactionList(props: {
                         <Select
                             value={sortBy}
                             onValueChange={(value) =>
-                                setSortBy(value as SortOption)
+                                setSortBy(value as TransactionSortOption)
                             }
                         >
                             <SelectTrigger
@@ -71,7 +76,7 @@ export function TransactionList(props: {
                                 <SelectValue placeholder="Sort by..." />
                             </SelectTrigger>
                             <SelectContent>
-                                {SORT_OPTIONS.map((option) => (
+                                {TRANSACTION_SORT_OPTIONS.map((option) => (
                                     <SelectItem
                                         key={option.value}
                                         value={option.value}
