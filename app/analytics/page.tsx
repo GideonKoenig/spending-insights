@@ -16,6 +16,7 @@ import "@/lib/operations-account";
 import "@/lib/operations-transaction";
 import { handleResult } from "@/contexts/notification/utils";
 
+// Todo: figure out if the coolify is static site checkmark needs to be set or not (plausible said to not host as static for redirection.. check it out)
 // Todo: Tags page should containa tagRule list. the save clear and delete  buttons should be moved to the tab panel, the toggle stuff button should be moved to the list → lowering the state which is also good, and then we have at the top the define tag panel, below the filter panel, and below that the current transaction
 // Todo: transactions should get annotated to enrich them with additional information. currently mainly for paypal to visualize where the money is going (analyzing the vendor id and stuff that is provided)
 // Todo: tag-rules should have a category, and then an unlimited amount of tags (provided in the nice thing ihave in the datamanger-parser project). there is no name, you select them from the list/card, they need a created and updated at field (and id which i think they already have)
