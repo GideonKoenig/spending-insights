@@ -7,6 +7,8 @@ import {
     useEffect,
     type ReactNode,
 } from "react";
+import { usePlausible } from "next-plausible";
+import { PlausibleEvents } from "@/lib/plausible-events";
 import { type Account } from "@/lib/types";
 import { useNotifications } from "@/contexts/notification/provider";
 import { SuperJSON } from "superjson";
@@ -51,6 +53,7 @@ export function AccountProvider(props: { children: ReactNode }) {
     const [activeAccount, setActiveAccount] = useState<string | true>(true);
     const [loading, setLoading] = useState(true);
     const notificationContext = useNotifications();
+    const plausible = usePlausible<PlausibleEvents>();
 
     useEffect(() => {
         setLoading(true);
@@ -146,6 +149,7 @@ export function AccountProvider(props: { children: ReactNode }) {
         notificationContext,
         saveAccounts,
         accounts,
+        plausible,
     };
     const importAccounts = createImportAccounts(dependencies);
     const exportAccounts = createExportAccounts(dependencies);

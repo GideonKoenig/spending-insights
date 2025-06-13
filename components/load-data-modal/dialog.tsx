@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
+import { usePlausible } from "next-plausible";
+import { PlausibleEvents } from "@/lib/plausible-events";
 import {
     Dialog,
     DialogContent,
@@ -27,6 +29,7 @@ export function LoadDataModal(props: {
 }) {
     const notificationContext = useNotifications();
     const accountsContext = useAccounts();
+    const plausible = usePlausible<PlausibleEvents>();
     const [files, setFiles] = useState<PreparedFile[]>([]);
 
     const dependencies = {
@@ -35,6 +38,7 @@ export function LoadDataModal(props: {
         notificationContext,
         accountsContext,
         closeDialog: props.closeDialog,
+        plausible,
     };
     const isValid = createIsValid(dependencies);
     const handleFileSelect = createHandleFileSelect(dependencies);

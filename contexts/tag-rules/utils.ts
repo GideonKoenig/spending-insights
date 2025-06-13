@@ -2,12 +2,15 @@ import { TagRule, TagRuleSchema } from "@/lib/tag-rule-engine/types";
 import { tryCatchAsync } from "@/lib/utils";
 import { SuperJSON } from "superjson";
 import z from "zod";
+import { usePlausible } from "next-plausible";
+import { PlausibleEvents } from "@/lib/plausible-events";
 
 export type TagRuleDependencies = {
     addError: (origin: string, message: string) => void;
     addDebug: (origin: string, message: string) => void;
     saveTagRules: (updater: (rules: TagRule[]) => TagRule[]) => void;
     tagRules: TagRule[];
+    plausible: ReturnType<typeof usePlausible<PlausibleEvents>>;
 };
 
 export function createExportTagRules(dependencies: TagRuleDependencies) {
@@ -23,6 +26,10 @@ export function createExportTagRules(dependencies: TagRuleDependencies) {
         linkElement.setAttribute("href", dataUri);
         linkElement.setAttribute("download", exportFileDefaultName);
         linkElement.click();
+
+        dependencies.plausible("export-tag-rules", {
+            props: { count: dependencies.tagRules.length },
+        });
 
         dependencies.addDebug(
             "Export Tag Rules",
@@ -93,6 +100,9 @@ export function createImportTagRules(dependencies: TagRuleDependencies) {
                 ]);
 
                 if (newRules.length > 0) {
+                    dependencies.plausible("import-tag-rules", {
+                        props: { count: newRules.length },
+                    });
                     dependencies.addDebug(
                         "Import Tag Rules",
                         `Successfully imported ${

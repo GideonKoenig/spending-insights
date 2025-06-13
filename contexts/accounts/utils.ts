@@ -3,11 +3,14 @@ import { hashTransaction } from "@/lib/data-injestion/utils";
 import { type Account, AccountSchema } from "@/lib/types";
 import { tryCatch } from "@/lib/utils";
 import SuperJSON from "superjson";
+import { usePlausible } from "next-plausible";
+import { PlausibleEvents } from "@/lib/plausible-events";
 
 export type AccountDependencies = {
     notificationContext: NotificationContextType;
     saveAccounts: (updater: (accounts: Account[]) => Account[]) => void;
     accounts: Account[];
+    plausible: ReturnType<typeof usePlausible<PlausibleEvents>>;
 };
 
 export function createImportAccounts(dependencies: AccountDependencies) {
@@ -73,6 +76,11 @@ export function createImportAccounts(dependencies: AccountDependencies) {
                     const newAccounts = parsedAccounts.data.filter(
                         (p) => !matches.some((m) => m.id === p.id)
                     );
+                    if (newAccounts.length > 0) {
+                        dependencies.plausible("import-accounts", {
+                            props: { count: newAccounts.length },
+                        });
+                    }
                     return [...accounts, ...newAccounts];
                 });
             }
@@ -93,6 +101,10 @@ export function createExportAccounts(dependencies: AccountDependencies) {
         linkElement.setAttribute("href", dataUri);
         linkElement.setAttribute("download", filename);
         linkElement.click();
+
+        dependencies.plausible("export-accounts", {
+            props: { count: dependencies.accounts.length },
+        });
     };
 }
 

@@ -5,6 +5,7 @@ import { AccountProvider } from "@/contexts/accounts/provider";
 import { NotificationProvider } from "@/contexts/notification/provider";
 import { TagRulesProvider } from "@/contexts/tag-rules/provider";
 import { NavBar } from "@/components/nav-bar/nav-bar";
+import PlausibleProvider from "next-plausible";
 import "./globals.css";
 import "@/lib/operations-account";
 import "@/lib/operations-transaction";
@@ -23,18 +24,25 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en" className={inter.className} suppressHydrationWarning>
-            <NotificationProvider>
-                <TagRulesProvider>
-                    <AccountProvider>
-                        <body className="h-dvh w-dvw bg-background text-foreground flex flex-col">
-                            <NavBar />
-                            <div className="flex-grow overflow-hidden">
-                                {children}
-                            </div>
-                        </body>
-                    </AccountProvider>
-                </TagRulesProvider>
-            </NotificationProvider>
+            <PlausibleProvider
+                domain="bank.gko.gg"
+                taggedEvents
+                selfHosted
+                customDomain="plausible.gko.gg"
+            >
+                <NotificationProvider>
+                    <TagRulesProvider>
+                        <AccountProvider>
+                            <body className="h-dvh w-dvw bg-background text-foreground flex flex-col">
+                                <NavBar />
+                                <div className="flex-grow overflow-hidden">
+                                    {children}
+                                </div>
+                            </body>
+                        </AccountProvider>
+                    </TagRulesProvider>
+                </NotificationProvider>
+            </PlausibleProvider>
         </html>
     );
 }

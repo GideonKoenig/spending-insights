@@ -1,6 +1,8 @@
 "use client";
 
 import { Dispatch, SetStateAction } from "react";
+import { usePlausible } from "next-plausible";
+import { PlausibleEvents } from "@/lib/plausible-events";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -37,6 +39,7 @@ export function TagPanel(props: {
 }) {
     const notificationContext = useNotifications();
     const tagRuleContext = useTagRules();
+    const plausible = usePlausible<PlausibleEvents>();
 
     const saveRule = () => {
         const validation = getCleanTagRule(
@@ -67,8 +70,10 @@ export function TagPanel(props: {
 
         if (props.selectedRule.id) {
             tagRuleContext.updateTagRule(props.selectedRule.id, newRule);
+            plausible("update-tag-rule");
         } else {
             tagRuleContext.addTagRule(newRule);
+            plausible("create-tag-rule");
         }
         props.setCurrentRule({ filters: [] });
     };
