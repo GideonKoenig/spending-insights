@@ -1,12 +1,11 @@
 "use client";
 
-import { Pie, PieChart, Cell, ResponsiveContainer } from "recharts";
+import { Pie, PieChart, Cell } from "recharts";
 import {
     ChartConfig,
     ChartContainer,
     ChartTooltip,
 } from "@/components/ui/chart";
-import { CardContent } from "@/components/ui/card";
 import {
     CategoryStats,
     getCategoryInsights,
@@ -17,7 +16,6 @@ import { useGraph } from "@/contexts/graph/provider";
 import { filterAccountsByTimeRange } from "@/lib/analytics-tools/filtering";
 import { Account } from "@/lib/types";
 import { Fragment } from "react";
-import { getDateRangeFromTimeRange } from "@/components/analytics/selector-time-range";
 import {
     differenceInDays,
     differenceInMonths,

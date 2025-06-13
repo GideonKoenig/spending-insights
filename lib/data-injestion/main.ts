@@ -1,11 +1,15 @@
-import { CustomError, type Result, newError, newSuccess } from "@/lib/utils";
+import { type Result, newSuccess } from "@/lib/utils";
 import { VrBankFormat } from "@/lib/data-injestion/sources/vr-bank";
 import { DataInjestFormat, PreparedFile } from "@/lib/data-injestion/types";
 import { CsvParser } from "@/lib/csv-parser/parser";
 import { hashTransaction, findFormat } from "@/lib/data-injestion/utils";
 import { Account } from "@/lib/types";
+import { z } from "zod";
 
-const MAPPING_REGISTRY: DataInjestFormat<any>[] = [VrBankFormat];
+// Todo: Figure out why this type casting is necessary... to tired right now
+const MAPPING_REGISTRY: DataInjestFormat<z.ZodObject<z.ZodRawShape>>[] = [
+    VrBankFormat as unknown as DataInjestFormat<z.ZodObject<z.ZodRawShape>>,
+];
 
 async function injest(files: PreparedFile[]) {
     const results: Result<Account>[] = [];

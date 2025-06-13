@@ -23,7 +23,7 @@ export function TagsHeadlessList(props: {
 
     useEffect(() => {
         virtualizer._willUpdate();
-    }, [containerRef.current]);
+    }, [virtualizer]);
 
     const taggedCount = props.transactions.getTagged().length;
     const untaggedCount = props.transactions.length - taggedCount;

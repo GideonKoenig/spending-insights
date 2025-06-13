@@ -7,7 +7,6 @@ import {
     YAxis,
     Line,
     ComposedChart,
-    Rectangle,
 } from "recharts";
 import {
     ChartConfig,
@@ -17,7 +16,6 @@ import {
     ChartLegend,
     ChartLegendContent,
 } from "@/components/ui/chart";
-import { CardContent } from "@/components/ui/card";
 import { Insights } from "@/lib/analytics-tools/grouping";
 import { useGraph } from "@/contexts/graph/provider";
 import { filterInsightsByTimeRange } from "@/lib/analytics-tools/filtering";
@@ -191,26 +189,5 @@ export function IncomeExpenseChart(props: { insights: Insights }) {
                 />
             </ComposedChart>
         </ChartContainer>
-    );
-}
-
-function OffsetBar(props: {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    fill: string;
-    side: "left" | "right";
-}) {
-    const offsetX = props.side === "left" ? -props.width / 2 : props.width / 2;
-    return (
-        <Rectangle
-            x={props.x + offsetX}
-            y={props.y}
-            width={props.width}
-            height={props.height}
-            fill={props.fill}
-            radius={[2, 2, 0, 0]}
-        />
     );
 }

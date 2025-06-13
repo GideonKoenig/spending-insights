@@ -5,7 +5,7 @@ export type HeaderMapping = Record<
     keyof Omit<Transaction, "tag" | "id">,
     string
 >;
-export type DataInjestFormat<T extends z.ZodObject<any>> = {
+export type DataInjestFormat<T extends z.ZodObject<z.ZodRawShape>> = {
     name: string;
     displayName: string;
     schema: T;
@@ -16,7 +16,7 @@ export type PreparedFile = {
     file: File;
     name: string;
     fileName: string;
-    format: DataInjestFormat<any> | null;
+    format: DataInjestFormat<z.ZodObject<z.ZodRawShape>> | null;
     error: string | null;
     headers: string[];
     action: "add" | "merge" | "notify-developer" | "do-nothing";

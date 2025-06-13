@@ -3,7 +3,6 @@
 import { Insights } from "@/lib/analytics-tools/grouping";
 import { GraphRenderer } from "@/app/analytics/graph-renderer";
 import { GraphProvider } from "@/contexts/graph/provider";
-import { CategoryInsights } from "@/lib/analytics-tools/grouping-category";
 import { Account } from "@/lib/types";
 
 const GRAPHS_SETTINGS_STORAGE_KEY = "bank-history-analytics-graphs";

@@ -7,7 +7,6 @@ import {
     ChartTooltip,
     ChartTooltipContent,
 } from "@/components/ui/chart";
-import { CardContent } from "@/components/ui/card";
 import { Insights } from "@/lib/analytics-tools/grouping";
 import { formatDate } from "@/lib/analytics-tools/utilts";
 import { filterInsightsByTimeRange } from "@/lib/analytics-tools/filtering";
@@ -88,7 +87,6 @@ export function RelativeBalanceChart(props: { insights: Insights }) {
 
     const yTicks = calculateRelativeYTicks(chartData);
     const xTickData = calculateXTicks(chartData);
-    const startingBalance = chartData[0].absoluteBalance;
 
     return (
         <ChartContainer config={chartConfig} className="w-full">

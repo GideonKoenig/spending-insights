@@ -1,5 +1,6 @@
 import { DataInjestFormat } from "@/lib/data-injestion/types";
 import { parseAmount, parseDate } from "@/lib/data-injestion/utils";
+import { Transaction } from "@/lib/types";
 import { z } from "zod";
 
 const VrBankSchema = z.object({
@@ -39,7 +40,7 @@ function map(element: z.infer<typeof VrBankSchema>) {
         amount: parseAmount(element["Betrag"]),
         currency: element["Waehrung"],
         balanceAfterTransaction: parseAmount(element["Saldo nach Buchung"]),
-    };
+    } as Omit<Transaction, "hash">;
 }
 
 export const VrBankFormat: DataInjestFormat<typeof VrBankSchema> = {

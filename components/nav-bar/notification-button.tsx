@@ -45,7 +45,7 @@ export function NotificationButton(props: {
                                 ? props.activeColorClass
                                 : "text-muted-foreground"
                         ),
-                    } as any)}
+                    } as React.HTMLAttributes<React.ReactElement>)}
                 </Button>
             </PopoverTrigger>
             <PopoverContent align="end" className="w-auto p-0">

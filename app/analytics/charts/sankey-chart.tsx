@@ -1,8 +1,7 @@
 "use client";
 
-import { Sankey, Tooltip, ResponsiveContainer } from "recharts";
+import { Sankey } from "recharts";
 import { ChartConfig, ChartContainer } from "@/components/ui/chart";
-import { CardContent } from "@/components/ui/card";
 import { useGraph } from "@/contexts/graph/provider";
 import { filterAccountsByTimeRange } from "@/lib/analytics-tools/filtering";
 import {
@@ -20,8 +19,14 @@ import {
 } from "date-fns";
 import { getDateRange } from "@/lib/operations-account";
 
-const CustomSankeyNode = (props: any) => {
-    const { x, y, width, height, payload } = props;
+const CustomSankeyNode = (props: unknown) => {
+    const { x, y, width, height, payload } = props as {
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+        payload: { name: string };
+    };
     const name = payload.name.toLowerCase();
     const labelOnLeft =
         name.startsWith("income:") ||
@@ -193,7 +198,7 @@ const buildSankeyData = (
 
     addNode("total-income", true);
 
-    for (const [_, categoryStats] of expense) {
+    for (const [, categoryStats] of expense) {
         const subcategories = categoryStats.subcategories.entries().toArray();
         let isFirst = true;
         for (const [subName, subStats] of subcategories) {

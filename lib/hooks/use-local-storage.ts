@@ -19,7 +19,7 @@ export function useLocalStorage<T>(key: string, defaultValue: T) {
         );
         setValue(loadedValue);
         setIsLoading(false);
-    }, [key]);
+    }, [key, defaultValue, notificationContext]);
 
     const updateValue = (newValue: T) => {
         setValue(newValue);

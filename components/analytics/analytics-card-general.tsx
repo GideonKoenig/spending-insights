@@ -17,7 +17,7 @@ export function AnalyticsCardGeneral(props: {
                     props.icon as React.ReactElement,
                     {
                         className: "h-4 w-4 text-muted-foreground",
-                    } as any
+                    } as React.HTMLAttributes<React.ReactElement>
                 )}
             </CardHeader>
             <CardContent className={props.className}>

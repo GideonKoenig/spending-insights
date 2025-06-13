@@ -1,7 +1,7 @@
 import { differenceInDays, differenceInMonths, format } from "date-fns";
 
 export function createLabelFormatter(aggregation: string) {
-    return (value: any, payload: any) => {
+    return (value: unknown, payload: unknown) => {
         const formatStr =
             aggregation === "yearly"
                 ? "yyyy"
@@ -10,7 +10,10 @@ export function createLabelFormatter(aggregation: string) {
                 : aggregation === "weekly"
                 ? "'Week' w yyyy"
                 : "dd MMM yyyy";
-        return format(payload[0].payload.fullDate, formatStr);
+        return format(
+            (payload as { payload: { fullDate: Date } }[])[0].payload.fullDate,
+            formatStr
+        );
     };
 }
 

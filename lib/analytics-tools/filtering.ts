@@ -4,14 +4,6 @@ import {
     TimeRange,
 } from "@/components/analytics/selector-time-range";
 import { Account } from "@/lib/types";
-import {
-    subMonths,
-    subYears,
-    startOfYear,
-    startOfMonth,
-    endOfMonth,
-    endOfYear,
-} from "date-fns";
 
 export function filterInsightsByTimeRange(
     insights: Insights,

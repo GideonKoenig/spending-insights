@@ -10,7 +10,6 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { DataInjester } from "@/lib/data-injestion/main";
 import { ModalContent } from "@/components/load-data-modal/content";
 import { PreparedFile } from "@/lib/data-injestion/types";
 import { useNotifications } from "@/contexts/notification/provider";

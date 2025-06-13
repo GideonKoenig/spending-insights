@@ -42,10 +42,7 @@ export function TagPanel(props: {
     const plausible = usePlausible<PlausibleEvents>();
 
     const saveRule = () => {
-        const validation = getCleanTagRule(
-            props.selectedRule,
-            tagRuleContext.tagRules
-        );
+        const validation = getCleanTagRule(props.selectedRule);
         if (!validation.success) {
             notificationContext.addError("Tag Panel", validation.error);
             return;
@@ -151,10 +148,7 @@ export function TagPanel(props: {
                             </TooltipTrigger>
                             <TooltipContent>
                                 <p className="text-xs max-w-xs">
-                                    Exclude transactions from calculations and
-                                    analysis. Example: Transfers between savings
-                                    and checking accounts shouldn't affect your
-                                    income totals.
+                                    {`Exclude transactions from calculations and analysis. Example: Transfers between savings and checking accounts shouldn't affect your income totals.`}
                                 </p>
                             </TooltipContent>
                         </Tooltip>
@@ -189,10 +183,7 @@ export function TagPanel(props: {
                         onClick={saveRule}
                         className={cn(
                             "flex-2",
-                            getCleanTagRule(
-                                props.selectedRule,
-                                tagRuleContext.tagRules
-                            ).success
+                            getCleanTagRule(props.selectedRule).success
                                 ? ""
                                 : "opacity-50"
                         )}

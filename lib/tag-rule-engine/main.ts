@@ -11,7 +11,7 @@ function tagAccount(account: Account, tagRules: TagRule[]) {
     const warnings: string[] = [];
 
     for (const tagRule of tagRules) {
-        const { matches, unmatches } = splitTransactions(
+        const { matches } = splitTransactions(
             transactions,
             tagRule.filters,
             TRANSACTION_FILTER

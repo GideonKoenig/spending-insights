@@ -14,8 +14,7 @@ export function EmptyAccountsState() {
                 <FolderOpen className="h-16 w-16 mx-auto text-muted-foreground" />
                 <h2 className="text-2xl font-semibold">No Accounts Loaded</h2>
                 <p className="text-muted-foreground">
-                    You haven't loaded any transaction data yet. Click the
-                    button below to get started.
+                    {`You haven't loaded any transaction data yet. Click the button below to get started.`}
                 </p>
                 <Button
                     onClick={() => setIsLoadDataOpen(true)}

@@ -54,9 +54,7 @@ export default function GuidePage() {
                                 </CardHeader>
                                 <CardContent className="space-y-4">
                                     <p className="text-sm text-muted-foreground">
-                                        Create date ranges by adding two
-                                        separate filters: one for "after" date
-                                        and one for "before" date.
+                                        {`Create date ranges by adding two separate filters: one for "after" date and one for "before" date.`}
                                     </p>
                                     <div className="bg-blue-950/30 p-3 rounded-md border border-blue-800">
                                         <p className="text-sm font-medium mb-2">
@@ -176,7 +174,7 @@ export default function GuidePage() {
                                                     className="border-purple-300 text-purple-300"
                                                 >
                                                     paymentParticipant includes
-                                                    "grocery"
+                                                    {"grocery"}
                                                 </Badge>
                                             </p>
                                             <p>
@@ -184,14 +182,12 @@ export default function GuidePage() {
                                                     variant="outline"
                                                     className="border-purple-300 text-purple-300"
                                                 >
-                                                    transactionType = "sepa"
+                                                    transactionType = {"sepa"}
                                                 </Badge>
                                             </p>
                                         </div>
                                         <p className="text-xs text-muted-foreground mt-2">
-                                            "grocery" matches "GROCERY",
-                                            "Grocery Store", "grocery-mart",
-                                            etc.
+                                            {`"grocery" matches "GROCERY", "Grocery Store", "grocery-mart", etc.`}
                                         </p>
                                     </div>
                                 </CardContent>
@@ -280,18 +276,19 @@ export default function GuidePage() {
                                                 all conditions must be true
                                             </strong>{" "}
                                             for a transaction to match. This is
-                                            called "additive" filtering - each
-                                            condition narrows down the results
-                                            further.
+                                            called &quot;additive&quot;
+                                            filtering - each condition narrows
+                                            down the results further.
                                         </p>
                                         <div className="mt-3 p-2 bg-amber-900/50 rounded text-xs text-amber-200">
                                             Example: paymentParticipant includes
-                                            "AMAZON" <strong>AND</strong> amount
-                                            &gt; 50 <strong>AND</strong> purpose
-                                            includes "PRIME"
+                                            &quot;AMAZON&quot;{" "}
+                                            <strong>AND</strong> amount &gt; 50{" "}
+                                            <strong>AND</strong> purpose
+                                            includes &quot;PRIME&quot;
                                             <br />→ Only matches Amazon
                                             transactions over €50 that mention
-                                            "PRIME"
+                                            &quot;PRIME&quot;
                                         </div>
                                     </CardContent>
                                 </Card>
@@ -368,7 +365,7 @@ export default function GuidePage() {
                                                     Value:
                                                 </span>
                                                 <Badge variant="secondary">
-                                                    "REWE"
+                                                    &quot;REWE&quot;
                                                 </Badge>
                                             </div>
                                             <div className="flex justify-between">
@@ -463,7 +460,7 @@ export default function GuidePage() {
                                                     Value:
                                                 </span>
                                                 <Badge variant="secondary">
-                                                    "GEHALT"
+                                                    &quot;GEHALT&quot;
                                                 </Badge>
                                             </div>
                                             <div className="flex justify-between">

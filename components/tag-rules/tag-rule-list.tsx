@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { TagRuleCard } from "@/components/tag-rules/tag-rule-card";
 import { TagRuleHeader } from "@/components/tag-rules/tag-rule-header";
 import { cn } from "@/lib/utils";
@@ -12,11 +12,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import {
-    Category,
-    MAIN_CATEGORIES,
-    TagRule,
-} from "@/lib/tag-rule-engine/types";
+import { Category, TagRule } from "@/lib/tag-rule-engine/types";
 import {
     sortTagRules,
     TagRuleSortOption,
@@ -69,7 +65,7 @@ export function TagRuleList(props: {
 
     useEffect(() => {
         virtualizer._willUpdate();
-    }, [props.containerReady]);
+    }, [props.containerReady, virtualizer]);
 
     return (
         <div className={cn("p-4", props.className)}>

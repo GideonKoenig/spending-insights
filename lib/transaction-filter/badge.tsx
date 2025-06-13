@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { TRANSACTION_FILTER } from "@/lib/transaction-filter/transaction-filter-options";
@@ -36,10 +35,6 @@ export function TransactionFilterBadge(props: {
         TRANSACTION_FILTER.find(
             (option) => option.attribute === props.filter.attribute
         )?.label ?? props.filter.attribute;
-
-    const operatorLabel =
-        OPERATORS.find((operator) => operator.name === props.filter.operator)
-            ?.label ?? props.filter.operator;
 
     const availableOperators = getOperatorsForFilterOption(
         props.filter.attribute,

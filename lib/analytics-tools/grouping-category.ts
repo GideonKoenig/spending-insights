@@ -1,4 +1,4 @@
-import { Transaction, Account } from "@/lib/types";
+import { Account } from "@/lib/types";
 
 export type CategoryInsights = {
     overall: {

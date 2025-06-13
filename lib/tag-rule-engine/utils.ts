@@ -32,7 +32,7 @@ export function applyTag(transactions: Transaction[], tagRule: TagRule) {
     return newSuccess(taggedTransactions, warnings);
 }
 
-export function getCleanTagRule(tagRule: PartialTagRule, other: TagRule[]) {
+export function getCleanTagRule(tagRule: PartialTagRule) {
     const hasCategory = tagRule.tag?.category?.trim();
     const hasSubCategory = tagRule.tag?.subCategory?.trim();
     const hasFilters = tagRule.filters.length > 0;
@@ -58,7 +58,7 @@ export function getCleanTagRule(tagRule: PartialTagRule, other: TagRule[]) {
 
 export function generateCategoryColor(category: string) {
     const isCategory = (category: string): category is Category => {
-        return MAIN_CATEGORIES.includes(category as any);
+        return (MAIN_CATEGORIES as readonly string[]).includes(category);
     };
     if (!isCategory(category) || category === "all") return "hsl(0, 0%, 50%)";
     const index = MAIN_CATEGORIES.indexOf(category);

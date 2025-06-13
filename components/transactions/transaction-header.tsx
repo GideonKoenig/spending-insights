@@ -23,7 +23,6 @@ import { DateInput } from "@/lib/transaction-filter/input-components/date-input"
 import { ListInput } from "@/lib/transaction-filter/input-components/list-input";
 import { getListOptions } from "@/lib/transaction-filter/utils";
 import { TransactionFilterBadge } from "@/lib/transaction-filter/badge";
-import { type TransactionSortOption } from "@/lib/transaction-sorter";
 import { cn } from "@/lib/utils";
 
 type Value = string | number | Date | undefined;

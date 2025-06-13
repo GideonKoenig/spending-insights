@@ -3,6 +3,7 @@ import type {
     TransactionFilter,
     FilterRule,
     TypedOperator,
+    FilterOperator,
 } from "@/lib/transaction-filter/types";
 import {
     dateEquals,
@@ -54,8 +55,10 @@ export function filter(
             const operator = operators.find((op) => op.name === rule.operator);
             if (!operator) return false;
 
-            // Type assertion is safe here because we've checked the types match
-            return (operator as any).compare(rule.value, value);
+            return (operator as FilterOperator<unknown>).compare(
+                rule.value,
+                value
+            );
         });
     });
 }
@@ -82,7 +85,10 @@ export function splitTransactions(
             const operator = operators.find((op) => op.name === rule.operator);
             if (!operator) return false;
 
-            return (operator as any).compare(rule.value, value);
+            return (operator as FilterOperator<unknown>).compare(
+                rule.value,
+                value
+            );
         });
 
         if (isMatch) matches.push(transaction);

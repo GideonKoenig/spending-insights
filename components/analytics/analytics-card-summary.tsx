@@ -30,7 +30,7 @@ export function AnalyticsCardSummary(props: {
             <div className="flex items-center justify-end">
                 {cloneElement(props.icon, {
                     className: "h-4 w-4 text-muted-foreground",
-                } as any)}
+                } as React.HTMLAttributes<React.ReactElement>)}
             </div>
 
             <div>

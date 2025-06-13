@@ -1,4 +1,4 @@
-import { TransactionSchema, type Transaction } from "@/lib/types";
+import { type Transaction } from "@/lib/types";
 import z from "zod";
 
 export type InputType = "text" | "currency" | "date" | "list";

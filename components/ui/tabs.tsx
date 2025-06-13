@@ -32,10 +32,16 @@ const Tabs = React.forwardRef<
         >
             {React.Children.map(props.children, (child) =>
                 React.isValidElement(child)
-                    ? React.cloneElement(child as any, {
-                          value: actualValue,
-                          onValueChange: handleValueChange,
-                      })
+                    ? React.cloneElement(
+                          child as React.ReactElement<{
+                              value: string;
+                              onValueChange: (value: string) => void;
+                          }>,
+                          {
+                              value: actualValue,
+                              onValueChange: handleValueChange,
+                          }
+                      )
                     : child
             )}
         </div>

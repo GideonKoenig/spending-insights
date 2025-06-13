@@ -1,5 +1,4 @@
 import { TagRule } from "@/lib/tag-rule-engine/types";
-import { type Transaction } from "@/lib/types";
 
 export type TagRuleSortOption =
     | "newest-created"

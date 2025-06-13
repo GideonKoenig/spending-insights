@@ -20,7 +20,10 @@ function getHeaders(text: string) {
     return newSuccess(headers);
 }
 
-function parse<T extends z.ZodObject<any>>(content: string, schema: T) {
+function parse<T extends z.ZodObject<z.ZodRawShape>>(
+    content: string,
+    schema: T
+) {
     const lines = content
         .trim()
         .split("\n")

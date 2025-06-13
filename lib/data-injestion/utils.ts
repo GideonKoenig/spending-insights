@@ -2,6 +2,7 @@ import { DataInjestFormat } from "@/lib/data-injestion/types";
 import { Transaction } from "@/lib/types";
 import { newError, newSuccess } from "@/lib/utils";
 import { createHash } from "crypto";
+import { z } from "zod";
 
 export function parseDate(dateStr: string): Date {
     if (!dateStr) return new Date();
@@ -25,7 +26,7 @@ export function parseAmount(amountStr: string): number {
 
 export function findFormat(
     headers: string[],
-    formats: DataInjestFormat<any>[]
+    formats: DataInjestFormat<z.ZodObject<z.ZodRawShape>>[]
 ) {
     const format = formats.find((format) => {
         const formatHeaders = Object.keys(format.schema.shape);

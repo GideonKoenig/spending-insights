@@ -4,11 +4,8 @@ export const dateEquals: FilterOperator<Date> = {
     name: "date-equals",
     label: "=",
     type: "date",
-    compare: (userValue, valueToCompare) => {
-        const string = "2025-04-14T22:00:00.000Z";
-        const date = new Date(string);
-        return valueToCompare.getTime() === userValue.getTime();
-    },
+    compare: (userValue, valueToCompare) =>
+        valueToCompare.getTime() === userValue.getTime(),
 };
 
 export const dateAfter: FilterOperator<Date> = {

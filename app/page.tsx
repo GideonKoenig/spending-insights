@@ -9,12 +9,10 @@ import {
     Tag,
     TrendingUp,
     Shield,
-    Check,
     FileSpreadsheet,
     Filter,
     BarChart3,
     Download,
-    Upload,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -62,9 +60,7 @@ export default function Home() {
                                 </CardHeader>
                                 <CardContent>
                                     <p className="text-sm text-muted-foreground">
-                                        Select your bank statement CSV files.
-                                        The data will be stored in your
-                                        browser's local storage for future use.
+                                        {`Select your bank statement CSV files. The data will be stored in your browser's local storage for future use.`}
                                     </p>
                                 </CardContent>
                             </Card>
@@ -112,9 +108,7 @@ export default function Home() {
 
                     <section className="text-center space-y-6">
                         <p className="text-sm text-muted-foreground">
-                            You can load data from the Transactions page or use
-                            the "Load Data" option in the Actions menu at the
-                            top.
+                            {`You can load data from the Transactions page or use the "Load Data" option in the Actions menu at the top.`}
                         </p>
 
                         <div className="flex justify-center gap-4">
@@ -147,11 +141,7 @@ export default function Home() {
                         </div>
                         <h3 className="text-2xl font-semibold mb-4">Privacy</h3>
                         <p className="text-muted-foreground max-w-2xl mx-auto">
-                            Your financial data stays completely private.
-                            Everything runs locally in your browser - no
-                            servers, no uploads, no accounts needed. Your
-                            transaction data and categorization rules are stored
-                            safely in your browser's local storage.
+                            {`Your financial data stays completely private. Everything runs locally in your browser - no servers, no uploads, no accounts needed. Your transaction data and categorization rules are stored safely in your browser's local storage.`}
                         </p>
                     </div>
 
