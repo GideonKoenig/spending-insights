@@ -1,0 +1,23 @@
+import type { FilterOperator } from "@/lib/transaction-filter/types";
+
+export const currencyEquals: FilterOperator<number> = {
+    name: "currency-equals",
+    label: "=",
+    type: "currency",
+    compare: (userValue, valueToCompare) =>
+        Math.abs(valueToCompare) === Math.abs(userValue),
+};
+
+export const currencyGreaterThan: FilterOperator<number> = {
+    name: "currency-greater-than",
+    label: ">",
+    type: "currency",
+    compare: (userValue, valueToCompare) => valueToCompare > userValue,
+};
+
+export const currencyLessThan: FilterOperator<number> = {
+    name: "currency-less-than",
+    label: "<",
+    type: "currency",
+    compare: (userValue, valueToCompare) => valueToCompare < userValue,
+};
