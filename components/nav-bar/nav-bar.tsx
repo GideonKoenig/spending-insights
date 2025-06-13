@@ -51,7 +51,8 @@ export function NavBar() {
     const [isLoadDataOpen, setIsLoadDataOpen] = useState(false);
 
     const links = [
-        { href: "/", label: "Transactions" },
+        { href: "/", label: "Home" },
+        { href: "/transactions", label: "Transactions" },
         { href: "/analytics", label: "Analytics" },
         { href: "/categories", label: "Categories" },
     ];
@@ -267,21 +268,24 @@ export function NavBar() {
                             )
                         }
                     />
-                    <NotificationButton
-                        notifications={notifications.debugs}
-                        icon={<Bug />}
-                        activeColorClass="text-debug"
-                        typeLabel="debug message"
-                        emptyMessage="No debug messages"
-                        onMarkAsRead={notifications.markDebugsAsRead}
-                        onClear={notifications.clearDebugs}
-                        onAddTest={() =>
-                            notifications.addDebug(
-                                "Test",
-                                "This is a test debug message"
-                            )
-                        }
-                    />
+
+                    {process.env.NODE_ENV === "development" && (
+                        <NotificationButton
+                            notifications={notifications.debugs}
+                            icon={<Bug />}
+                            activeColorClass="text-debug"
+                            typeLabel="debug message"
+                            emptyMessage="No debug messages"
+                            onMarkAsRead={notifications.markDebugsAsRead}
+                            onClear={notifications.clearDebugs}
+                            onAddTest={() =>
+                                notifications.addDebug(
+                                    "Test",
+                                    "This is a test debug message"
+                                )
+                            }
+                        />
+                    )}
                 </div>
             </div>
 
