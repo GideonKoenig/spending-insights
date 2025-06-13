@@ -7,6 +7,8 @@ import {
     useEffect,
     type ReactNode,
 } from "react";
+import { usePlausible } from "next-plausible";
+import { PlausibleEvents } from "@/lib/plausible-events";
 import { TagRule, TagRuleSchema } from "@/lib/tag-rule-engine/types";
 import { useNotifications } from "@/contexts/notification/provider";
 import superjson from "superjson";
@@ -41,6 +43,7 @@ export function useTagRules() {
 
 export function TagRulesProvider(props: { children: ReactNode }) {
     const { addError, addDebug } = useNotifications();
+    const plausible = usePlausible<PlausibleEvents>();
     const [tagRules, setTagRules] = useState<TagRule[]>([]);
     const [loading, setLoading] = useState(false);
 
@@ -87,6 +90,7 @@ export function TagRulesProvider(props: { children: ReactNode }) {
         addDebug,
         saveTagRules,
         tagRules,
+        plausible,
     };
     const importTagRules = createImportTagRules(dependencies);
     const exportTagRules = createExportTagRules(dependencies);

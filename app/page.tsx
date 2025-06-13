@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { usePlausible } from "next-plausible";
+import { PlausibleEvents } from "@/lib/plausible-events";
 import {
     ArrowRight,
     Database,
@@ -25,6 +27,8 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function Home() {
+    const plausible = usePlausible<PlausibleEvents>();
+
     return (
         <ScrollArea className="h-full">
             <div className="container mx-auto px-6 py-12 max-w-4xl">
@@ -114,13 +118,22 @@ export default function Home() {
                         </p>
 
                         <div className="flex justify-center gap-4">
-                            <Button asChild size="lg">
+                            <Button
+                                asChild
+                                size="lg"
+                                onClick={() => plausible("get-started")}
+                            >
                                 <Link href="/transactions">
                                     Get Started
                                     <ArrowRight className="ml-2 h-4 w-4" />
                                 </Link>
                             </Button>
-                            <Button asChild size="lg" variant="outline">
+                            <Button
+                                asChild
+                                size="lg"
+                                variant="outline"
+                                onClick={() => plausible("learn-more")}
+                            >
                                 <Link href="/guide">Learn More</Link>
                             </Button>
                         </div>

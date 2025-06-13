@@ -5,6 +5,8 @@ import { PreparedFile } from "@/lib/data-injestion/types";
 import { Dispatch, SetStateAction } from "react";
 import { CsvParser } from "@/lib/csv-parser/parser";
 import { notifyDeveloperAboutUnknownCsvFormat } from "@/lib/server-actions";
+import { usePlausible } from "next-plausible";
+import { PlausibleEvents } from "@/lib/plausible-events";
 
 export interface LoadDataDependencies {
     files: PreparedFile[];
@@ -12,6 +14,7 @@ export interface LoadDataDependencies {
     notificationContext: NotificationContextType;
     accountsContext: AccountsContextType;
     closeDialog: () => void;
+    plausible: ReturnType<typeof usePlausible<PlausibleEvents>>;
 }
 
 export function createIsValid(dependencies: LoadDataDependencies) {
@@ -105,6 +108,7 @@ export function createLoadData(dependencies: LoadDataDependencies) {
                     preparedFile.headers,
                     preparedFile.bankName
                 );
+                dependencies.plausible("notify-developer");
                 dependencies.notificationContext.addDebug(
                     "Notify Developer",
                     `CSV headers sent to developer for file: ${
@@ -119,6 +123,7 @@ export function createLoadData(dependencies: LoadDataDependencies) {
             }
 
             if (preparedFile.action === "do-nothing") {
+                dependencies.plausible("do-nothing");
                 dependencies.notificationContext.addDebug(
                     "Do Nothing",
                     `Skipped processing file: ${preparedFile.fileName}`
@@ -157,9 +162,11 @@ export function createLoadData(dependencies: LoadDataDependencies) {
                     preparedFile.mergeAccount,
                     account
                 );
+                dependencies.plausible("merge-account");
             }
             if (preparedFile.action === "add") {
                 dependencies.accountsContext.addAccount(result.value);
+                dependencies.plausible("add-account");
             }
         }
         dependencies.setFiles([]);
