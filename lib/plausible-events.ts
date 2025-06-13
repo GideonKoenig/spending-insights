@@ -11,4 +11,5 @@ export type PlausibleEvents = {
     "add-account": never;
     "merge-account": never;
     "do-nothing": never;
+    "download-sample-data": never;
 };

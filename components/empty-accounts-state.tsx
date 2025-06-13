@@ -4,11 +4,15 @@ import { Button } from "@/components/ui/button";
 import { FolderOpen, Download } from "lucide-react";
 import { LoadDataModal } from "@/components/load-data-modal/dialog";
 import { useState } from "react";
+import { usePlausible } from "next-plausible";
+import { PlausibleEvents } from "@/lib/plausible-events";
 
 export function EmptyAccountsState() {
     const [isLoadDataOpen, setIsLoadDataOpen] = useState(false);
+    const plausible = usePlausible<PlausibleEvents>();
 
     const downloadSampleData = () => {
+        plausible("download-sample-data");
         const link = document.createElement("a");
         link.href = "/sample-transactions.csv";
         link.download = "sample-transactions.csv";
