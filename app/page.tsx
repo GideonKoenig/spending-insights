@@ -27,6 +27,16 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 export default function Home() {
     const plausible = usePlausible<PlausibleEvents>();
 
+    const downloadSampleData = () => {
+        plausible("download-sample-data");
+        const link = document.createElement("a");
+        link.href = "/sample-transactions.csv";
+        link.download = "sample-transactions.csv";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
     return (
         <ScrollArea className="h-full">
             <div className="container mx-auto px-6 py-12 max-w-4xl">
@@ -47,62 +57,102 @@ export default function Home() {
                             What you need to do
                         </h2>
 
-                        <div className="grid gap-6 md:grid-cols-3">
+                        <div className="space-y-6">
                             <Card>
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2">
-                                        <Database className="h-5 w-5" />
-                                        1. Load Data
+                                        <FileSpreadsheet className="h-5 w-5" />
+                                        0. Get Your Data
                                     </CardTitle>
                                     <CardDescription>
-                                        Import your transaction CSV files
+                                        Download transaction data from your bank
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent>
-                                    <p className="text-sm text-muted-foreground">
-                                        {`Select your bank statement CSV files. The data will be stored in your browser's local storage for future use.`}
-                                    </p>
+                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                                        <p className="text-sm text-muted-foreground flex-1">
+                                            Most online banking providers offer
+                                            the ability to export your
+                                            transaction history as CSV files.
+                                            Don&apos;t have your own data yet?
+                                            <span className="font-medium text-foreground">
+                                                {" "}
+                                                Explore the app using our sample
+                                                dataset.
+                                            </span>
+                                        </p>
+                                        <Button
+                                            onClick={downloadSampleData}
+                                            variant="outline"
+                                            className="shrink-0 sm:ml-4"
+                                        >
+                                            <Download className="h-4 w-4 mr-2" />
+                                            Try Sample Data
+                                        </Button>
+                                    </div>
                                 </CardContent>
                             </Card>
 
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle className="flex items-center gap-2">
-                                        <Tag className="h-5 w-5" />
-                                        2. Create Rules
-                                    </CardTitle>
-                                    <CardDescription>
-                                        Set up categorization rules
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <p className="text-sm text-muted-foreground">
-                                        Define rules based on merchant names,
-                                        amounts, or descriptions to
-                                        automatically categorize similar
-                                        transactions.
-                                    </p>
-                                </CardContent>
-                            </Card>
+                            <div className="grid gap-6 md:grid-cols-3">
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle className="flex items-center gap-2">
+                                            <Database className="h-5 w-5" />
+                                            1. Load Data
+                                        </CardTitle>
+                                        <CardDescription>
+                                            Import your transaction CSV files
+                                        </CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <p className="text-sm text-muted-foreground">
+                                            Select your bank statement CSV
+                                            files. The data will be stored in
+                                            your browser&apos;s local storage
+                                            for future use.
+                                        </p>
+                                    </CardContent>
+                                </Card>
 
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle className="flex items-center gap-2">
-                                        <TrendingUp className="h-5 w-5" />
-                                        3. Analyze Spending
-                                    </CardTitle>
-                                    <CardDescription>
-                                        Review your spending patterns
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <p className="text-sm text-muted-foreground">
-                                        View categorized transactions and
-                                        analytics to understand your spending
-                                        habits over time.
-                                    </p>
-                                </CardContent>
-                            </Card>
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle className="flex items-center gap-2">
+                                            <Tag className="h-5 w-5" />
+                                            2. Create Rules
+                                        </CardTitle>
+                                        <CardDescription>
+                                            Set up categorization rules
+                                        </CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <p className="text-sm text-muted-foreground">
+                                            Define rules based on merchant
+                                            names, amounts, or descriptions to
+                                            automatically categorize similar
+                                            transactions.
+                                        </p>
+                                    </CardContent>
+                                </Card>
+
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle className="flex items-center gap-2">
+                                            <TrendingUp className="h-5 w-5" />
+                                            3. Analyze Spending
+                                        </CardTitle>
+                                        <CardDescription>
+                                            Review your spending patterns
+                                        </CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <p className="text-sm text-muted-foreground">
+                                            View categorized transactions and
+                                            analytics to understand your
+                                            spending habits over time.
+                                        </p>
+                                    </CardContent>
+                                </Card>
+                            </div>
                         </div>
                     </section>
 
