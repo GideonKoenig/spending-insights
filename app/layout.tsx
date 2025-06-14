@@ -13,8 +13,8 @@ import "@/lib/operations-transaction";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-    title: "Bank History",
-    description: "Analyze your bank transactions",
+    title: "Spending Insights",
+    description: "Analyze your bank transactions privately in your browser",
 };
 
 export default function RootLayout({
@@ -25,7 +25,7 @@ export default function RootLayout({
     return (
         <html lang="en" className={inter.className} suppressHydrationWarning>
             <PlausibleProvider
-                domain="bank.gko.gg"
+                domain="spendinginsights.app"
                 taggedEvents
                 selfHosted
                 customDomain="plausible.gko.gg"
