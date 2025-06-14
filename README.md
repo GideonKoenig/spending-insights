@@ -6,18 +6,10 @@ A tool for analyzing and categorizing bank transactions from CSV files. Built wi
 
 - **CSV Import**: Load bank transaction files directly in your browser
 - **Categorization Rules**: Create rules to automatically categorize transactions
-- **Transaction Filtering**: Filter by date, amount, merchant, and more
 - **Analytics**: View spending breakdowns with charts and statistics
 - **Local Processing**: All data stays in your browser
 
 ## Getting Started
-
-### Prerequisites
-
-- Node.js 18+
-- Modern browser with File System Access API support (Chrome/Edge)
-
-### Installation
 
 ```bash
 # Clone repository
@@ -25,10 +17,10 @@ git clone <repository-url>
 cd bank-history
 
 # Install dependencies
-npm install
+pnpm install
 
 # Run development server
-npm run dev
+pnpm dev
 ```
 
 Visit [http://localhost:3000](http://localhost:3000) to start using the application.
@@ -38,7 +30,6 @@ Visit [http://localhost:3000](http://localhost:3000) to start using the applicat
 1. **Import Transactions**: Select your bank CSV file on the Transactions page
 2. **Create Rules**: Navigate to Categories to create rules for automatic categorization
 3. **Analyze**: View your categorized transactions and spending analytics
-
 
 ## Creating Categorization Rules
 
@@ -73,21 +64,13 @@ Rules let you automatically categorize transactions based on criteria:
 - **Framework**: Next.js 14 with App Router
 - **UI**: Tailwind CSS + shadcn/ui
 - **Language**: TypeScript
-- **Storage**: IndexedDB for file handles, LocalStorage for rules
+- **Storage**: LocalStorage for rules and data
 
 ## Privacy
 
 - All processing happens in your browser
 - No data is sent to external servers
 - No accounts or authentication needed
-- File access managed by browser security
-
-## Browser Support
-
-- ✅ Chrome 86+
-- ✅ Edge 86+
-- ❌ Firefox (File System Access API not supported)
-- ❌ Safari (File System Access API not supported)
 
 ## License
 MIT License 
