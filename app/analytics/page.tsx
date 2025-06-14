@@ -16,8 +16,6 @@ import "@/lib/operations-account";
 import "@/lib/operations-transaction";
 import { handleResult } from "@/contexts/notification/utils";
 
-// Todo: transactions should get annotated to enrich them with additional information. currently mainly for paypal to visualize where the money is going (analyzing the vendor id and stuff that is provided)
-
 const SELECTED_TAB_KEY = "bank-history-analytics-selected-tab";
 
 export default function AnalyticsPage() {
