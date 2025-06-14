@@ -33,6 +33,7 @@ export function TransactionHeader(props: {
     filters: FilterRule[];
     transactions: Transaction[];
     sortSelector?: React.ReactNode;
+    viewToggle?: React.ReactNode;
 }) {
     const [option, setOption] = useState(TRANSACTION_FILTER[0]);
     const [operator, setOperator] = useState<TypedOperator>(
@@ -224,10 +225,11 @@ export function TransactionHeader(props: {
                     Add
                 </Button>
 
-                {props.sortSelector && (
+                {(props.sortSelector || props.viewToggle) && (
                     <>
                         <div className="flex-grow" />
                         {props.sortSelector}
+                        {props.viewToggle}
                     </>
                 )}
             </div>

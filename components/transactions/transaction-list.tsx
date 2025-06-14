@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { type Transaction } from "@/lib/types";
 import { TransactionCard } from "@/components/transactions/transaction-card";
+import { TransactionCardSlim } from "@/components/transactions/transaction-card-slim";
 import { TransactionHeader } from "@/components/transactions/transaction-header";
+import { TransactionViewToggle } from "@/components/transactions/transaction-view-toggle";
 import { filter } from "@/lib/transaction-filter/main";
 import { type FilterRule } from "@/lib/transaction-filter/types";
 import { TRANSACTION_FILTER } from "@/lib/transaction-filter/transaction-filter-options";
@@ -21,6 +23,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { useTransactionView } from "@/lib/hooks/use-transaction-view";
+
 export function TransactionList(props: {
     transactions: Transaction[];
     containerRef: React.RefObject<HTMLDivElement | null>;
@@ -29,30 +33,36 @@ export function TransactionList(props: {
 }) {
     const [filters, setFilters] = useState<FilterRule[]>([]);
     const [sortBy, setSortBy] = useState<TransactionSortOption>("newest");
+    const view = useTransactionView();
 
     const filteredTransactions = filter(
         props.transactions,
         filters,
         TRANSACTION_FILTER
     );
-    console.log(filteredTransactions);
-    const sortResult = sortTransactions(filteredTransactions, sortBy);
-    console.log(sortResult);
-    const sortedTransactions = sortResult;
-    console.log(sortedTransactions);
+    const sortedTransactions = sortTransactions(filteredTransactions, sortBy);
 
     const getScrollElement = useCallback(
         () => props.containerRef.current,
         [props.containerRef]
     );
+
     const virtualizer = useVirtualizer({
         count: sortedTransactions.length,
         getScrollElement,
-        estimateSize: () => 192,
+        estimateSize: () => (view.viewType === "standard" ? 192 : 48),
         overscan: 5,
-        gap: 16,
+        gap: view.viewType === "standard" ? 16 : 8,
         enabled: props.containerReady,
     });
+
+    useEffect(() => {
+        virtualizer._willUpdate();
+        virtualizer.measure();
+    }, [props.containerReady, view.viewType, virtualizer]);
+
+    const CardComponent =
+        view.viewType === "standard" ? TransactionCard : TransactionCardSlim;
 
     return (
         <div className="p-4 max-w-4xl mx-auto">
@@ -87,6 +97,7 @@ export function TransactionList(props: {
                             </SelectContent>
                         </Select>
                     }
+                    viewToggle={<TransactionViewToggle view={view} />}
                 />
                 {props.containerRef.current && (
                     <div
@@ -94,14 +105,13 @@ export function TransactionList(props: {
                         style={{ height: `${virtualizer.getTotalSize()}px` }}
                     >
                         {virtualizer.getVirtualItems().map((item) => (
-                            <TransactionCard
+                            <CardComponent
                                 key={sortedTransactions[item.index].hash}
                                 transaction={sortedTransactions[item.index]}
                                 style={{
                                     position: "absolute",
                                     top: 0,
                                     left: 0,
-
                                     width: "100%",
                                     height: `${item.size}px`,
                                     transform: `translateY(${item.start}px)`,

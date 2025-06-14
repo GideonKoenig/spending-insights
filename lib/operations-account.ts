@@ -2,6 +2,7 @@ import { TagRuleEngine } from "@/lib/tag-rule-engine/main";
 import { TagRule } from "@/lib/tag-rule-engine/types";
 import { Account, Transaction } from "@/lib/types";
 import { CustomSuccess, newSuccess } from "@/lib/utils";
+import { enricher } from "@/lib/transaction-enrichment/main";
 
 declare global {
     interface Array<T> {
@@ -55,7 +56,8 @@ export function getActiveAccounts(
 export function preprocessAccounts(accounts: Account[], tagRules: TagRule[]) {
     const warnings: string[] = [];
     const processedAccounts = accounts.map((account) => {
-        const result = TagRuleEngine.tagAccount(account, tagRules);
+        const enrichedAccount = enricher.enrichAccount(account);
+        const result = TagRuleEngine.tagAccount(enrichedAccount, tagRules);
         if (result.warnings) warnings.push(...result.warnings);
         return result.value;
     });

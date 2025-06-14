@@ -40,7 +40,7 @@ export const FilterRuleSchema = z.object({
 });
 
 export type TransactionFilter = {
-    attribute: keyof Omit<Transaction, "tag">;
+    attribute: keyof Omit<Transaction, "tag" | "enrichment">;
     label: string;
     inputType: InputType;
 };
