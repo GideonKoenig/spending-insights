@@ -1,9 +1,8 @@
 import { type Transaction } from "@/lib/types";
 import { type TransactionEnricher } from "./types";
-import { paypalEnricher } from "./enrichers/paypal";
 import { type Account } from "@/lib/types";
 
-const ENRICHERS: TransactionEnricher[] = [paypalEnricher];
+const ENRICHERS: TransactionEnricher[] = [];
 
 export function enrichTransaction(transaction: Transaction): Transaction {
     let enrichedTransaction = transaction;
