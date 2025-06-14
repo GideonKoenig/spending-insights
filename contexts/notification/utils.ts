@@ -51,7 +51,7 @@ export function createDebug(
     };
 }
 
-function formatParameter(param: any) {
+function formatParameter(param: unknown) {
     if (Array.isArray(param)) {
         if (param.length === 0) return "Array(0)";
         const firstType = typeof param[0];
@@ -74,7 +74,7 @@ function formatParameter(param: any) {
 
 function formatDebugMessage(
     functionName: string,
-    params: any[],
+    params: unknown[],
     result: string,
     duration: string
 ) {
@@ -100,7 +100,7 @@ function formatDebugMessage(
  * - This causes React error: "Cannot update a component while rendering a different component"
  * - queueMicrotask() defers the state update until after the render cycle completes
  */
-export function profileFunction<T extends (...args: any[]) => any>(
+export function profileFunction<T extends (...args: unknown[]) => unknown>(
     fn: T,
     addDebug: (origin: string, message: string) => void,
     functionName?: string
@@ -180,11 +180,17 @@ export function handleResult<T>(
                   result.error.toLowerCase().includes(error.toLowerCase())
               )
             : false;
-        if (!isIgnored) notificationContext.addError(origin, result.error);
+        if (!isIgnored) {
+            queueMicrotask(() =>
+                notificationContext.addError(origin, result.error)
+            );
+        }
         return defaultValue;
     }
     if (result.success && result.warnings) {
-        notificationContext.addWarning(origin, result.warnings);
+        queueMicrotask(() =>
+            notificationContext.addWarning(origin, result.warnings!)
+        );
     }
     return result.value;
 }
