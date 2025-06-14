@@ -23,7 +23,8 @@ export function TagsHeadlessList(props: {
 
     useEffect(() => {
         virtualizer._willUpdate();
-    }, [virtualizer]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [virtualizer, containerRef.current]);
 
     const taggedCount = props.transactions.getTagged().length;
     const untaggedCount = props.transactions.length - taggedCount;
