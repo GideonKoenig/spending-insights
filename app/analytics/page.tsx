@@ -16,11 +16,7 @@ import "@/lib/operations-account";
 import "@/lib/operations-transaction";
 import { handleResult } from "@/contexts/notification/utils";
 
-// Todo: figure out if the coolify is static site checkmark needs to be set or not (plausible said to not host as static for redirection.. check it out)
-
 // Todo: transactions should get annotated to enrich them with additional information. currently mainly for paypal to visualize where the money is going (analyzing the vendor id and stuff that is provided)
-
-// Todo: default value for stuff on the filter fields should be determined by currently displayed "firstuntaggedtranscation"
 
 const SELECTED_TAB_KEY = "bank-history-analytics-selected-tab";
 
