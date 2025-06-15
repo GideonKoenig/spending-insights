@@ -19,10 +19,6 @@ export type FilterRule = z.infer<typeof FilterRuleSchema>;
 export const FilterRuleSchema = z.object({
     attribute: z.enum([
         "hash",
-        "accountName",
-        "accountIban",
-        "accountBic",
-        "bankName",
         "bookingDate",
         "valueDate",
         "participantName",
