@@ -43,11 +43,35 @@ export function PreparedFileItem(props: {
                 placeholder="Enter name..."
             />
 
-            {props.file.format ? (
+            {props.file.format && props.file.format.note && (
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Badge
+                                variant="default"
+                                className="text-xs h-7 w-full cursor-help"
+                            >
+                                {props.file.format.displayName}
+                            </Badge>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <div className="max-w-xs">
+                                <p className="text-xs text-foreground">
+                                    {props.file.format.note}
+                                </p>
+                            </div>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+            )}
+
+            {props.file.format && !props.file.format.note && (
                 <Badge variant="default" className="text-xs h-7 w-full">
                     {props.file.format.displayName}
                 </Badge>
-            ) : (
+            )}
+
+            {!props.file.format && (
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
