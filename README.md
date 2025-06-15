@@ -41,6 +41,27 @@ Rules let you automatically categorize transactions based on criteria:
 4. Assign a category (Food, Transportation, Housing, etc.)
 5. Save the rule to apply it to all matching transactions
 
+## Supported Bank Formats
+
+The application automatically detects and imports CSV files from various German banks:
+
+- **Standard Format 3** (Recommended)
+- **Standard Format 1**
+- **Standard Format 2**
+- **DKB**
+- **Sparkasse**
+- **Consors Bank**
+- **Commerzbank**
+- **ING**
+- **Comdirect**
+
+### Common Limitations
+- Most formats don't provide actual account balance information, so running balances are calculated starting from 0
+- BIC codes are frequently missing across formats
+- Some formats have missing participant names or IBAN information
+
+If your bank isn't supported, you can use the "Notify Developer" option when uploading files to request format support.
+
 ## Available Categories
 
 - Advance Money
