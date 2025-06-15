@@ -64,7 +64,7 @@ export function hashTransaction(
             .update(
                 JSON.stringify({
                     accountName,
-                    valueDate: transaction.valueDate,
+                    bookingDate: transaction.bookingDate,
                     amount: transaction.amount,
                     participantName: transaction.participantName,
                     purpose: transaction.purpose,

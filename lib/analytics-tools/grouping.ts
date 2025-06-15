@@ -176,7 +176,7 @@ export function getInsights(accounts: Account[]): Insights {
         >();
 
         for (const transaction of account.transactions) {
-            const date = transaction.valueDate;
+            const date = transaction.bookingDate;
 
             // Track first/last transaction per account
             if (!accountFirstTransaction.has(account.id)) {

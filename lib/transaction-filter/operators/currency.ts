@@ -5,8 +5,8 @@ export const currencyEquals: FilterOperator<number> = {
     label: "=",
     type: "currency",
     compare: (userValue, valueToCompare) => {
-        if (!userValue || !valueToCompare) return false;
-        return Math.abs(valueToCompare) === Math.abs(userValue);
+        if (userValue == null || valueToCompare == null) return false;
+        return valueToCompare === userValue;
     },
 };
 
@@ -15,7 +15,7 @@ export const currencyGreaterThan: FilterOperator<number> = {
     label: ">",
     type: "currency",
     compare: (userValue, valueToCompare) => {
-        if (!userValue || !valueToCompare) return false;
+        if (userValue == null || valueToCompare == null) return false;
         return valueToCompare > userValue;
     },
 };
@@ -25,7 +25,7 @@ export const currencyLessThan: FilterOperator<number> = {
     label: "<",
     type: "currency",
     compare: (userValue, valueToCompare) => {
-        if (!userValue || !valueToCompare) return false;
+        if (userValue == null || valueToCompare == null) return false;
         return valueToCompare < userValue;
     },
 };

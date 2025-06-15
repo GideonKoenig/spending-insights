@@ -31,7 +31,7 @@ function map(elements: z.infer<typeof ComdirectSchema>[]) {
         result.push(transaction);
     }
 
-    result.sort((a, b) => a.valueDate.getTime() - b.valueDate.getTime());
+    result.sort((a, b) => a.bookingDate.getTime() - b.bookingDate.getTime());
 
     let runningBalance = 0;
     for (const transaction of result) {

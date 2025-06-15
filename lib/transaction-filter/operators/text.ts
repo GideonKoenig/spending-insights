@@ -15,7 +15,7 @@ export const textIncludes: FilterOperator<string> = {
     label: "includes",
     type: "text",
     compare: (userValue, valueToCompare) => {
-        if (!userValue || !valueToCompare) return false;
+        // if (!userValue || !valueToCompare) return false;
         return valueToCompare.toLowerCase().includes(userValue.toLowerCase());
     },
 };

@@ -40,7 +40,7 @@ function map(elements: z.infer<typeof StandardFormat1Schema>[]) {
         result.push(transaction);
     }
 
-    result.sort((a, b) => a.valueDate.getTime() - b.valueDate.getTime());
+    result.sort((a, b) => a.bookingDate.getTime() - b.bookingDate.getTime());
 
     let runningBalance = 0;
     for (const transaction of result) {
@@ -57,7 +57,7 @@ function getBankName() {
 
 export const StandardFormat1: DataInjestFormat<typeof StandardFormat1Schema> = {
     name: "standard-format-1",
-    displayName: "Standard Format",
+    displayName: "Standard Format 1",
     schema: StandardFormat1Schema,
     map,
     getBankName,

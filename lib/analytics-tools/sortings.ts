@@ -11,11 +11,11 @@ export function dominoSort(accounts: Account[]) {
         const transactions = account.transactions;
 
         const sorted = transactions.sort(
-            (a, b) => a.valueDate.getTime() - b.valueDate.getTime()
+            (a, b) => a.bookingDate.getTime() - b.bookingDate.getTime()
         );
-        const oldestDate = sorted[0].valueDate;
+        const oldestDate = sorted[0].bookingDate;
         const firstOfSecondDay = sorted.findIndex(
-            (t) => t.valueDate.getTime() !== oldestDate.getTime()
+            (t) => t.bookingDate.getTime() !== oldestDate.getTime()
         );
 
         const remaining = sorted.slice(firstOfSecondDay);
@@ -80,14 +80,16 @@ function processTransactionChain(
         if (matchIndex !== -1) {
             const candidate = remaining[matchIndex];
             const dateComparison = isForward
-                ? candidate.valueDate.getTime() < current.valueDate.getTime()
-                : candidate.valueDate.getTime() > current.valueDate.getTime();
+                ? candidate.bookingDate.getTime() <
+                  current.bookingDate.getTime()
+                : candidate.bookingDate.getTime() >
+                  current.bookingDate.getTime();
 
             if (dateComparison) {
                 const direction = isForward ? "before" : "after";
                 const operator = isForward ? "<" : ">";
                 warnings.push(
-                    `Skipping transaction that should have come ${direction} current transaction: ${candidate.valueDate.toDateString()} ${operator} ${current.valueDate.toDateString()}`
+                    `Skipping transaction that should have come ${direction} current transaction: ${candidate.bookingDate.toDateString()} ${operator} ${current.bookingDate.toDateString()}`
                 );
                 remaining.splice(matchIndex, 1);
                 continue;

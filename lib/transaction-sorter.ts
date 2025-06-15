@@ -26,11 +26,11 @@ export function sortTransactions(
     switch (sortBy) {
         case "newest":
             return sorted.sort(
-                (a, b) => b.valueDate.getTime() - a.valueDate.getTime()
+                (a, b) => b.bookingDate.getTime() - a.bookingDate.getTime()
             );
         case "oldest":
             return sorted.sort(
-                (a, b) => a.valueDate.getTime() - b.valueDate.getTime()
+                (a, b) => a.bookingDate.getTime() - b.bookingDate.getTime()
             );
         case "highest-amount":
             return sorted.sort(

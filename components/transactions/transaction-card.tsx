@@ -25,7 +25,7 @@ export function TransactionCard(props: {
         currency: props.transaction.currency,
     }).format(props.transaction.balanceAfterTransaction);
 
-    const date = props.transaction.valueDate.toLocaleDateString("de-DE", {
+    const date = props.transaction.bookingDate.toLocaleDateString("de-DE", {
         year: "numeric",
         month: "2-digit",
         day: "2-digit",

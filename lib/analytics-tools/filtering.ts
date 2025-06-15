@@ -96,7 +96,7 @@ export function filterAccountsByTimeRange(
     for (const account of accounts) {
         const filteredTransactions = [];
         for (const transaction of account.transactions) {
-            const date = transaction.valueDate;
+            const date = transaction.bookingDate;
             if (date >= start && date <= end) {
                 filteredTransactions.push(transaction);
             }
