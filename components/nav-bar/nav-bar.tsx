@@ -171,7 +171,7 @@ export function NavBar() {
                                     onClick={clearAllAccounts}
                                 >
                                     <Trash className="h-4 w-4 mr-2" />
-                                    Clear All Accounts
+                                    Delete All Accounts
                                 </Button>
 
                                 <div className="border-t border-border my-1" />
