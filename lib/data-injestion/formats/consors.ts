@@ -70,5 +70,5 @@ export const Consors: DataInjestFormat<typeof ConsorsSchema> = {
     schema: ConsorsSchema,
     map,
     getBankName,
-    note: "Consors Bank format for Giro accounts. The system calculates a running balance starting from 0 before the first transaction. At a later point, there will be an option to set the starting balance manually.",
+    note: "Consors Bank does not provide account balance information. We calculate a running balance starting from 0 before the first transaction. At a later point, there will be an option to set the starting balance manually.",
 };

@@ -6,6 +6,7 @@ import { hashTransaction, findFormat } from "@/lib/data-injestion/utils";
 import { Account } from "@/lib/types";
 import z from "zod";
 import { Comdirect } from "@/lib/data-injestion/formats/comdirect";
+import { Commerzbank } from "@/lib/data-injestion/formats/commerzbank";
 import { Consors } from "@/lib/data-injestion/formats/consors";
 import { Dkb } from "@/lib/data-injestion/formats/dkb";
 import { StandardFormat1 } from "@/lib/data-injestion/formats/standard-format-1";
@@ -14,6 +15,7 @@ import { Sparkasse } from "@/lib/data-injestion/formats/sparkasse";
 
 const MAPPING_REGISTRY = [
     Comdirect,
+    Commerzbank,
     Consors,
     Dkb,
     Sparkasse,

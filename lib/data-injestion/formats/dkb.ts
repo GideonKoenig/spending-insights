@@ -79,5 +79,5 @@ export const Dkb: DataInjestFormat<typeof DkbSchema> = {
     schema: DkbSchema,
     map,
     getBankName,
-    note: "DKB does not provide account balance information in their export format. We calculate a running balance starting from 0 before the first transaction. At a later point, there will be an option to set the starting balance manually.",
+    note: "DKB does not provide account balance information. We calculate a running balance starting from 0 before the first transaction. At a later point, there will be an option to set the starting balance manually.",
 };
