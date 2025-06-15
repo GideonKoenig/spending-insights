@@ -7,534 +7,575 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { TransactionCard } from "@/components/transactions/transaction-card";
 import {
-    Filter,
-    Tag,
+    AlertCircle,
     ArrowRight,
-    Calendar,
-    DollarSign,
+    BarChart,
     Building,
+    Calendar,
+    Check,
+    DollarSign,
+    Filter,
+    Github,
+    Info,
+    Merge,
+    Plus,
+    Send,
+    Tag,
+    Upload,
 } from "lucide-react";
+import Link from "next/link";
+import { Transaction } from "@/lib/types";
+
+const groceryTransaction: Transaction = {
+    hash: "1",
+    amount: -45.67,
+    balanceAfterTransaction: 1000.0,
+    currency: "EUR",
+    bookingDate: new Date("2024-03-15"),
+    valueDate: new Date("2024-03-15"),
+    participantName: "REWE MARKT GMBH",
+    participantIban: "DE87100100100123456789",
+    participantBic: "PBNKDEFF",
+    purpose: "Kartenzahlung 14.03.2024 19:45 Uhr",
+    transactionType: "Sepa",
+    tag: {
+        category: "food",
+        subCategory: "Groceries",
+        ruleId: "groceries-rule",
+    },
+};
+
+const salaryTransaction: Transaction = {
+    hash: "2",
+    amount: 3500.0,
+    balanceAfterTransaction: 4500.0,
+    currency: "EUR",
+    bookingDate: new Date("2024-03-01"),
+    valueDate: new Date("2024-03-01"),
+    participantName: "Musterfirma GmbH",
+    participantIban: "DE91100100100987654321",
+    participantBic: "PBNKDEFF",
+    purpose: "Gehalt/Salary 03/24 Ref. 12345",
+    transactionType: "Sepa",
+    tag: {
+        category: "income",
+        subCategory: "Salary",
+        ruleId: "salary-rule",
+    },
+};
+
+const FilterBadge = ({
+    field,
+    operator,
+    value,
+}: {
+    field: string;
+    operator: string;
+    value: string;
+}) => (
+    <div className="inline-flex items-center gap-px">
+        <span className="bg-primary text-primary-foreground rounded-l-md p-1 px-3 text-xs font-medium">
+            {field}
+        </span>
+        <span className="bg-primary text-primary-foreground p-1 px-3 text-xs font-medium">
+            {operator}
+        </span>
+        <span className="bg-primary text-primary-foreground rounded-r-md p-1 px-3 text-xs font-medium">
+            {value}
+        </span>
+    </div>
+);
 
 export default function GuidePage() {
     return (
         <ScrollArea className="h-full">
-            <div className="container mx-auto px-6 py-12 max-w-5xl">
-                <div className="space-y-12">
-                    {/* Filtering Section */}
-                    <section className="space-y-8">
-                        <div className="text-center space-y-4">
-                            <div className="flex justify-center">
-                                <div className="bg-primary rounded-full p-3">
-                                    <Filter className="h-8 w-8 text-primary-foreground" />
+            <div className="container mx-auto max-w-5xl px-6 py-12">
+                <div className="space-y-20">
+                    {/* Section 0: Notifications */}
+                    <section className="space-y-6">
+                        <div className="space-y-2">
+                            <div className="flex items-center gap-3">
+                                <div className="inline-block rounded-full bg-primary p-3">
+                                    <Info className="h-7 w-7 text-primary-foreground" />
                                 </div>
+                                <h2 className="text-3xl font-semibold">
+                                    Understanding Notifications
+                                </h2>
                             </div>
-                            <h2 className="text-3xl font-semibold">
-                                Transaction Filtering
-                            </h2>
-                            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                                Filters help you find specific transactions
-                                quickly by setting criteria based on transaction
-                                attributes.
+                            <p className="text-lg text-muted-foreground pl-16">
+                                The application uses notifications to keep you
+                                informed. You will see them appear at the top
+                                right.
                             </p>
                         </div>
-
-                        <div className="grid gap-6 md:grid-cols-3">
-                            <Card className="border-blue-800">
+                        <div className="grid gap-6 md:grid-cols-2 ml-16">
+                            <Card>
                                 <CardHeader>
-                                    <CardTitle className="flex items-center gap-2 text-blue-300">
-                                        <Calendar className="h-5 w-5" />
+                                    <CardTitle className="flex items-center gap-2 text-amber-400">
+                                        <AlertCircle className="h-5 w-5" />
+                                        Warnings
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <p className="text-sm text-muted-foreground">
+                                        Warnings inform you about potential
+                                        issues that do not stop the application
+                                        from working. For example, you might see
+                                        a warning if you try to create a rule
+                                        without selecting a category first.
+                                    </p>
+                                </CardContent>
+                            </Card>
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2 text-red-400">
+                                        <AlertCircle className="h-5 w-5" />
+                                        Errors
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <p className="text-sm text-muted-foreground">
+                                        Errors indicate that something went
+                                        wrong and a specific action could not be
+                                        completed. For example, an error will
+                                        appear if a data file fails to upload or
+                                        process correctly.
+                                    </p>
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </section>
+
+                    {/* Section 1: Getting Started */}
+                    <section className="space-y-6">
+                        <div className="space-y-2">
+                            <div className="flex items-center gap-3">
+                                <div className="inline-block rounded-full bg-primary p-3">
+                                    <Upload className="h-7 w-7 text-primary-foreground" />
+                                </div>
+                                <h2 className="text-3xl font-semibold">
+                                    1. The Data Loading Process
+                                </h2>
+                            </div>
+                            <p className="text-lg text-muted-foreground pl-16">
+                                To begin, upload a CSV file of your transaction
+                                history. The application will automatically try
+                                to detect the format.
+                            </p>
+                        </div>
+                        <div className="ml-16 space-y-6">
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>
+                                        Format Detection & Supported Banks
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <p className="text-sm text-muted-foreground mb-4">
+                                        The application detects the bank format
+                                        by analyzing the headers in your CSV
+                                        file. The following formats are
+                                        currently supported:
+                                    </p>
+                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                        {[
+                                            "Comdirect",
+                                            "Commerzbank",
+                                            "Consors",
+                                            "DKB",
+                                            "ING",
+                                            "Sparkasse",
+                                            "Volksbanken / Raiffeisenbanken",
+                                            "Postbank",
+                                            "Targobank",
+                                        ].map((bank) => (
+                                            <div
+                                                key={bank}
+                                                className="flex items-center gap-2"
+                                            >
+                                                <Check className="h-4 w-4 text-green-500" />
+                                                <span className="text-sm text-muted-foreground">
+                                                    {bank}
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </CardContent>
+                            </Card>
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>File Actions</CardTitle>
+                                    <CardDescription>
+                                        After uploading a file, you have several
+                                        options for how to handle the data.
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent className="space-y-6">
+                                    <div className="flex items-start gap-4">
+                                        <div className="bg-blue-500/10 text-blue-500 rounded-full p-2">
+                                            <Plus className="h-5 w-5" />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-semibold">
+                                                Add
+                                            </h4>
+                                            <p className="text-sm text-muted-foreground">
+                                                Creates a new, separate account.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-start gap-4">
+                                        <div className="bg-purple-500/10 text-purple-500 rounded-full p-2">
+                                            <Merge className="h-5 w-5" />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-semibold">
+                                                Merge
+                                            </h4>
+                                            <p className="text-sm text-muted-foreground">
+                                                Combines transactions into an
+                                                existing account.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-start gap-4">
+                                        <div className="bg-amber-500/10 text-amber-500 rounded-full p-2">
+                                            <Send className="h-5 w-5" />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-semibold">
+                                                Notify Developer
+                                            </h4>
+                                            <p className="text-sm text-muted-foreground">
+                                                If your format isn&apos;t
+                                                supported, sends file headers
+                                                (not data) to the developer.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </section>
+
+                    {/* Section 2: Filtering */}
+                    <section className="space-y-6">
+                        <div className="space-y-2">
+                            <div className="flex items-center gap-3">
+                                <div className="inline-block rounded-full bg-primary p-3">
+                                    <Filter className="h-7 w-7 text-primary-foreground" />
+                                </div>
+                                <h2 className="text-3xl font-semibold">
+                                    2. How to Filter Transactions
+                                </h2>
+                            </div>
+                            <p className="text-lg text-muted-foreground pl-16">
+                                Filters help you find specific transactions. You
+                                can filter by date, amount, or text fields.
+                            </p>
+                        </div>
+                        <div className="grid gap-6 md:grid-cols-3 ml-16">
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2">
+                                        <Calendar className="h-5 w-5 text-blue-400" />
                                         Date Filtering
                                     </CardTitle>
-                                    <CardDescription>
-                                        Filter transactions by date ranges
-                                    </CardDescription>
                                 </CardHeader>
-                                <CardContent className="space-y-4">
-                                    <p className="text-sm text-muted-foreground">
-                                        {`Create date ranges by adding two separate filters: one for "after" date and one for "before" date.`}
+                                <CardContent>
+                                    <p className="text-sm text-muted-foreground mb-4">
+                                        Use two filters to set a start and end
+                                        date.
                                     </p>
-                                    <div className="bg-blue-950/30 p-3 rounded-md border border-blue-800">
-                                        <p className="text-sm font-medium mb-2">
-                                            Example for January 2024:
-                                        </p>
-                                        <div className="space-y-1 text-xs">
-                                            <p>
-                                                <Badge
-                                                    variant="outline"
-                                                    className="border-blue-300 text-blue-300"
-                                                >
-                                                    bookingDate after 01.01.2024
-                                                </Badge>
-                                            </p>
-                                            <p>
-                                                <Badge
-                                                    variant="outline"
-                                                    className="border-blue-300 text-blue-300"
-                                                >
-                                                    bookingDate before
-                                                    31.01.2024
-                                                </Badge>
-                                            </p>
-                                        </div>
-                                        <p className="text-xs text-muted-foreground mt-2">
-                                            Both conditions must be true to show
-                                            transactions from January 2024
-                                        </p>
+                                    <div className="space-y-2">
+                                        <FilterBadge
+                                            field="Date"
+                                            operator="after"
+                                            value="01.01.2024"
+                                        />
+                                        <FilterBadge
+                                            field="Date"
+                                            operator="before"
+                                            value="31.01.2024"
+                                        />
                                     </div>
                                 </CardContent>
                             </Card>
-
-                            <Card className="border-green-800">
+                            <Card>
                                 <CardHeader>
-                                    <CardTitle className="flex items-center gap-2 text-green-300">
-                                        <DollarSign className="h-5 w-5" />
+                                    <CardTitle className="flex items-center gap-2">
+                                        <DollarSign className="h-5 w-5 text-green-400" />
                                         Amount Filtering
                                     </CardTitle>
-                                    <CardDescription>
-                                        Filter by transaction amounts using
-                                        operators
-                                    </CardDescription>
                                 </CardHeader>
-                                <CardContent className="space-y-4">
-                                    <p className="text-sm text-muted-foreground">
-                                        Use comparison operators to find
-                                        transactions above, below, or equal to
-                                        specific amounts.
+                                <CardContent>
+                                    <p className="text-sm text-muted-foreground mb-4">
+                                        Easily find payments by filtering for
+                                        specific amounts or ranges.
                                     </p>
-                                    <div className="bg-green-950/30 p-3 rounded-md border border-green-800">
-                                        <p className="text-sm font-medium mb-2">
-                                            Available operators:
-                                        </p>
-                                        <div className="space-y-1 text-xs">
-                                            <p>
-                                                <code className="bg-background px-1 rounded">
-                                                    &gt;
-                                                </code>{" "}
-                                                Greater than:{" "}
-                                                <code>amount &gt; 100</code>
-                                            </p>
-                                            <p>
-                                                <code className="bg-background px-1 rounded">
-                                                    &lt;
-                                                </code>{" "}
-                                                Less than:{" "}
-                                                <code>amount &lt; 50</code>
-                                            </p>
-                                            <p>
-                                                <code className="bg-background px-1 rounded">
-                                                    =
-                                                </code>{" "}
-                                                Equal to:{" "}
-                                                <code>amount = 25.99</code>
-                                            </p>
-                                            <p>
-                                                <code className="bg-background px-1 rounded">
-                                                    &gt;=
-                                                </code>{" "}
-                                                Greater or equal:{" "}
-                                                <code>amount &gt;= 100</code>
-                                            </p>
-                                        </div>
+                                    <div className="space-y-2">
+                                        <FilterBadge
+                                            field="Amount"
+                                            operator=">"
+                                            value="100.00"
+                                        />
+                                        <FilterBadge
+                                            field="Amount"
+                                            operator="<"
+                                            value="50.00"
+                                        />
+                                        <FilterBadge
+                                            field="Amount"
+                                            operator="="
+                                            value="25.99"
+                                        />
                                     </div>
                                 </CardContent>
                             </Card>
-
-                            <Card className="border-purple-800">
+                            <Card>
                                 <CardHeader>
-                                    <CardTitle className="flex items-center gap-2 text-purple-300">
-                                        <Building className="h-5 w-5" />
+                                    <CardTitle className="flex items-center gap-2">
+                                        <Building className="h-5 w-5 text-purple-400" />
                                         Text Filtering
                                     </CardTitle>
-                                    <CardDescription>
-                                        Filter by merchant names, descriptions,
-                                        or other text fields
-                                    </CardDescription>
                                 </CardHeader>
-                                <CardContent className="space-y-4">
-                                    <p className="text-sm text-muted-foreground">
-                                        <strong className="text-purple-300">
-                                            Capitalization is ignored when
-                                            matching.
-                                        </strong>{" "}
-                                        Search within text fields like payment
-                                        participant, purpose, or transaction
-                                        type.
+                                <CardContent>
+                                    <p className="text-sm text-muted-foreground mb-4">
+                                        Search text fields (case-insensitive).
                                     </p>
-                                    <div className="bg-purple-950/30 p-3 rounded-md border border-purple-800">
-                                        <p className="text-sm font-medium mb-2">
-                                            Example filters:
-                                        </p>
-                                        <div className="space-y-1 text-xs">
-                                            <p>
-                                                <Badge
-                                                    variant="outline"
-                                                    className="border-purple-300 text-purple-300"
-                                                >
-                                                    paymentParticipant includes
-                                                    {"grocery"}
-                                                </Badge>
-                                            </p>
-                                            <p>
-                                                <Badge
-                                                    variant="outline"
-                                                    className="border-purple-300 text-purple-300"
-                                                >
-                                                    transactionType = {"sepa"}
-                                                </Badge>
-                                            </p>
-                                        </div>
-                                        <p className="text-xs text-muted-foreground mt-2">
-                                            {`"grocery" matches "GROCERY", "Grocery Store", "grocery-mart", etc.`}
-                                        </p>
+                                    <div className="space-y-2">
+                                        <FilterBadge
+                                            field="Participant"
+                                            operator="includes"
+                                            value="REWE"
+                                        />
+                                        <FilterBadge
+                                            field="Purpose"
+                                            operator="contains"
+                                            value="Invoice"
+                                        />
                                     </div>
                                 </CardContent>
                             </Card>
                         </div>
                     </section>
 
-                    {/* Category Creation Section */}
-                    <section className="space-y-8">
-                        <div className="text-center space-y-4">
-                            <div className="flex justify-center">
-                                <div className="bg-primary rounded-full p-3">
-                                    <Tag className="h-8 w-8 text-primary-foreground" />
+                    {/* Section 3: Category Creation */}
+                    <section className="space-y-6">
+                        <div className="space-y-2">
+                            <div className="flex items-center gap-3">
+                                <div className="inline-block rounded-full bg-primary p-3">
+                                    <Tag className="h-7 w-7 text-primary-foreground" />
                                 </div>
+                                <h2 className="text-3xl font-semibold">
+                                    3. Creating Categorization Rules
+                                </h2>
                             </div>
-                            <h2 className="text-3xl font-semibold">
-                                Category Creation & Pattern Matching
-                            </h2>
-                            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                                Create rules to automatically categorize
-                                transactions based on patterns in your
-                                transaction data.
+                            <p className="text-lg text-muted-foreground pl-16">
+                                A rule is a set of conditions that automatically
+                                assigns a category to a transaction. A
+                                transaction is categorized only if it meets all
+                                conditions of a rule.
                             </p>
                         </div>
-
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>
-                                    How Categorization Rules Work
-                                </CardTitle>
-                                <CardDescription>
-                                    Rules automatically assign categories to
-                                    matching transactions
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div className="grid gap-4 md:grid-cols-3">
-                                    <div className="text-center space-y-2">
-                                        <div className="bg-blue-950/30 rounded-lg p-4 border border-blue-800">
-                                            <Filter className="h-6 w-6 mx-auto text-blue-400" />
-                                        </div>
-                                        <h4 className="font-medium">
-                                            1. Find Pattern
-                                        </h4>
-                                        <p className="text-sm text-muted-foreground">
-                                            Identify common elements in similar
-                                            transactions
-                                        </p>
+                        <div className="ml-16 space-y-8">
+                            <div>
+                                <h3 className="text-xl font-semibold mb-2">
+                                    Example: Groceries
+                                </h3>
+                                <p className="text-sm text-muted-foreground mb-4">
+                                    This rule finds all expenses from the
+                                    supermarket &quot;REWE&quot; and categorizes
+                                    them as &quot;food&quot;.
+                                </p>
+                                <div className="grid md:grid-cols-5 gap-6">
+                                    <div className="md:col-span-3">
+                                        <TransactionCard
+                                            transaction={groceryTransaction}
+                                            className="h-full"
+                                        />
                                     </div>
-                                    <div className="text-center space-y-2">
-                                        <div className="bg-green-950/30 rounded-lg p-4 border border-green-800">
-                                            <Tag className="h-6 w-6 mx-auto text-green-400" />
-                                        </div>
-                                        <h4 className="font-medium">
-                                            2. Create Rule
+                                    <div className="border rounded-lg p-4 space-y-3 flex flex-col justify-center md:col-span-2">
+                                        <h4 className="font-semibold text-sm">
+                                            Conditions
                                         </h4>
-                                        <p className="text-sm text-muted-foreground">
-                                            Define matching criteria and assign
-                                            category
-                                        </p>
-                                    </div>
-                                    <div className="text-center space-y-2">
-                                        <div className="bg-purple-950/30 rounded-lg p-4 border border-purple-800">
-                                            <ArrowRight className="h-6 w-6 mx-auto text-purple-400" />
+                                        <div className="space-y-2">
+                                            <FilterBadge
+                                                field="Participant"
+                                                operator="includes"
+                                                value="REWE"
+                                            />
+                                            <FilterBadge
+                                                field="Amount"
+                                                operator="<"
+                                                value="0"
+                                            />
                                         </div>
-                                        <h4 className="font-medium">
-                                            3. Auto-Apply
-                                        </h4>
-                                        <p className="text-sm text-muted-foreground">
-                                            Rule automatically categorizes
-                                            matching transactions
-                                        </p>
+                                        <div className="pt-2">
+                                            <div className="flex items-center gap-2">
+                                                <ArrowRight className="h-4 w-4" />
+                                                <span className="font-semibold text-sm">
+                                                    Category:
+                                                </span>
+                                                <span className="text-sm">
+                                                    food
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center gap-2 pl-6">
+                                                <span className="text-xs text-muted-foreground">
+                                                    Subcategory: Groceries
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-
-                                <Card className="bg-amber-950/30 p-4 rounded-md border border-amber-800">
-                                    <CardContent className="p-4">
-                                        <p className="text-sm font-medium mb-2 text-amber-200">
-                                            Important: How Multiple Conditions
-                                            Work
-                                        </p>
-                                        <p className="text-sm text-amber-300">
-                                            When you add multiple conditions to
-                                            a rule,{" "}
-                                            <strong>
-                                                all conditions must be true
-                                            </strong>{" "}
-                                            for a transaction to match. This is
-                                            called &quot;additive&quot;
-                                            filtering - each condition narrows
-                                            down the results further.
-                                        </p>
-                                        <div className="mt-3 p-2 bg-amber-900/50 rounded text-xs text-amber-200">
-                                            Example: paymentParticipant includes
-                                            &quot;AMAZON&quot;{" "}
-                                            <strong>AND</strong> amount &gt; 50{" "}
-                                            <strong>AND</strong> purpose
-                                            includes &quot;PRIME&quot;
-                                            <br />→ Only matches Amazon
-                                            transactions over €50 that mention
-                                            &quot;PRIME&quot;
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            </CardContent>
-                        </Card>
-
-                        <div className="grid gap-6 md:grid-cols-2">
-                            <Card className="border-green-800">
-                                <CardHeader>
-                                    <CardTitle className="text-green-300">
-                                        Example: Grocery Store Rule
-                                    </CardTitle>
-                                    <CardDescription>
-                                        Automatically categorize grocery store
-                                        purchases
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    <div className="bg-muted p-4 rounded-md">
-                                        <p className="text-sm font-medium mb-3">
-                                            Sample Transaction:
-                                        </p>
-                                        <div className="space-y-1 text-xs">
-                                            <p>
-                                                <span className="font-medium">
-                                                    Payment Participant:
-                                                </span>{" "}
-                                                REWE MARKT GMBH
-                                            </p>
-                                            <p>
-                                                <span className="font-medium">
-                                                    Amount:
-                                                </span>{" "}
-                                                -45.67
-                                            </p>
-                                            <p>
-                                                <span className="font-medium">
-                                                    Purpose:
-                                                </span>{" "}
-                                                KARTENZAHLUNG
-                                            </p>
-                                            <p>
-                                                <span className="font-medium">
-                                                    Date:
-                                                </span>{" "}
-                                                15.03.2024
-                                            </p>
-                                        </div>
+                            </div>
+                            <div>
+                                <h3 className="text-xl font-semibold mb-2">
+                                    Example: Salary
+                                </h3>
+                                <p className="text-sm text-muted-foreground mb-4">
+                                    This rule finds deposits from your employer
+                                    containing the word &quot;Salary&quot; in
+                                    the purpose field.
+                                </p>
+                                <div className="grid md:grid-cols-5 gap-6">
+                                    <div className="md:col-span-3">
+                                        <TransactionCard
+                                            transaction={salaryTransaction}
+                                            className="h-full"
+                                        />
                                     </div>
-
-                                    <div className="bg-green-950/30 p-4 rounded-md border border-green-800">
-                                        <p className="text-sm font-medium mb-3 text-green-200">
-                                            Rule Configuration:
-                                        </p>
-                                        <div className="space-y-2 text-xs">
-                                            <div className="flex justify-between">
-                                                <span className="text-green-300">
-                                                    Field:
-                                                </span>
-                                                <Badge variant="secondary">
-                                                    paymentParticipant
-                                                </Badge>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="text-green-300">
-                                                    Operator:
-                                                </span>
-                                                <Badge variant="secondary">
-                                                    includes
-                                                </Badge>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="text-green-300">
-                                                    Value:
-                                                </span>
-                                                <Badge variant="secondary">
-                                                    &quot;REWE&quot;
-                                                </Badge>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="text-green-300">
+                                    <div className="border rounded-lg p-4 space-y-3 flex flex-col justify-center md:col-span-2">
+                                        <h4 className="font-semibold text-sm">
+                                            Conditions
+                                        </h4>
+                                        <div className="space-y-2">
+                                            <FilterBadge
+                                                field="Participant"
+                                                operator="includes"
+                                                value="Musterfirma"
+                                            />
+                                            <FilterBadge
+                                                field="Purpose"
+                                                operator="contains"
+                                                value="Salary"
+                                            />
+                                        </div>
+                                        <div className="pt-2">
+                                            <div className="flex items-center gap-2">
+                                                <ArrowRight className="h-4 w-4" />
+                                                <span className="font-semibold text-sm">
                                                     Category:
                                                 </span>
-                                                <Badge className="bg-green-600 hover:bg-green-700">
-                                                    food
-                                                </Badge>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="text-green-300">
-                                                    Subcategory:
-                                                </span>
-                                                <Badge
-                                                    variant="outline"
-                                                    className="border-green-400 text-green-300"
-                                                >
-                                                    supermarket
-                                                </Badge>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-
-                            <Card className="border-blue-800">
-                                <CardHeader>
-                                    <CardTitle className="text-blue-300">
-                                        Example: Salary Rule
-                                    </CardTitle>
-                                    <CardDescription>
-                                        Automatically categorize salary payments
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    <div className="bg-muted p-4 rounded-md">
-                                        <p className="text-sm font-medium mb-3">
-                                            Sample Transaction:
-                                        </p>
-                                        <div className="space-y-1 text-xs">
-                                            <p>
-                                                <span className="font-medium">
-                                                    Payment Participant:
-                                                </span>{" "}
-                                                TELEKOM DEUTSCHLAND GMBH
-                                            </p>
-                                            <p>
-                                                <span className="font-medium">
-                                                    Amount:
-                                                </span>{" "}
-                                                +3500.00
-                                            </p>
-                                            <p>
-                                                <span className="font-medium">
-                                                    Purpose:
-                                                </span>{" "}
-                                                GEHALT MÄRZ 2024
-                                            </p>
-                                            <p>
-                                                <span className="font-medium">
-                                                    Date:
-                                                </span>{" "}
-                                                01.03.2024
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <div className="bg-blue-950/30 p-4 rounded-md border border-blue-800">
-                                        <p className="text-sm font-medium mb-3 text-blue-200">
-                                            Rule Configuration:
-                                        </p>
-                                        <div className="space-y-2 text-xs">
-                                            <div className="flex justify-between">
-                                                <span className="text-blue-300">
-                                                    Field:
-                                                </span>
-                                                <Badge variant="secondary">
-                                                    purpose
-                                                </Badge>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="text-blue-300">
-                                                    Operator:
-                                                </span>
-                                                <Badge variant="secondary">
-                                                    includes
-                                                </Badge>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="text-blue-300">
-                                                    Value:
-                                                </span>
-                                                <Badge variant="secondary">
-                                                    &quot;GEHALT&quot;
-                                                </Badge>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="text-blue-300">
-                                                    Category:
-                                                </span>
-                                                <Badge className="bg-blue-600 hover:bg-blue-700">
+                                                <span className="text-sm">
                                                     income
-                                                </Badge>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="text-blue-300">
-                                                    Subcategory:
                                                 </span>
-                                                <Badge
-                                                    variant="outline"
-                                                    className="border-blue-400 text-blue-300"
-                                                >
-                                                    telekom
-                                                </Badge>
+                                            </div>
+                                            <div className="flex items-center gap-2 pl-6">
+                                                <span className="text-xs text-muted-foreground">
+                                                    Subcategory: Salary
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="ml-16">
+                            <Card className="border-slate-600 bg-slate-950/30">
+                                <CardHeader>
+                                    <CardTitle className="text-slate-300 text-base">
+                                        Tip: Make Your Rules Specific
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <p className="text-slate-400 text-sm">
+                                        Aim to create rules that are specific
+                                        enough to correctly categorize future
+                                        transactions. A rule for
+                                        &quot;Amazon&quot; might catch regular
+                                        purchases and Prime subscriptions. To
+                                        only categorize Prime payments, add
+                                        another condition like{" "}
+                                        <code>
+                                            purpose includes &quot;Prime&quot;
+                                        </code>
+                                        . You could even add an amount filter
+                                        for the specific subscription cost.
+                                    </p>
                                 </CardContent>
                             </Card>
                         </div>
+                    </section>
 
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>
-                                    Advanced Pattern Matching Tips
-                                </CardTitle>
-                                <CardDescription>
-                                    Get the most out of your categorization
-                                    rules
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div className="space-y-3">
-                                    <h4 className="font-medium">
-                                        Best Practices:
-                                    </h4>
-                                    <ul className="space-y-2 text-sm text-muted-foreground">
-                                        <li>
-                                            •{" "}
-                                            <strong>
-                                                Be as specific as possible
-                                            </strong>{" "}
-                                            - precise rules ensure future
-                                            transactions are categorized
-                                            correctly
-                                        </li>
-                                        <li>
-                                            •{" "}
-                                            <strong>
-                                                Avoid overlapping patterns
-                                            </strong>{" "}
-                                            - make sure only one category
-                                            applies to any given transaction
-                                        </li>
-                                        <li>
-                                            •{" "}
-                                            <strong>
-                                                Ignore internal transactions
-                                            </strong>{" "}
-                                            - skip transfers between your own
-                                            accounts (e.g., checking to savings)
-                                        </li>
-                                    </ul>
+                    {/* Section 4: Analytics */}
+                    <section className="space-y-6">
+                        <div className="space-y-2">
+                            <div className="flex items-center gap-3">
+                                <div className="inline-block rounded-full bg-primary p-3">
+                                    <BarChart className="h-7 w-7 text-primary-foreground" />
                                 </div>
-                            </CardContent>
-                        </Card>
+                                <h2 className="text-3xl font-semibold">
+                                    4. Using the Analytics Page
+                                </h2>
+                            </div>
+                            <p className="text-lg text-muted-foreground pl-16">
+                                Visualize your finances on the Analytics page.
+                            </p>
+                        </div>
+                        <div className="grid gap-6 md:grid-cols-3 ml-16">
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Dashboard</CardTitle>
+                                    <CardDescription>
+                                        An overview of income vs. expenses and
+                                        top spending categories.
+                                    </CardDescription>
+                                </CardHeader>
+                            </Card>
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Graphs</CardTitle>
+                                    <CardDescription>
+                                        Track spending over time and view
+                                        category distributions.
+                                    </CardDescription>
+                                </CardHeader>
+                            </Card>
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Compare</CardTitle>
+                                    <CardDescription>
+                                        Compare spending between different time
+                                        periods.
+                                    </CardDescription>
+                                </CardHeader>
+                            </Card>
+                        </div>
                     </section>
                 </div>
+
+                <footer className="mt-24 border-t pt-6 pb-4 text-center text-sm">
+                    <p className="text-muted-foreground">
+                        This is an open-source project. Contributions are
+                        welcome!
+                    </p>
+                    <div className="mt-4">
+                        <Link
+                            href="https://github.com/GideonKoenig/spending-insights"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 rounded-md bg-muted px-3 py-1.5 text-sm font-medium transition-colors hover:bg-muted/80"
+                        >
+                            <Github className="h-4 w-4" />
+                            <span>spending-insights</span>
+                        </Link>
+                    </div>
+                </footer>
             </div>
         </ScrollArea>
     );
