@@ -65,5 +65,5 @@ export const Sparkasse: DataInjestFormat<typeof SparkasseSchema> = {
     schema: SparkasseSchema,
     map,
     getBankName,
-    note: "Sparkasse format for Giro accounts. The system calculates a running balance starting from 0 before the first transaction.",
+    note: "Sparkasse format for Giro accounts. The system calculates a running balance starting from 0 before the first transaction. At a later point, there will be an option to set the starting balance manually.",
 };

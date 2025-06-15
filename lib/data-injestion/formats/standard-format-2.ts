@@ -74,5 +74,5 @@ export const StandardFormat2: DataInjestFormat<typeof StandardFormat2Schema> = {
     schema: StandardFormat2Schema,
     map,
     getBankName,
-    note: "This format does not provide account balance information. We calculate a running balance starting from 0 before the first transaction.",
+    note: "This format does not provide account balance information. We calculate a running balance starting from 0 before the first transaction. At a later point, there will be an option to set the starting balance manually.",
 };
