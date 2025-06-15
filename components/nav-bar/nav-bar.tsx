@@ -27,6 +27,7 @@ import {
     RefreshCcw,
     FolderOpen,
     Trash,
+    Github,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -286,6 +287,21 @@ export function NavBar() {
                                 )
                             }
                         />
+                    )}
+                    {process.env.NODE_ENV !== "development" && (
+                        <Link
+                            href="https://github.com/GideonKoenig/spending-insights"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-muted-foreground hover:text-foreground"
+                            >
+                                <Github className="h-4 w-4" />
+                            </Button>
+                        </Link>
                     )}
                 </div>
             </div>
