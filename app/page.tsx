@@ -201,6 +201,29 @@ export default function Home() {
                         </h2>
 
                         <div className="grid gap-6 md:grid-cols-2">
+                            <Card className="border-emerald-800/50">
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2 text-emerald-300">
+                                        <Shield className="h-5 w-5" />
+                                        Free & Open Access
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-2">
+                                    <p className="text-sm">
+                                        • Completely free to use forever
+                                    </p>
+                                    <p className="text-sm">
+                                        • No account registration required
+                                    </p>
+                                    <p className="text-sm">
+                                        • No login or sign-up process
+                                    </p>
+                                    <p className="text-sm">
+                                        • Start analyzing immediately
+                                    </p>
+                                </CardContent>
+                            </Card>
+
                             <Card className="border-blue-800/50">
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2 text-blue-300">
@@ -213,14 +236,13 @@ export default function Home() {
                                         • Import bank transaction CSV files
                                     </p>
                                     <p className="text-sm">
-                                        • View all transactions in organized
-                                        lists
-                                    </p>
-                                    <p className="text-sm">
                                         • Support for multiple bank accounts
                                     </p>
                                     <p className="text-sm">
-                                        • Persistent data storage in browser
+                                        • View transactions in organized lists
+                                    </p>
+                                    <p className="text-sm">
+                                        • Persistent storage in your browser
                                     </p>
                                 </CardContent>
                             </Card>
@@ -237,42 +259,13 @@ export default function Home() {
                                         • Create custom categorization rules
                                     </p>
                                     <p className="text-sm">
-                                        • Rule-based automatic transaction
-                                        tagging
+                                        • Automatic transaction tagging
                                     </p>
                                     <p className="text-sm">
                                         • 15 predefined spending categories
                                     </p>
                                     <p className="text-sm">
-                                        • Pattern matching on any transaction
-                                        field
-                                    </p>
-                                </CardContent>
-                            </Card>
-
-                            <Card className="border-purple-800/50">
-                                <CardHeader>
-                                    <CardTitle className="flex items-center gap-2 text-purple-300">
-                                        <Filter className="h-5 w-5" />
-                                        Advanced Filtering
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-2">
-                                    <p className="text-sm">
-                                        • Filter by date ranges with date
-                                        pickers
-                                    </p>
-                                    <p className="text-sm">
-                                        • Search by merchant, amount, or
-                                        description
-                                    </p>
-                                    <p className="text-sm">
-                                        • Multiple filter operators (equals,
-                                        includes, etc.)
-                                    </p>
-                                    <p className="text-sm">
-                                        • Combine multiple filters for precise
-                                        results
+                                        • Pattern matching on any field
                                     </p>
                                 </CardContent>
                             </Card>
@@ -286,7 +279,7 @@ export default function Home() {
                                 </CardHeader>
                                 <CardContent className="space-y-2">
                                     <p className="text-sm">
-                                        • Interactive spending charts and graphs
+                                        • Interactive spending charts
                                     </p>
                                     <p className="text-sm">
                                         • Category breakdown analysis
@@ -295,7 +288,30 @@ export default function Home() {
                                         • Time-based spending trends
                                     </p>
                                     <p className="text-sm">
-                                        • Visual spending pattern recognition
+                                        • Visual pattern recognition
+                                    </p>
+                                </CardContent>
+                            </Card>
+
+                            <Card className="border-purple-800/50">
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2 text-purple-300">
+                                        <Filter className="h-5 w-5" />
+                                        Advanced Search & Filtering
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-2">
+                                    <p className="text-sm">
+                                        • Filter by date ranges and amounts
+                                    </p>
+                                    <p className="text-sm">
+                                        • Search by merchant or description
+                                    </p>
+                                    <p className="text-sm">
+                                        • Multiple filter operators
+                                    </p>
+                                    <p className="text-sm">
+                                        • Combine filters for precise results
                                     </p>
                                 </CardContent>
                             </Card>
@@ -304,44 +320,21 @@ export default function Home() {
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2 text-cyan-300">
                                         <Download className="h-5 w-5" />
-                                        Data Management
+                                        Backup & Sharing
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-2">
                                     <p className="text-sm">
-                                        • Export data and rules as JSON
+                                        • Export your data and rules
                                     </p>
                                     <p className="text-sm">
-                                        • Import data from backups
+                                        • Import from backup files
                                     </p>
                                     <p className="text-sm">
-                                        • Save configurations locally
+                                        • Share categorization rules
                                     </p>
                                     <p className="text-sm">
-                                        • Share rules with others
-                                    </p>
-                                </CardContent>
-                            </Card>
-
-                            <Card className="border-orange-800/50">
-                                <CardHeader>
-                                    <CardTitle className="flex items-center gap-2 text-orange-300">
-                                        <Database className="h-5 w-5" />
-                                        Multi-Account Management
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-2">
-                                    <p className="text-sm">
-                                        • Switch between individual accounts
-                                    </p>
-                                    <p className="text-sm">
-                                        • View all accounts simultaneously
-                                    </p>
-                                    <p className="text-sm">
-                                        • Merge data from different sources
-                                    </p>
-                                    <p className="text-sm">
-                                        • Account-specific analytics
+                                        • Multi-account management
                                     </p>
                                 </CardContent>
                             </Card>
