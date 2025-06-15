@@ -138,6 +138,8 @@ export function createMergeAccounts(dependencies: AccountDependencies) {
             name,
             createdAt,
             updatedAt,
+            bankName: targetAccount.bankName,
+            startingBalance: targetAccount.startingBalance,
             transactions: [...targetAccount.transactions, ...newTransactions],
         };
 
