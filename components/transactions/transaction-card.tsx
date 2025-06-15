@@ -25,7 +25,7 @@ export function TransactionCard(props: {
         currency: props.transaction.currency,
     }).format(props.transaction.balanceAfterTransaction);
 
-    const date = props.transaction.bookingDate.toLocaleDateString("de-DE", {
+    const date = props.transaction.valueDate.toLocaleDateString("de-DE", {
         year: "numeric",
         month: "2-digit",
         day: "2-digit",
@@ -43,13 +43,13 @@ export function TransactionCard(props: {
                 <h3
                     className={cn(
                         "font-medium text-sm truncate",
-                        !props.transaction.paymentParticipant &&
+                        !props.transaction.participantName &&
                             "text-muted-foreground"
                     )}
                 >
-                    {props.transaction.paymentParticipant === ""
+                    {props.transaction.participantName === ""
                         ? "???"
-                        : props.transaction.paymentParticipant}
+                        : props.transaction.participantName}
                 </h3>
                 <div className="flex gap-2 items-center">
                     {props.transaction.tag && (
@@ -115,18 +115,18 @@ export function TransactionCard(props: {
             <div className="flex flex-col col-span-2 gap-1 text-xs text-muted-foreground">
                 <p className="">{"IBAN"}</p>
                 <p className="">
-                    {props.transaction.paymentParticipantIban === ""
+                    {props.transaction.participantIban === ""
                         ? "???"
-                        : props.transaction.paymentParticipantIban}
+                        : props.transaction.participantIban}
                 </p>
             </div>
 
             <div className="flex flex-col col-span-2 gap-1 text-xs text-muted-foreground">
                 <p className="">{"BIC"}</p>
                 <p className="">
-                    {props.transaction.paymentParticipantBic === ""
+                    {props.transaction.participantBic === ""
                         ? "???"
-                        : props.transaction.paymentParticipantBic}
+                        : props.transaction.participantBic}
                 </p>
             </div>
         </div>

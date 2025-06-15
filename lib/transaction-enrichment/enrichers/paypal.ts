@@ -37,10 +37,10 @@ export const paypalEnricher: TransactionEnricher = {
         "Extracts vendor information from PayPal transaction descriptions",
 
     matcher: (transaction: Transaction): boolean => {
-        const participant = transaction.paymentParticipant.toLowerCase();
+        const participant = transaction.participantName.toLowerCase();
         return (
             participant.includes("paypal") ||
-            transaction.paymentParticipantIban.startsWith("LU")
+            transaction.participantIban.startsWith("LU")
         );
     },
 

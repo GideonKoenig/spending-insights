@@ -60,6 +60,7 @@ export function NotificationProvider(props: { children: ReactNode }) {
     }
 
     function addError(origin: string, message: string | string[]) {
+        console.log("addError", origin, message);
         if (Array.isArray(message)) {
             message.forEach((m) => {
                 const error = createError(origin, m);

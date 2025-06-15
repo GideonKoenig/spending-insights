@@ -72,6 +72,7 @@ export function TransactionList(props: {
                     filters={filters}
                     onFiltersChange={setFilters}
                     transactions={props.transactions}
+                    possibleFilters={TRANSACTION_FILTER}
                     sortSelector={
                         <Select
                             value={sortBy}

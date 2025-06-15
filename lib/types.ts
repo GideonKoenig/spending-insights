@@ -5,20 +5,17 @@ import { z } from "zod";
 export type Transaction = z.infer<typeof TransactionSchema>;
 export const TransactionSchema = z.object({
     hash: z.string(),
-    accountName: z.string(),
-    accountIban: z.string(),
-    accountBic: z.string(),
-    bankName: z.string(),
     bookingDate: z.date(),
     valueDate: z.date(),
-    paymentParticipant: z.string(),
-    paymentParticipantIban: z.string(),
-    paymentParticipantBic: z.string(),
+    participantName: z.string(),
     transactionType: z.string(),
     purpose: z.string(),
     amount: z.number(),
     currency: z.string(),
     balanceAfterTransaction: z.number(),
+    participantIban: z.string().optional(),
+    participantBic: z.string().optional(),
+    // Category is added as extra field, because the filter operator needs to be able to access it directly
     category: z.string().optional(),
     tag: TagSchema.optional(),
     enrichment: EnrichmentSchema.optional(),
@@ -30,5 +27,7 @@ export const AccountSchema = z.object({
     createdAt: z.date(),
     updatedAt: z.date(),
     name: z.string(),
+    bankName: z.string(),
+    startingBalance: z.number(),
     transactions: z.array(TransactionSchema),
 });

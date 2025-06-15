@@ -4,20 +4,28 @@ export const currencyEquals: FilterOperator<number> = {
     name: "currency-equals",
     label: "=",
     type: "currency",
-    compare: (userValue, valueToCompare) =>
-        Math.abs(valueToCompare) === Math.abs(userValue),
+    compare: (userValue, valueToCompare) => {
+        if (!userValue || !valueToCompare) return false;
+        return Math.abs(valueToCompare) === Math.abs(userValue);
+    },
 };
 
 export const currencyGreaterThan: FilterOperator<number> = {
     name: "currency-greater-than",
     label: ">",
     type: "currency",
-    compare: (userValue, valueToCompare) => valueToCompare > userValue,
+    compare: (userValue, valueToCompare) => {
+        if (!userValue || !valueToCompare) return false;
+        return valueToCompare > userValue;
+    },
 };
 
 export const currencyLessThan: FilterOperator<number> = {
     name: "currency-less-than",
     label: "<",
     type: "currency",
-    compare: (userValue, valueToCompare) => valueToCompare < userValue,
+    compare: (userValue, valueToCompare) => {
+        if (!userValue || !valueToCompare) return false;
+        return valueToCompare < userValue;
+    },
 };

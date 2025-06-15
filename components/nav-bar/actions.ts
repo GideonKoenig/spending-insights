@@ -1,7 +1,6 @@
 import { AccountsContextType } from "@/contexts/accounts/provider";
 import { NotificationContextType } from "@/contexts/notification/provider";
 import { TagRulesContextType } from "@/contexts/tag-rules/provider";
-import { Tag } from "@/lib/tag-rule-engine/types";
 
 export interface ActionDependencies {
     tagRules: TagRulesContextType;
@@ -16,10 +15,6 @@ export function createUpdateAllCategories(dependencies: ActionDependencies) {
         dependencies.tagRules.tagRules.forEach((rule) => {
             dependencies.tagRules.updateTagRule(rule.id, {
                 ...rule,
-                tag: {
-                    ...rule.tag,
-                    spreadOverMonths: null,
-                } as Tag,
             });
         });
 

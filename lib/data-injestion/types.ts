@@ -9,7 +9,9 @@ export type DataInjestFormat<T extends z.ZodObject<z.ZodRawShape>> = {
     name: string;
     displayName: string;
     schema: T;
-    map: (element: z.infer<T>) => Omit<Transaction, "hash">;
+    map: (elements: z.infer<T>[]) => Omit<Transaction, "hash">[];
+    getBankName: (elements: z.infer<T>[]) => string;
+    note?: string;
 };
 
 export type PreparedFile = {

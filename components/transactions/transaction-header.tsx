@@ -11,10 +11,10 @@ import {
 } from "@/components/ui/select";
 import { type Transaction } from "@/lib/types";
 import {
+    TransactionFilter,
     type FilterRule,
     type TypedOperator,
 } from "@/lib/transaction-filter/types";
-import { TRANSACTION_FILTER } from "@/lib/transaction-filter/transaction-filter-options";
 import { getOperatorsForFilterOption } from "@/lib/transaction-filter/utils";
 import { OPERATORS } from "@/lib/transaction-filter/main";
 import { TextInput } from "@/lib/transaction-filter/input-components/text-input";
@@ -31,13 +31,14 @@ export function TransactionHeader(props: {
     className?: string;
     onFiltersChange: (filters: FilterRule[]) => void;
     filters: FilterRule[];
+    possibleFilters: TransactionFilter[];
     transactions: Transaction[];
     sortSelector?: React.ReactNode;
     viewToggle?: React.ReactNode;
 }) {
-    const [option, setOption] = useState(TRANSACTION_FILTER[0]);
+    const [option, setOption] = useState(props.possibleFilters[0]);
     const [operator, setOperator] = useState<TypedOperator>(
-        getAvailableOperators(option.attribute)[0]
+        getAvailableOperators(option.attribute, props.possibleFilters)[0]
     );
     const [value, setValue] = useState<Value>(undefined);
 
@@ -110,12 +111,17 @@ export function TransactionHeader(props: {
                 <Select
                     value={option.attribute}
                     onValueChange={(newAttribute) => {
-                        const option = TRANSACTION_FILTER.find(
+                        const option = props.possibleFilters.find(
                             (opt) => opt.attribute === newAttribute
                         );
                         if (option) {
                             setOption(option);
-                            setOperator(getAvailableOperators(newAttribute)[0]);
+                            setOperator(
+                                getAvailableOperators(
+                                    newAttribute,
+                                    props.possibleFilters
+                                )[0]
+                            );
                             setValue(undefined);
                         }
                     }}
@@ -127,7 +133,7 @@ export function TransactionHeader(props: {
                         <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                        {TRANSACTION_FILTER.map((option) => (
+                        {props.possibleFilters.map((option) => (
                             <SelectItem
                                 key={option.attribute}
                                 value={option.attribute}
@@ -142,9 +148,10 @@ export function TransactionHeader(props: {
                     value={operator.name}
                     onValueChange={(newOperator) => {
                         setOperator(
-                            getAvailableOperators(option.attribute).find(
-                                (op) => op.name === newOperator
-                            )!
+                            getAvailableOperators(
+                                option.attribute,
+                                props.possibleFilters
+                            ).find((op) => op.name === newOperator)!
                         );
                     }}
                     disabled={!option}
@@ -156,7 +163,10 @@ export function TransactionHeader(props: {
                         <SelectValue placeholder="Select operator..." />
                     </SelectTrigger>
                     <SelectContent>
-                        {getAvailableOperators(option.attribute).map((op) => (
+                        {getAvailableOperators(
+                            option.attribute,
+                            props.possibleFilters
+                        ).map((op) => (
                             <SelectItem key={op.name} value={op.name}>
                                 {op.label}
                             </SelectItem>
@@ -237,10 +247,9 @@ export function TransactionHeader(props: {
     );
 }
 
-function getAvailableOperators(attribute: string) {
-    return getOperatorsForFilterOption(
-        attribute,
-        TRANSACTION_FILTER,
-        OPERATORS
-    );
+function getAvailableOperators(
+    attribute: string,
+    possibleFilters: TransactionFilter[]
+) {
+    return getOperatorsForFilterOption(attribute, possibleFilters, OPERATORS);
 }

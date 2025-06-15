@@ -1,15 +1,22 @@
 import { type Result, newSuccess } from "@/lib/utils";
-import { VrBankFormat } from "@/lib/data-injestion/sources/vr-bank";
+import { StandardFormat3 } from "@/lib/data-injestion/formats/standard-format-3";
 import { DataInjestFormat, PreparedFile } from "@/lib/data-injestion/types";
 import { CsvParser } from "@/lib/csv-parser/parser";
 import { hashTransaction, findFormat } from "@/lib/data-injestion/utils";
 import { Account } from "@/lib/types";
-import { z } from "zod";
+import z from "zod";
+import { Comdirect } from "@/lib/data-injestion/formats/comdirect";
+import { Dkb } from "@/lib/data-injestion/formats/dkb";
+import { StandardFormat1 } from "@/lib/data-injestion/formats/standard-format-1";
+import { StandardFormat2 } from "@/lib/data-injestion/formats/standard-format-2";
 
-// Todo: Figure out why this type casting is necessary... to tired right now
-const MAPPING_REGISTRY: DataInjestFormat<z.ZodObject<z.ZodRawShape>>[] = [
-    VrBankFormat as unknown as DataInjestFormat<z.ZodObject<z.ZodRawShape>>,
-];
+const MAPPING_REGISTRY = [
+    Comdirect,
+    Dkb,
+    StandardFormat1,
+    StandardFormat2,
+    StandardFormat3,
+] as unknown as DataInjestFormat<z.ZodObject<z.ZodRawShape>>[];
 
 async function injest(files: PreparedFile[]) {
     const results: Result<Account>[] = [];
@@ -33,9 +40,10 @@ async function injest(files: PreparedFile[]) {
             results.push(data);
             continue;
         }
-        const transactions = data.value.map(format.value.map);
+        const transactions = format.value.map(data.value);
         const accountName = file.name;
         const hashedTransactions = hashTransaction(transactions, accountName);
+        const bankName = format.value.getBankName(data.value);
 
         results.push(
             newSuccess({
@@ -43,6 +51,8 @@ async function injest(files: PreparedFile[]) {
                 createdAt: new Date(),
                 updatedAt: new Date(),
                 name: accountName,
+                bankName,
+                startingBalance: 0,
                 transactions: hashedTransactions,
             })
         );

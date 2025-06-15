@@ -24,7 +24,7 @@ export function TransactionCardSlim(props: {
         currency: props.transaction.currency,
     }).format(props.transaction.balanceAfterTransaction);
 
-    const date = props.transaction.bookingDate.toLocaleDateString("de-DE", {
+    const date = props.transaction.valueDate.toLocaleDateString("de-DE", {
         year: "numeric",
         month: "2-digit",
         day: "2-digit",
@@ -48,11 +48,11 @@ export function TransactionCardSlim(props: {
                         <h3
                             className={cn(
                                 "font-medium text-sm truncate",
-                                !props.transaction.paymentParticipant &&
+                                !props.transaction.participantName &&
                                     "text-muted-foreground"
                             )}
                         >
-                            {props.transaction.paymentParticipant ?? "???"}
+                            {props.transaction.participantName ?? "???"}
                         </h3>
 
                         {props.transaction.tag && (
@@ -87,7 +87,7 @@ export function TransactionCardSlim(props: {
                     <div className="flex items-start justify-between gap-4">
                         <div>
                             <h4 className="font-semibold text-base">
-                                {props.transaction.paymentParticipant || "???"}
+                                {props.transaction.participantName || "???"}
                             </h4>
                         </div>
                         <div className="text-right">
@@ -150,12 +150,11 @@ export function TransactionCardSlim(props: {
                         <div className="grid grid-cols-[auto_1fr] gap-x-2 gap-y-1 text-xs">
                             <span className="text-muted-foreground">IBAN:</span>
                             <span className="font-mono truncate">
-                                {props.transaction.paymentParticipantIban ||
-                                    "—"}
+                                {props.transaction.participantIban || "—"}
                             </span>
                             <span className="text-muted-foreground">BIC:</span>
                             <span className="font-mono">
-                                {props.transaction.paymentParticipantBic || "—"}
+                                {props.transaction.participantBic || "—"}
                             </span>
                         </div>
                     </div>

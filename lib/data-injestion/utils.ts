@@ -4,6 +4,7 @@ import { newError, newSuccess } from "@/lib/utils";
 import { createHash } from "crypto";
 import { z } from "zod";
 
+// Todo: this probably doesnt work for all formats... this needs to be more generalized.
 export function parseDate(dateStr: string): Date {
     if (!dateStr) return new Date();
 
@@ -20,8 +21,18 @@ export function parseDate(dateStr: string): Date {
 export function parseAmount(amountStr: string): number {
     if (!amountStr) return 0;
 
-    const cleanAmount = amountStr.replace(/\s/g, "").replace(",", ".");
-    return parseFloat(cleanAmount) || 0;
+    // 1) Detect a minus sign (could be leading or trailing)
+    const isNegative = /-/.test(amountStr);
+
+    // 2) Remove every non-digit. What remains represents the value in cents.
+    const onlyDigits = amountStr.replace(/\D/g, "");
+    if (!onlyDigits) return 0;
+
+    // 3) Interpret the last two digits as the cent portion.
+    const cents = parseInt(onlyDigits, 10);
+    const value = cents / 100;
+
+    return isNegative ? -value : value;
 }
 
 export function findFormat(
@@ -52,13 +63,12 @@ export function hashTransaction(
         hash: createHash("sha256")
             .update(
                 JSON.stringify({
-                    accountIban: transaction.accountIban,
-                    bookingDate: transaction.bookingDate,
+                    accountName,
+                    valueDate: transaction.valueDate,
                     amount: transaction.amount,
-                    paymentParticipant: transaction.paymentParticipant,
+                    participantName: transaction.participantName,
                     purpose: transaction.purpose,
                     transactionType: transaction.transactionType,
-                    accountName,
                 })
             )
             .digest("hex")

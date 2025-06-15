@@ -121,6 +121,9 @@ export default function TagsPage() {
                             setCurrentRule((prev) => ({ ...prev, filters }))
                         }
                         transactions={transactions}
+                        possibleFilters={TRANSACTION_FILTER.filter(
+                            (filter) => filter.attribute !== "category"
+                        )}
                     />
                 </div>
 

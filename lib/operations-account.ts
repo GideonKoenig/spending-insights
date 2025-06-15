@@ -74,9 +74,8 @@ export function getDateRange(accounts: Account[]): { start: Date; end: Date } {
 
     for (const account of accounts) {
         for (const transaction of account.transactions) {
-            if (transaction.bookingDate < start)
-                start = transaction.bookingDate;
-            if (transaction.bookingDate > end) end = transaction.bookingDate;
+            if (transaction.valueDate < start) start = transaction.valueDate;
+            if (transaction.valueDate > end) end = transaction.valueDate;
         }
     }
     return { start, end };

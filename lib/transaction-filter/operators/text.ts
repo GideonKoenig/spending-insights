@@ -5,15 +5,7 @@ export const textEquals: FilterOperator<string> = {
     label: "=",
     type: "text",
     compare: (userValue, valueToCompare) => {
-        if (typeof userValue.toLowerCase !== "function")
-            console.log(
-                "ISSUE1:\n",
-                "userValue",
-                userValue,
-                "\n",
-                "valueToCompare",
-                valueToCompare
-            );
+        if (!userValue || !valueToCompare) return false;
         return valueToCompare.toLowerCase() === userValue.toLowerCase();
     },
 };
@@ -23,15 +15,7 @@ export const textIncludes: FilterOperator<string> = {
     label: "includes",
     type: "text",
     compare: (userValue, valueToCompare) => {
-        if (typeof userValue.toLowerCase !== "function")
-            console.log(
-                "ISSUE2:\n",
-                "userValue",
-                userValue,
-                "\n",
-                "valueToCompare",
-                valueToCompare
-            );
+        if (!userValue || !valueToCompare) return false;
         return valueToCompare.toLowerCase().includes(userValue.toLowerCase());
     },
 };
@@ -41,15 +25,7 @@ export const textExcludes: FilterOperator<string> = {
     label: "excludes",
     type: "text",
     compare: (userValue, valueToCompare) => {
-        if (typeof userValue.toLowerCase !== "function")
-            console.log(
-                "ISSUE3:\n",
-                "userValue",
-                userValue,
-                "\n",
-                "valueToCompare",
-                valueToCompare
-            );
+        if (!userValue || !valueToCompare) return false;
         return !valueToCompare.toLowerCase().includes(userValue.toLowerCase());
     },
 };

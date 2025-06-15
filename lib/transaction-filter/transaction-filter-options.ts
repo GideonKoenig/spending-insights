@@ -7,7 +7,7 @@ export const TRANSACTION_FILTER: TransactionFilter[] = [
         inputType: "text",
     },
     {
-        attribute: "paymentParticipant",
+        attribute: "participantName",
         label: "Participant",
         inputType: "text",
     },
