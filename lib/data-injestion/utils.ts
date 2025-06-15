@@ -75,3 +75,23 @@ export function hashTransaction(
             .substring(0, 16),
     }));
 }
+
+export function calculateIban(konto: string, blz: string): string {
+    if (!konto || !blz) return "";
+
+    const mod97 = (numStr: string): number => {
+        let rem = 0;
+        for (let i = 0; i < numStr.length; i++) {
+            const digit = numStr.charCodeAt(i) - 48; // '0' => 48
+            rem = (rem * 10 + digit) % 97;
+        }
+        return rem;
+    };
+
+    const bban = blz.padStart(8, "0") + konto.padStart(10, "0");
+    const testNumber = bban + "131400"; // BBAN + "DE00" verschoben
+    const remainder = mod97(testNumber);
+    const check = String(98 - remainder).padStart(2, "0");
+
+    return `DE${check}${bban}`;
+}

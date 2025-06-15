@@ -9,10 +9,12 @@ import { Comdirect } from "@/lib/data-injestion/formats/comdirect";
 import { Dkb } from "@/lib/data-injestion/formats/dkb";
 import { StandardFormat1 } from "@/lib/data-injestion/formats/standard-format-1";
 import { StandardFormat2 } from "@/lib/data-injestion/formats/standard-format-2";
+import { Sparkasse } from "@/lib/data-injestion/formats/sparkasse";
 
 const MAPPING_REGISTRY = [
     Comdirect,
     Dkb,
+    Sparkasse,
     StandardFormat1,
     StandardFormat2,
     StandardFormat3,
