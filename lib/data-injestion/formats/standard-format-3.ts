@@ -53,7 +53,7 @@ function getBankName(elements: z.infer<typeof StandardFormat3Schema>[]) {
 
 export const StandardFormat3: DataInjestFormat<typeof StandardFormat3Schema> = {
     name: "standard-format-3",
-    displayName: "Standard Format 3",
+    displayName: "Standard Format",
     schema: StandardFormat3Schema,
     map,
     getBankName,

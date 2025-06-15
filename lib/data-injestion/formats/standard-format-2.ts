@@ -70,7 +70,7 @@ function getBankName() {
 
 export const StandardFormat2: DataInjestFormat<typeof StandardFormat2Schema> = {
     name: "standard-format-2",
-    displayName: "Standard Format 2",
+    displayName: "Standard Format",
     schema: StandardFormat2Schema,
     map,
     getBankName,
