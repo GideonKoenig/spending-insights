@@ -13,15 +13,67 @@ import "@/lib/operations-transaction";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-    title: "Spending Insights",
-    description: "Analyze your bank transactions privately in your browser",
+    title: {
+        default: "Spending Insights - Analyze Bank Transactions Privately",
+        template: "%s | Spending Insights",
+    },
+    description:
+        "Analyze your bank transactions privately in your browser. Free, secure, and no account required. Import CSV files, categorize spending, and get insights into your financial habits.",
+    keywords: [
+        "bank transactions",
+        "spending analysis",
+        "financial insights",
+        "CSV import",
+        "private",
+        "secure",
+        "budgeting",
+        "expense tracking",
+    ],
+    authors: [{ name: "Gideon Koenig" }],
+    creator: "Gideon Koenig",
+    publisher: "Gideon Koenig",
+    formatDetection: {
+        email: false,
+        address: false,
+        telephone: false,
+    },
+    icons: {
+        icon: [
+            { url: "/icon.svg", type: "image/svg+xml" },
+            { url: "/icon.png", type: "image/png" },
+        ],
+        shortcut: "/favicon.ico",
+        apple: "/icon.png",
+    },
+    metadataBase: new URL("https://spendinginsights.app"),
+    openGraph: {
+        title: "Spending Insights - Analyze Bank Transactions Privately",
+        description:
+            "Analyze your bank transactions privately in your browser. Free, secure, and no account required.",
+        url: "https://spendinginsights.app",
+        siteName: "Spending Insights",
+        images: [
+            {
+                url: "/icon.png",
+                width: 1200,
+                height: 630,
+                alt: "Spending Insights - Private Bank Transaction Analysis",
+            },
+        ],
+        locale: "en_DE",
+        type: "website",
+    },
+    twitter: {
+        card: "summary_large_image",
+        title: "Spending Insights - Analyze Bank Transactions Privately",
+        description:
+            "Analyze your bank transactions privately in your browser. Free, secure, and no account required.",
+        images: ["/icon.png"],
+        creator: "@Gideon_Koenig",
+    },
 };
 
-export default function RootLayout({
-    children,
-}: {
-    children: React.ReactNode;
-}) {
+export default function RootLayout(props: { children: React.ReactNode }) {
     return (
         <html lang="en" className={inter.className} suppressHydrationWarning>
             <PlausibleProvider
@@ -36,7 +88,7 @@ export default function RootLayout({
                             <body className="h-dvh w-dvw bg-background text-foreground flex flex-col">
                                 <NavBar />
                                 <div className="flex-grow overflow-hidden">
-                                    {children}
+                                    {props.children}
                                 </div>
                             </body>
                         </AccountProvider>

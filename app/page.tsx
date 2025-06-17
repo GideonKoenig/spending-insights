@@ -23,6 +23,7 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { SEOWrapper } from "@/app/seo-wrapper";
 
 export default function Home() {
     const plausible = usePlausible<PlausibleEvents>();
@@ -80,9 +81,8 @@ export default function Home() {
             description: "Set up categorization rules",
             content: (
                 <p className="text-sm text-muted-foreground">
-                    Define rules based on merchant names, amounts, or
-                    descriptions to automatically categorize similar
-                    transactions.
+                    Define custom rules based on merchant names, amounts, or
+                    descriptions to categorize similar transactions.
                 </p>
             ),
         },
@@ -133,11 +133,10 @@ export default function Home() {
         {
             icon: Tag,
             title: "Smart Categorization",
-            description:
-                "Create custom rules for automatic transaction tagging.",
+            description: "Create custom rules for precise transaction tagging.",
             items: [
                 "Create custom categorization rules",
-                "Automatic transaction tagging",
+                "Rule-based transaction tagging",
                 "15 predefined spending categories",
                 "Pattern matching on any field",
             ],
@@ -192,157 +191,174 @@ export default function Home() {
     ];
 
     return (
-        <ScrollArea className="h-full ">
-            <div className="bg-gradient-to-b from-primary/20 to-background bg-[length:100%_20%] bg-no-repeat">
-                <div className="flex flex-col max-w-5xl mx-auto gap-12 py-24">
-                    <section className="flex flex-col items-center gap-8 text-center p-8">
-                        <h1 className="text-5xl font-bold leading-tight">
-                            {"Understand your spending at a glance"}
-                        </h1>
-                        <p className="text-lg text-muted-foreground max-w-3xl mx-auto ">
-                            {
-                                "Analyze your bank transactions locally and securely in your browser. Import CSV files, set up smart rules and instantly see where your money goes."
-                            }
-                        </p>
-                        <div className="flex justify-center gap-4">
-                            <Button
-                                asChild
-                                size="lg"
-                                onClick={() => plausible("get-started")}
-                            >
-                                <Link href="/transactions">
-                                    Get Started
-                                    <ArrowRight className="ml-2 h-4 w-4" />
-                                </Link>
-                            </Button>
-                            <Button
-                                asChild
-                                size="lg"
-                                variant="outline"
-                                onClick={() => plausible("learn-more")}
-                            >
-                                <Link href="/guide">Learn More</Link>
-                            </Button>
-                        </div>
-                    </section>
+        <SEOWrapper>
+            <ScrollArea className="h-full ">
+                <div className="bg-gradient-to-b from-primary/20 to-background bg-[length:100%_20%] bg-no-repeat">
+                    <div className="flex flex-col max-w-5xl mx-auto gap-12 py-24">
+                        <section className="flex flex-col items-center gap-8 text-center p-8">
+                            <h1 className="text-5xl font-bold leading-tight">
+                                {"Understand your spending at a glance"}
+                            </h1>
+                            <p className="text-lg text-muted-foreground max-w-3xl mx-auto ">
+                                {
+                                    "Analyze your bank transactions locally and securely in your browser. Import CSV files, set up smart rules and instantly see where your money goes."
+                                }
+                            </p>
+                            <div className="flex justify-center gap-4">
+                                <Button
+                                    asChild
+                                    size="lg"
+                                    onClick={() => plausible("get-started")}
+                                >
+                                    <Link href="/transactions">
+                                        Get Started
+                                        <ArrowRight className="ml-2 h-4 w-4" />
+                                    </Link>
+                                </Button>
+                                <Button
+                                    asChild
+                                    size="lg"
+                                    variant="outline"
+                                    onClick={() => plausible("learn-more")}
+                                >
+                                    <Link href="/guide">Learn More</Link>
+                                </Button>
+                            </div>
+                        </section>
 
-                    <section className="max-w-3xl mx-auto p-8 w-full">
-                        <h2 className="text-3xl font-bold text-center mb-12">
-                            How It Works
-                        </h2>
-                        <div className="relative flex flex-col gap-10">
-                            <div
-                                className="absolute left-6 top-6 h-[calc(100%-6rem)] w-px bg-border"
-                                aria-hidden="true"
-                            />
-                            {steps.map((step, index) => {
-                                const Icon = step.icon;
-                                return (
-                                    <div
-                                        key={index}
-                                        className="flex items-start gap-6 relative"
-                                    >
-                                        <div className="z-10 flex items-center justify-center w-12 h-12 rounded-full bg-background border text-primary shrink-0">
-                                            <Icon className="w-6 h-6" />
-                                        </div>
-                                        <div className="relative flex-grow pt-1">
-                                            <h3 className="text-xl font-semibold">
-                                                {step.title}
-                                            </h3>
-                                            <p className="text-muted-foreground mt-1">
-                                                {step.description}
-                                            </p>
-                                            <div className="mt-4">
-                                                {step.content}
+                        <section className="max-w-3xl mx-auto p-8 w-full">
+                            <h2 className="text-3xl font-bold text-center mb-12">
+                                How It Works
+                            </h2>
+                            <div className="relative flex flex-col gap-10">
+                                <div
+                                    className="absolute left-6 top-6 h-[calc(100%-6rem)] w-px bg-border"
+                                    aria-hidden="true"
+                                />
+                                {steps.map((step, index) => {
+                                    const Icon = step.icon;
+                                    return (
+                                        <div
+                                            key={index}
+                                            className="flex items-start gap-6 relative"
+                                        >
+                                            <div className="z-10 flex items-center justify-center w-12 h-12 rounded-full bg-background border text-primary shrink-0">
+                                                <Icon className="w-6 h-6" />
+                                            </div>
+                                            <div className="relative flex-grow pt-1">
+                                                <h3 className="text-xl font-semibold">
+                                                    {step.title}
+                                                </h3>
+                                                <p className="text-muted-foreground mt-1">
+                                                    {step.description}
+                                                </p>
+                                                <div className="mt-4">
+                                                    {step.content}
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </section>
+                                    );
+                                })}
+                            </div>
+                        </section>
 
-                    <section className="p-8 max-w-4xl mx-auto">
-                        <div className="bg-card border  border-border rounded-lg p-8 flex flex-col items-center justify-center text-center gap-4">
-                            <Shield className="h-20 w-20 text-primary-foreground bg-primary rounded-full p-4" />
-                            <h3 className="text-2xl font-semibold">Privacy</h3>
-                            <p className="text-muted-foreground">
-                                {`Your financial data stays completely private. Everything runs locally in your browser - no servers, no uploads, no accounts needed. Your transaction data and categorization rules are stored safely in your browser's local storage.`}
-                            </p>
-                        </div>
-                    </section>
+                        <section className="p-8 max-w-4xl mx-auto">
+                            <div className="bg-card border  border-border rounded-lg p-8 flex flex-col items-center justify-center text-center gap-4">
+                                <Shield className="h-20 w-20 text-primary-foreground bg-primary rounded-full p-4" />
+                                <h3 className="text-2xl font-semibold">
+                                    Privacy
+                                </h3>
+                                <p className="text-muted-foreground">
+                                    {`Your financial data stays completely private. Everything runs locally in your browser - no servers, no uploads, no accounts needed. Your transaction data and categorization rules are stored safely in your browser's local storage.`}
+                                </p>
+                            </div>
+                        </section>
 
-                    <section className="max-w-5xl w-full mx-auto p-8">
-                        <h2 className="text-3xl font-bold text-center mb-12">
-                            Powerful Features for Total Control
-                        </h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 auto-rows-fr">
-                            {features.map((feature, index) => {
-                                const Icon = feature.icon;
-                                return (
-                                    <div
-                                        key={index}
-                                        className="relative group cursor-pointer w-full h-full"
-                                        onMouseMove={(e) => {
-                                            const card = e.currentTarget;
-                                            const rect =
-                                                card.getBoundingClientRect();
-                                            const x = e.clientX - rect.left;
-                                            const y = e.clientY - rect.top;
-                                            const rotateX =
-                                                (-(y - rect.height / 2) / 15) *
-                                                0.6;
-                                            const rotateY =
-                                                ((x - rect.width / 2) / 15) *
-                                                0.5;
-                                            card.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            const card = e.currentTarget;
-                                            card.style.transform =
-                                                "perspective(800px) rotateX(0deg) rotateY(0deg)";
-                                        }}
-                                    >
+                        <section className="max-w-5xl w-full mx-auto p-8">
+                            <h2 className="text-3xl font-bold text-center mb-12">
+                                Powerful Features for Total Control
+                            </h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 auto-rows-fr">
+                                {features.map((feature, index) => {
+                                    const Icon = feature.icon;
+                                    return (
                                         <div
-                                            className={`relative h-full p-[2px] rounded-xl bg-gradient-to-br ${feature.gradient} transition-shadow`}
-                                            style={{
-                                                boxShadow: `0 0 25px ${feature.glow}`,
+                                            key={index}
+                                            className="relative group cursor-pointer w-full h-full"
+                                            onMouseMove={(e) => {
+                                                const card = e.currentTarget;
+                                                const rect =
+                                                    card.getBoundingClientRect();
+                                                const x = e.clientX - rect.left;
+                                                const y = e.clientY - rect.top;
+                                                const rotateX =
+                                                    (-(y - rect.height / 2) /
+                                                        15) *
+                                                    0.6;
+                                                const rotateY =
+                                                    ((x - rect.width / 2) /
+                                                        15) *
+                                                    0.5;
+                                                card.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                const card = e.currentTarget;
+                                                card.style.transform =
+                                                    "perspective(800px) rotateX(0deg) rotateY(0deg)";
                                             }}
                                         >
-                                            <Card className="rounded-[12px] w-full h-full bg-background/90 backdrop-blur-md">
-                                                <CardHeader className="items-center text-center">
-                                                    <CardTitle
-                                                        className={`flex items-center justify-center gap-3 font-semibold ${feature.text}`}
-                                                    >
-                                                        <Icon className="w-7 h-7" />
-                                                        {feature.title}
-                                                    </CardTitle>
-                                                    <CardDescription className="pt-2 text-foreground/70">
-                                                        {feature.description}
-                                                    </CardDescription>
-                                                </CardHeader>
-                                                <CardContent className="px-6 pb-6">
-                                                    <div className="flex justify-center w-full">
-                                                        <ul className="text-sm space-y-2 list-disc list-inside text-muted-foreground text-left">
-                                                            {feature.items.map(
-                                                                (item, i) => (
-                                                                    <li key={i}>
-                                                                        {item}
-                                                                    </li>
-                                                                )
-                                                            )}
-                                                        </ul>
-                                                    </div>
-                                                </CardContent>
-                                            </Card>
+                                            <div
+                                                className={`relative h-full p-[2px] rounded-xl bg-gradient-to-br ${feature.gradient} transition-shadow`}
+                                                style={{
+                                                    boxShadow: `0 0 25px ${feature.glow}`,
+                                                }}
+                                            >
+                                                <Card className="rounded-[12px] w-full h-full bg-background/90 backdrop-blur-md">
+                                                    <CardHeader className="items-center text-center">
+                                                        <CardTitle
+                                                            className={`flex items-center justify-center gap-3 font-semibold ${feature.text}`}
+                                                        >
+                                                            <Icon className="w-7 h-7" />
+                                                            {feature.title}
+                                                        </CardTitle>
+                                                        <CardDescription className="pt-2 text-foreground/70">
+                                                            {
+                                                                feature.description
+                                                            }
+                                                        </CardDescription>
+                                                    </CardHeader>
+                                                    <CardContent className="px-6 pb-6">
+                                                        <div className="flex justify-center w-full">
+                                                            <ul className="text-sm space-y-2 list-disc list-inside text-muted-foreground text-left">
+                                                                {feature.items.map(
+                                                                    (
+                                                                        item,
+                                                                        i
+                                                                    ) => (
+                                                                        <li
+                                                                            key={
+                                                                                i
+                                                                            }
+                                                                        >
+                                                                            {
+                                                                                item
+                                                                            }
+                                                                        </li>
+                                                                    )
+                                                                )}
+                                                            </ul>
+                                                        </div>
+                                                    </CardContent>
+                                                </Card>
+                                            </div>
                                         </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </section>
+                                    );
+                                })}
+                            </div>
+                        </section>
+                    </div>
                 </div>
-            </div>
-        </ScrollArea>
+            </ScrollArea>
+        </SEOWrapper>
     );
 }
