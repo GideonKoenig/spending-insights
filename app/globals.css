@@ -93,4 +93,7 @@
     body {
         @apply bg-background text-foreground;
     }
+    section h1 {
+        @apply text-5xl;
+    }
 }
