@@ -111,11 +111,12 @@ export function NavBar() {
                                 }
                             }}
                         >
-                            <SelectTrigger className="w-52" size="sm">
-                                <SelectValue
-                                    placeholder="Select account..."
-                                    aria-label="Select Account"
-                                />
+                            <SelectTrigger
+                                className="w-52"
+                                size="sm"
+                                aria-label="Select an account"
+                            >
+                                <SelectValue placeholder="Select account..." />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="all">
@@ -296,12 +297,12 @@ export function NavBar() {
                             href="https://github.com/GideonKoenig/spending-insights"
                             target="_blank"
                             rel="noopener noreferrer"
-                            aria-label="View source code on GitHub"
                         >
                             <Button
                                 variant="ghost"
                                 size="sm"
                                 className="text-muted-foreground hover:text-foreground"
+                                aria-label="View source code on GitHub"
                             >
                                 <Github className="h-4 w-4" />
                             </Button>

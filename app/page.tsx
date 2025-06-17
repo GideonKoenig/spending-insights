@@ -224,6 +224,7 @@ export default function Home() {
                                     <Link
                                         href="/guide"
                                         aria-label="Learn more about how to use this app"
+                                        title="Learn more about how to use this app"
                                     >
                                         Learn More
                                     </Link>
