@@ -32,6 +32,7 @@ export function NotificationButton(props: {
                     variant="ghost"
                     size="sm"
                     className="h-8 w-8 p-0"
+                    aria-label={`Open ${props.typeLabel} notifications`}
                     onClick={() => {
                         if (isOpen) {
                             props.onMarkAsRead();
