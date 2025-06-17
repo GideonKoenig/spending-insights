@@ -222,11 +222,10 @@ export default function Home() {
                                     onClick={() => plausible("learn-more")}
                                 >
                                     <Link
+                                        aria-label="Read the guide"
                                         href="/guide"
-                                        aria-label="Learn more about how to use this app"
-                                        title="Learn more about how to use this app"
                                     >
-                                        Learn More
+                                        Read Guide
                                     </Link>
                                 </Button>
                             </div>
