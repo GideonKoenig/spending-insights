@@ -18,7 +18,7 @@ export const metadata: Metadata = {
         template: "%s | Spending Insights",
     },
     description:
-        "Analyze your bank transactions privately in your browser. Free, secure, and no account required. Import CSV files, categorize spending, and get insights into your financial habits.",
+        "Analyze bank transactions privately in your browser. Free, secure, and no account required. Categorize spending, and get insights into your financial habits.",
     keywords: [
         "bank transactions",
         "spending analysis",
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     openGraph: {
         title: "Spending Insights - Analyze Bank Transactions Privately",
         description:
-            "Analyze your bank transactions privately in your browser. Free, secure, and no account required.",
+            "Analyze bank transactions privately in your browser. Free, secure, and no account required. Categorize spending, and get insights into your financial habits.",
         url: "https://spendinginsights.app",
         siteName: "Spending Insights",
         images: [
@@ -67,7 +67,7 @@ export const metadata: Metadata = {
         card: "summary_large_image",
         title: "Spending Insights - Analyze Bank Transactions Privately",
         description:
-            "Analyze your bank transactions privately in your browser. Free, secure, and no account required.",
+            "Analyze bank transactions privately in your browser. Free, secure, and no account required. Categorize spending, and get insights into your financial habits.",
         images: ["/icon.png"],
         creator: "@Gideon_Koenig",
     },

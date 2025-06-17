@@ -5,7 +5,7 @@ const structuredData = {
     "@type": "WebApplication",
     name: "Spending Insights",
     description:
-        "Analyze your bank transactions privately in your browser. Free, secure, and no account required.",
+        "Analyze bank transactions privately in your browser. Free, secure, and no account required. Categorize spending, and get insights into your financial habits.",
     url: "https://spendinginsights.app",
     applicationCategory: "FinanceApplication",
     operatingSystem: "Web Browser",
