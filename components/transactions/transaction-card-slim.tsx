@@ -31,7 +31,7 @@ export function TransactionCardSlim(props: {
     });
 
     return (
-        <HoverCard openDelay={300}>
+        <HoverCard openDelay={20}>
             <HoverCardTrigger asChild>
                 <div
                     className={cn(
