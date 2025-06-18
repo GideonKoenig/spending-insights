@@ -245,21 +245,6 @@ export function NavBar() {
 
                 <div className="flex items-center gap-1">
                     <NotificationButton
-                        notifications={notifications.errors}
-                        icon={<OctagonX />}
-                        activeColorClass="text-destructive"
-                        typeLabel="error"
-                        emptyMessage="No errors"
-                        onMarkAsRead={notifications.markErrorsAsRead}
-                        onClear={notifications.clearErrors}
-                        onAddTest={() =>
-                            notifications.addError(
-                                "Test",
-                                "This is a test error message"
-                            )
-                        }
-                    />
-                    <NotificationButton
                         notifications={notifications.warnings}
                         icon={<TriangleAlert />}
                         activeColorClass="text-warning"
@@ -271,6 +256,22 @@ export function NavBar() {
                             notifications.addWarning(
                                 "Test",
                                 "This is a test warning message"
+                            )
+                        }
+                    />
+
+                    <NotificationButton
+                        notifications={notifications.errors}
+                        icon={<OctagonX />}
+                        activeColorClass="text-destructive"
+                        typeLabel="error"
+                        emptyMessage="No errors"
+                        onMarkAsRead={notifications.markErrorsAsRead}
+                        onClear={notifications.clearErrors}
+                        onAddTest={() =>
+                            notifications.addError(
+                                "Test",
+                                "This is a test error message"
                             )
                         }
                     />
