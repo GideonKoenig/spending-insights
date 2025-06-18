@@ -10,7 +10,6 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { TransactionCard } from "@/components/transactions/transaction-card";
 import {
-    AlertCircle,
     ArrowRight,
     BarChart,
     Building,
@@ -21,9 +20,11 @@ import {
     Github,
     Info,
     Merge,
+    OctagonX,
     Plus,
     Send,
     Tag,
+    TriangleAlert,
     Upload,
 } from "lucide-react";
 import Link from "next/link";
@@ -115,7 +116,7 @@ export default function GuidePage() {
                             <Card>
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2 text-amber-400">
-                                        <AlertCircle className="h-5 w-5" />
+                                        <TriangleAlert className="h-5 w-5" />
                                         Warnings
                                     </CardTitle>
                                 </CardHeader>
@@ -132,7 +133,7 @@ export default function GuidePage() {
                             <Card>
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2 text-red-400">
-                                        <AlertCircle className="h-5 w-5" />
+                                        <OctagonX className="h-5 w-5" />
                                         Errors
                                     </CardTitle>
                                 </CardHeader>
@@ -350,12 +351,12 @@ export default function GuidePage() {
                                         <FilterBadge
                                             field="Participant"
                                             operator="includes"
-                                            value="REWE"
+                                            value="rewe"
                                         />
                                         <FilterBadge
                                             field="Purpose"
                                             operator="contains"
-                                            value="Invoice"
+                                            value="invoice"
                                         />
                                     </div>
                                 </CardContent>
@@ -406,7 +407,7 @@ export default function GuidePage() {
                                             <FilterBadge
                                                 field="Participant"
                                                 operator="includes"
-                                                value="REWE"
+                                                value="rewe"
                                             />
                                             <FilterBadge
                                                 field="Amount"
@@ -457,12 +458,12 @@ export default function GuidePage() {
                                             <FilterBadge
                                                 field="Participant"
                                                 operator="includes"
-                                                value="Musterfirma"
+                                                value="musterfirma"
                                             />
                                             <FilterBadge
                                                 field="Purpose"
                                                 operator="contains"
-                                                value="Salary"
+                                                value="salary"
                                             />
                                         </div>
                                         <div className="pt-2">
