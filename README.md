@@ -1,20 +1,23 @@
-# Bank Transaction Analyzer
+# Spending Insights
 
-A tool for analyzing and categorizing bank transactions from CSV files. Built with Next.js, this application runs entirely in your browser - no data is sent to any server.
+Understand your spending at a glance. Analyze your bank transactions locally and securely in your browser. Import CSV files, set up smart rules and instantly see where your money goes.
 
 ## Features
 
-- **CSV Import**: Load bank transaction files directly in your browser
-- **Categorization Rules**: Create rules to automatically categorize transactions
-- **Analytics**: View spending breakdowns with charts and statistics
-- **Local Processing**: All data stays in your browser
+- **Free & Open Access**: Completely free to use forever, no account registration required
+- **Transaction Management**: Import, view, and manage transactions from multiple bank accounts
+- **Smart Categorization**: Create custom rules for precise transaction tagging with 15 predefined categories
+- **Analytics & Insights**: Interactive charts and visualizations to understand your spending patterns
+- **Advanced Search & Filtering**: Find transactions with powerful filters by date, amount, merchant, or description
+- **Backup & Sharing**: Export your data and rules, or import from backup files
+- **Complete Privacy**: All processing happens locally in your browser - no servers, no uploads
 
 ## Getting Started
 
 ```bash
 # Clone repository
 git clone <repository-url>
-cd bank-history
+cd spending-insights
 
 # Install dependencies
 pnpm install
@@ -80,9 +83,11 @@ If your bank isn't supported, you can use the "Notify Developer" option when upl
 - Transportation
 - Utilities
 
+**Missing a category?** Please open an issue to request additional categories. If there's enough demand, I might add the option to create custom categories.
+
 ## Technology Stack
 
-- **Framework**: Next.js 14 with App Router
+- **Framework**: Next.js 15 with App Router
 - **UI**: Tailwind CSS + shadcn/ui
 - **Language**: TypeScript
 - **Storage**: LocalStorage for rules and data
