@@ -13,6 +13,8 @@ import { Ing } from "@/lib/data-injestion/formats/ing";
 import { StandardFormat1 } from "@/lib/data-injestion/formats/standard-format-1";
 import { StandardFormat2 } from "@/lib/data-injestion/formats/standard-format-2";
 import { Sparkasse } from "@/lib/data-injestion/formats/sparkasse";
+import { Unspecified1 } from "@/lib/data-injestion/formats/unspecified-1";
+import { Unspecified2 } from "@/lib/data-injestion/formats/unspecified-2";
 
 const MAPPING_REGISTRY = [
     Comdirect,
@@ -24,6 +26,8 @@ const MAPPING_REGISTRY = [
     StandardFormat1,
     StandardFormat2,
     StandardFormat3,
+    Unspecified1,
+    Unspecified2,
 ] as unknown as DataInjestFormat<z.ZodObject<z.ZodRawShape>>[];
 
 async function injest(files: PreparedFile[]) {
