@@ -570,7 +570,7 @@ export default function GuidePage() {
                             href="https://github.com/GideonKoenig/spending-insights"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 rounded-md bg-muted px-3 py-1.5 text-sm font-medium transition-colors hover:bg-muted/80"
+                            className="inline-flex items-center gap-2 rounded-md bg-muted px-3 py-1.5 text-sm font-medium hover:bg-muted/80"
                         >
                             <Github className="h-4 w-4" />
                             <span>spending-insights</span>

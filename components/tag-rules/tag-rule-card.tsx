@@ -26,7 +26,7 @@ export function TagRuleCard(props: {
                 <TooltipTrigger asChild>
                     <div
                         className={cn(
-                            "p-6 flex items-center gap-4 bg-card text-card-foreground rounded-md border shadow-sm cursor-help hover:bg-accent/5 transition-colors",
+                            "p-6 flex items-center gap-4 bg-card text-card-foreground rounded-md border shadow-sm cursor-help hover:bg-accent/5",
                             props.className
                         )}
                         style={props.style}
