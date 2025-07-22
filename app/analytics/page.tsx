@@ -15,6 +15,7 @@ import { useLocalStorage } from "@/lib/hooks/use-local-storage";
 import "@/lib/operations-account";
 import "@/lib/operations-transaction";
 import { handleResult } from "@/contexts/notification/utils";
+import { cn } from "@/lib/utils";
 
 const SELECTED_TAB_KEY = "bank-history-analytics-selected-tab";
 
@@ -49,13 +50,18 @@ export default function AnalyticsPage() {
 
     return (
         <ScrollArea className="h-full">
-            <div className="mx-auto max-w-7xl p-4">
+            <div
+                className={cn(
+                    "mx-auto p-4",
+                    tabStorage.value !== "compare" && "max-w-7xl"
+                )}
+            >
                 <Tabs
                     value={tabStorage.value}
                     onValueChange={tabStorage.updateValue}
                     className="w-full"
                 >
-                    <TabsList className="grid w-full grid-cols-3 max-w-md">
+                    <TabsList className="grid w-full grid-cols-3 mx-auto max-w-[78rem]">
                         <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
                         <TabsTrigger value="graphs">Graphs</TabsTrigger>
                         <TabsTrigger value="compare">Compare</TabsTrigger>

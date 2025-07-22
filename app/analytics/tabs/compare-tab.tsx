@@ -24,7 +24,7 @@ const DEFAULT_RIGHT_SETTINGS = {
 
 export function CompareTab(props: { insights: Insights; accounts: Account[] }) {
     return (
-        <div className="h-full w-full grid grid-cols-2 gap-4">
+        <div className="h-full w-full grid lg:grid-cols-2 gap-4">
             <GraphProvider
                 storageKey={COMPARE_LEFT_TYPE_KEY}
                 defaultSettings={DEFAULT_LEFT_SETTINGS}

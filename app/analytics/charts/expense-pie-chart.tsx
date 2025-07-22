@@ -86,7 +86,7 @@ export function ExpensePieChart(props: { accounts: Account[] }) {
     }
 
     return (
-        <ChartContainer config={chartConfig} className="w-full">
+        <ChartContainer config={chartConfig} className="w-full h-[500px]">
             <PieChart>
                 <ChartTooltip
                     content={({ active, payload }) => {
