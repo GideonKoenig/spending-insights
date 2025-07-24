@@ -19,10 +19,11 @@ export const metadata: Metadata = {
         type: "website",
         images: [
             {
-                url: "/icon.svg",
+                url: "/og-image.webp",
                 width: 1200,
                 height: 630,
                 alt: "Spending Insights User Guide",
+                type: "image/webp",
             },
         ],
     },
@@ -31,7 +32,7 @@ export const metadata: Metadata = {
         title: "User Guide | Spending Insights",
         description:
             "Learn how to use Spending Insights effectively with our comprehensive guide.",
-        images: ["/icon.svg"],
+        images: ["/og-image.webp"],
         creator: "@Gideon_Koenig",
     },
 };

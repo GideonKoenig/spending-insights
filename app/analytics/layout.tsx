@@ -19,10 +19,11 @@ export const metadata: Metadata = {
         type: "website",
         images: [
             {
-                url: "/icon.svg",
+                url: "/og-image.webp",
                 width: 1200,
                 height: 630,
                 alt: "Spending Insights Analytics Dashboard",
+                type: "image/webp",
             },
         ],
     },
@@ -31,7 +32,7 @@ export const metadata: Metadata = {
         title: "Analytics Dashboard | Spending Insights",
         description:
             "Analyze your spending patterns with detailed charts and insights.",
-        images: ["/icon.svg"],
+        images: ["/og-image.webp"],
         creator: "@Gideon_Koenig",
     },
 };

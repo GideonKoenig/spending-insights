@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     icons: {
         icon: [
             { url: "/icon.svg", type: "image/svg+xml" },
-            { url: "/icon.png", type: "image/png" },
+            { url: "/og-image.webp", type: "image/webp" },
         ],
         shortcut: "/favicon.ico",
         apple: "/icon.png",
@@ -54,10 +54,11 @@ export const metadata: Metadata = {
         siteName: "Spending Insights",
         images: [
             {
-                url: "/icon.png",
+                url: "/og-image.webp",
                 width: 1200,
                 height: 630,
                 alt: "Spending Insights - Private Bank Transaction Analysis",
+                type: "image/webp",
             },
         ],
         locale: "en_DE",
@@ -68,7 +69,7 @@ export const metadata: Metadata = {
         title: "Spending Insights - Analyze Bank Transactions Privately",
         description:
             "Analyze bank transactions privately in your browser. Free, secure, and no account required. Categorize spending, and get insights into your financial habits.",
-        images: ["/icon.png"],
+        images: ["/og-image.webp"],
         creator: "@Gideon_Koenig",
     },
 };
