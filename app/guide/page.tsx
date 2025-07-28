@@ -183,6 +183,7 @@ export default function GuidePage() {
                                     </p>
                                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                                         {[
+                                            "Arvest",
                                             "Comdirect",
                                             "Commerzbank",
                                             "Consors",

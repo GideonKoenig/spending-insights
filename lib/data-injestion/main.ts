@@ -15,8 +15,10 @@ import { StandardFormat2 } from "@/lib/data-injestion/formats/standard-format-2"
 import { Sparkasse } from "@/lib/data-injestion/formats/sparkasse";
 import { Unspecified1 } from "@/lib/data-injestion/formats/unspecified-1";
 import { Unspecified2 } from "@/lib/data-injestion/formats/unspecified-2";
+import { Arvest } from "@/lib/data-injestion/formats/arvest";
 
 const MAPPING_REGISTRY = [
+    Arvest,
     Comdirect,
     Commerzbank,
     Consors,
