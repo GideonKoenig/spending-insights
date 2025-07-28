@@ -22,7 +22,7 @@ export async function notifyDeveloperAboutUnknownCsvFormat(
     const msg = {
         to: "gideon.koenig@online.de",
         from: process.env.SENDGRID_FROM_EMAIL!,
-        subject: "[SPENDING INSIGHTS] Unknown CSV Format Detected",
+        subject: "[SPENDING INSIGHTS] New format detected",
         html: `
             <h2>Unknown CSV Format Detected</h2>
             <p><strong>Date/Time:</strong> ${timestamp}</p>
