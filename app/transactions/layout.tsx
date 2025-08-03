@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
     title: "Transaction List | Spending Insights",
+    alternates: {
+        canonical: "https://spendinginsights.app/transactions",
+    },
     description:
         "View and manage all your financial transactions. Filter, sort, and categorize your income and expenses with advanced search capabilities and manual categorization rules.",
     keywords: [

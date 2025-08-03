@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
     title: "Analytics Dashboard | Spending Insights",
+    alternates: {
+        canonical: "https://spendinginsights.app/analytics",
+    },
     description:
         "Analyze your spending patterns with detailed charts and insights. View expense breakdowns, balance trends, and category distributions to understand your financial habits.",
     keywords: [

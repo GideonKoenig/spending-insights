@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
     title: "User Guide | Spending Insights",
+    alternates: {
+        canonical: "https://spendinginsights.app/guide",
+    },
     description:
         "Learn how to use Spending Insights effectively. Step-by-step guide for importing transactions, setting up manual categorization rules, and analyzing your spending patterns.",
     keywords: [

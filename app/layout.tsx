@@ -46,6 +46,9 @@ export const metadata: Metadata = {
         apple: "/icon.png",
     },
     metadataBase: new URL("https://spendinginsights.app"),
+    alternates: {
+        canonical: "https://spendinginsights.app",
+    },
     openGraph: {
         title: "Spending Insights - Analyze Bank Transactions Privately",
         description:

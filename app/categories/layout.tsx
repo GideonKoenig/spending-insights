@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
     title: "Category Rules | Spending Insights",
+    alternates: {
+        canonical: "https://spendinginsights.app/categories",
+    },
     description:
         "Create and manage manual categorization rules for your transactions. Set up custom tags and categories to organize your financial data with precision and control.",
     keywords: [
