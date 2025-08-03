@@ -89,7 +89,9 @@ export function PreparedFileItem(props: {
                                     CSV format not recognized
                                 </p>
                                 <p className="text-xs text-foreground/80 mt-1">
-                                    {`This file format is not yet supported. You can select "Notify Developer" in the action dropdown to send the file structure (headers only) so it can be added as an option in the future. You'll need to provide the bank name when using this option.`}
+                                    {
+                                        'This file format is not yet supported. You can select "Notify Developer" to send the file structure and anonymized sample data so it can be added as an option in the future. Please provide the bank name as it helps greatly with adding the format.'
+                                    }
                                 </p>
                             </div>
                         </TooltipContent>

@@ -252,9 +252,9 @@ export default function GuidePage() {
                                                 Notify Developer
                                             </h4>
                                             <p className="text-sm text-muted-foreground">
-                                                If your format isn&apos;t
-                                                supported, sends file headers
-                                                (not data) to the developer.
+                                                {
+                                                    "If your format isn't supported, sends file structure and strongly anonymized sample data to the developer."
+                                                }
                                             </p>
                                         </div>
                                     </div>

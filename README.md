@@ -63,7 +63,7 @@ The application automatically detects and imports CSV files from various German 
 - BIC codes are frequently missing across formats
 - Some formats have missing participant names or IBAN information
 
-If your bank isn't supported, you can use the "Notify Developer" option when uploading files to request format support.
+If your bank isn't supported, you can use the "Notify Developer" option when uploading files to request format support. This sends anonymized sample data to help implement your format faster.
 
 ## Available Categories
 

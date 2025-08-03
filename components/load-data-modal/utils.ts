@@ -5,6 +5,7 @@ import { PreparedFile } from "@/lib/data-injestion/types";
 import { Dispatch, SetStateAction } from "react";
 import { CsvParser } from "@/lib/csv-parser/parser";
 import { notifyDeveloperAboutUnknownCsvFormat } from "@/lib/server-actions";
+import { anonymizeCsvSample } from "@/lib/notify-developer";
 import { usePlausible } from "next-plausible";
 import { PlausibleEvents } from "@/lib/plausible-events";
 
@@ -104,19 +105,22 @@ export function createLoadData(dependencies: LoadDataDependencies) {
 
         for (const preparedFile of dependencies.files) {
             if (preparedFile.action === "notify-developer") {
+                const csvContent = await preparedFile.file.text();
+                const anonymizedSampleData = anonymizeCsvSample(csvContent);
                 await notifyDeveloperAboutUnknownCsvFormat(
                     preparedFile.headers,
+                    anonymizedSampleData,
                     preparedFile.bankName
                 );
                 dependencies.plausible("notify-developer");
                 dependencies.notificationContext.addDebug(
                     "Notify Developer",
-                    `CSV headers sent to developer for file: ${
+                    `CSV structure and anonymized sample data sent to developer for file: ${
                         preparedFile.fileName
                     }${
                         preparedFile.bankName
                             ? ` (Bank: ${preparedFile.bankName})`
-                            : ""
+                            : " - Please consider providing bank name for better support"
                     }`
                 );
                 continue;

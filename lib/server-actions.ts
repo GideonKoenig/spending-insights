@@ -2,9 +2,11 @@
 
 import sgMail from "@sendgrid/mail";
 import { tryCatchAsync } from "@/lib/utils";
+import { formatAnonymizedDataAsHtml } from "@/lib/notify-developer";
 
 export async function notifyDeveloperAboutUnknownCsvFormat(
     headers: string[],
+    anonymizedSampleData: string[][],
     bankName?: string
 ) {
     const timestamp = new Date().toLocaleString("de-DE", {
@@ -16,6 +18,11 @@ export async function notifyDeveloperAboutUnknownCsvFormat(
         minute: "2-digit",
         second: "2-digit",
     });
+
+    const dataTableHtml = formatAnonymizedDataAsHtml(
+        headers,
+        anonymizedSampleData
+    );
 
     sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
@@ -31,6 +38,8 @@ export async function notifyDeveloperAboutUnknownCsvFormat(
             <ul>
                 ${headers.map((header) => `<li>${header}</li>`).join("")}
             </ul>
+            <p><strong>Sample Data (Anonymized):</strong></p>
+            ${dataTableHtml}
             <hr>
             <p><em>This is an automated notification from your spending insights application.</em></p>
         `,
@@ -50,5 +59,6 @@ export async function notifyDeveloperAboutUnknownCsvFormat(
         console.log("Date/Time:", timestamp);
         console.log("Bank:", bankName || "Not specified");
         console.log("Headers:", headers);
+        console.log("Sample Data (anonymized):", anonymizedSampleData);
     }
 }
