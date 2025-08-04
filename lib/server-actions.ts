@@ -34,11 +34,7 @@ export async function notifyDeveloperAboutUnknownCsvFormat(
             <h2>Unknown CSV Format Detected</h2>
             <p><strong>Date/Time:</strong> ${timestamp}</p>
             <p><strong>Bank:</strong> ${bankName || "<not specified>"}</p>
-            <p><strong>Headers:</strong></p>
-            <ul>
-                ${headers.map((header) => `<li>${header}</li>`).join("")}
-            </ul>
-            <p><strong>Sample Data (Anonymized):</strong></p>
+            <p><strong>CSV Structure with Sample Data (Anonymized):</strong></p>
             ${dataTableHtml}
             <hr>
             <p><em>This is an automated notification from your spending insights application.</em></p>
@@ -59,6 +55,11 @@ export async function notifyDeveloperAboutUnknownCsvFormat(
         console.log("Date/Time:", timestamp);
         console.log("Bank:", bankName || "Not specified");
         console.log("Headers:", headers);
-        console.log("Sample Data (anonymized):", anonymizedSampleData);
+        console.log(
+            "Sample Data (anonymized):",
+            anonymizedSampleData.length > 0
+                ? anonymizedSampleData
+                : "No sample data available"
+        );
     }
 }

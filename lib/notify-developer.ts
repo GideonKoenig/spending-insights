@@ -29,6 +29,28 @@ export function formatAnonymizedDataAsHtml(
     headers: string[],
     anonymizedRows: string[][]
 ) {
+    const hasData = anonymizedRows.length > 0;
+    const tableRows = hasData
+        ? anonymizedRows
+              .map(
+                  (row) =>
+                      `<tr>${row
+                          .map(
+                              (cell) =>
+                                  `<td style="padding: 8px;">${
+                                      cell || "<empty>"
+                                  }</td>`
+                          )
+                          .join("")}</tr>`
+              )
+              .join("")
+        : `<tr>${headers
+              .map(
+                  () =>
+                      `<td style="padding: 8px; color: #888; font-style: italic;">no data</td>`
+              )
+              .join("")}</tr>`;
+
     return `
         <table border="1" style="border-collapse: collapse; margin: 10px 0;">
             <thead>
@@ -42,21 +64,13 @@ export function formatAnonymizedDataAsHtml(
                 </tr>
             </thead>
             <tbody>
-                ${anonymizedRows
-                    .map(
-                        (row) =>
-                            `<tr>${row
-                                .map(
-                                    (cell) =>
-                                        `<td style="padding: 8px;">${
-                                            cell || "<empty>"
-                                        }</td>`
-                                )
-                                .join("")}</tr>`
-                    )
-                    .join("")}
+                ${tableRows}
             </tbody>
         </table>
-        <p><em>Note: Data has been anonymized using pattern preservation (A=uppercase, a=lowercase, 0=numbers, symbols preserved)</em></p>
+        <p><em>Note: ${
+            hasData
+                ? "Data has been anonymized using pattern preservation (A=uppercase, a=lowercase, 0=numbers, symbols preserved)"
+                : "No sample data available - only headers shown"
+        }</em></p>
     `;
 }
