@@ -1,5 +1,5 @@
 import { NotificationContextType } from "@/contexts/notification/provider";
-import { hashTransaction } from "@/lib/data-injestion/utils";
+import { hashTransactions } from "@/lib/data-injestion/utils";
 import { type Account, AccountSchema } from "@/lib/types";
 import { tryCatch } from "@/lib/utils";
 import SuperJSON from "superjson";
@@ -128,7 +128,7 @@ export function createMergeAccounts(dependencies: AccountDependencies) {
             targetAccount.transactions.map((t) => t.hash)
         );
 
-        const sourceTransactions = hashTransaction(account.transactions, name);
+        const sourceTransactions = hashTransactions(account.transactions, name);
         const newTransactions = sourceTransactions.filter(
             (t) => !existingHashes.has(t.hash)
         );

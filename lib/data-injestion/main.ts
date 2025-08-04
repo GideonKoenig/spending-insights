@@ -2,7 +2,7 @@ import { type Result, newSuccess } from "@/lib/utils";
 import { StandardFormat3 } from "@/lib/data-injestion/formats/standard-format-3";
 import { DataInjestFormat, PreparedFile } from "@/lib/data-injestion/types";
 import { CsvParser } from "@/lib/csv-parser/parser";
-import { hashTransaction, findFormat } from "@/lib/data-injestion/utils";
+import { hashTransactions, findFormat } from "@/lib/data-injestion/utils";
 import { Account } from "@/lib/types";
 import z from "zod";
 import { Comdirect } from "@/lib/data-injestion/formats/comdirect";
@@ -17,6 +17,7 @@ import { Unspecified1 } from "@/lib/data-injestion/formats/unspecified-1";
 import { Unspecified2 } from "@/lib/data-injestion/formats/unspecified-2";
 import { Arvest } from "@/lib/data-injestion/formats/arvest";
 import { Unspecified3 } from "@/lib/data-injestion/formats/unspecified-3";
+import { Mint } from "@/lib/data-injestion/formats/mint";
 
 const MAPPING_REGISTRY = [
     Arvest,
@@ -25,6 +26,7 @@ const MAPPING_REGISTRY = [
     Consors,
     Dkb,
     Ing,
+    Mint,
     Sparkasse,
     StandardFormat1,
     StandardFormat2,
@@ -58,7 +60,7 @@ async function injest(files: PreparedFile[]) {
         }
         const transactions = format.value.map(data.value);
         const accountName = file.name;
-        const hashedTransactions = hashTransaction(transactions, accountName);
+        const hashedTransactions = hashTransactions(transactions, accountName);
         const bankName = format.value.getBankName(data.value);
 
         results.push(

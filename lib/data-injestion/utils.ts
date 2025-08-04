@@ -55,24 +55,31 @@ export function findFormat(
 }
 
 export function hashTransaction(
+    transaction: Omit<Transaction, "hash">,
+    accountName: string
+) {
+    return createHash("sha256")
+        .update(
+            JSON.stringify({
+                accountName,
+                bookingDate: transaction.bookingDate,
+                amount: transaction.amount,
+                participantName: transaction.participantName,
+                purpose: transaction.purpose,
+                transactionType: transaction.transactionType,
+            })
+        )
+        .digest("hex")
+        .substring(0, 16);
+}
+
+export function hashTransactions(
     transactions: Omit<Transaction, "hash">[],
     accountName: string
 ) {
     return transactions.map((transaction) => ({
         ...transaction,
-        hash: createHash("sha256")
-            .update(
-                JSON.stringify({
-                    accountName,
-                    bookingDate: transaction.bookingDate,
-                    amount: transaction.amount,
-                    participantName: transaction.participantName,
-                    purpose: transaction.purpose,
-                    transactionType: transaction.transactionType,
-                })
-            )
-            .digest("hex")
-            .substring(0, 16),
+        hash: hashTransaction(transaction, accountName),
     }));
 }
 
