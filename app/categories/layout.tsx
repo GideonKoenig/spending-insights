@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SmallScreenGuard } from "@/components/small-screen-guard";
 
 export const metadata: Metadata = {
     title: "Category Rules | Spending Insights",
@@ -41,5 +42,12 @@ export const metadata: Metadata = {
 };
 
 export default function CategoriesLayout(props: { children: React.ReactNode }) {
-    return props.children;
+    return (
+        <>
+            <div className="md:hidden h-full">
+                <SmallScreenGuard />
+            </div>
+            <div className="hidden md:block h-full">{props.children}</div>
+        </>
+    );
 }

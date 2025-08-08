@@ -76,23 +76,46 @@ export function NavBar() {
 
     return (
         <nav className="border-b min-h-12 px-4 flex items-center justify-between bg-background">
-            <div className="flex items-center gap-4">
-                {links.map((link) => (
-                    <Link
-                        key={link.href}
-                        href={link.href}
-                        className={cn(
-                            "text-sm font-medium hover:text-primary p-2",
-                            pathname === link.href
-                                ? "text-primary"
-                                : "text-muted-foreground"
-                        )}
-                    >
-                        {link.label}
-                    </Link>
-                ))}
+            <div className="flex items-center gap-2 sm:gap-4">
+                {/* Mobile (sm and below): only Home + Guide */}
+                <div className="flex sm:hidden items-center gap-2">
+                    {["/", "/guide"].map((href) => {
+                        const link = links.find((l) => l.href === href)!;
+                        return (
+                            <Link
+                                key={link.href}
+                                href={link.href}
+                                className={cn(
+                                    "text-sm font-medium hover:text-primary p-2",
+                                    pathname === link.href
+                                        ? "text-primary"
+                                        : "text-muted-foreground"
+                                )}
+                            >
+                                {link.label}
+                            </Link>
+                        );
+                    })}
+                </div>
+                {/* md and up: full nav */}
+                <div className="hidden sm:flex items-center gap-4">
+                    {links.map((link) => (
+                        <Link
+                            key={link.href}
+                            href={link.href}
+                            className={cn(
+                                "text-sm font-medium hover:text-primary p-2",
+                                pathname === link.href
+                                    ? "text-primary"
+                                    : "text-muted-foreground"
+                            )}
+                        >
+                            {link.label}
+                        </Link>
+                    ))}
+                </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="hidden sm:flex items-center gap-2">
                 {accounts.loading ? (
                     <p className="text-muted-foreground text-sm">Loading...</p>
                 ) : (
@@ -152,9 +175,9 @@ export function NavBar() {
                         >
                             <PopoverTrigger asChild>
                                 <Button
+                                    className="hidden sm:inline-flex rounded-sm"
                                     variant="outline"
                                     size="sm"
-                                    className="rounded-sm"
                                 >
                                     Actions
                                 </Button>
@@ -242,8 +265,7 @@ export function NavBar() {
                         </Popover>
                     </>
                 )}
-
-                <div className="flex items-center gap-1">
+                <div className="hidden sm:flex items-center gap-1">
                     <NotificationButton
                         notifications={notifications.warnings}
                         icon={<TriangleAlert />}
@@ -316,6 +338,22 @@ export function NavBar() {
                 isOpen={isLoadDataOpen}
                 closeDialog={() => setIsLoadDataOpen(false)}
             />
+
+            <Link
+                href="https://github.com/GideonKoenig/spending-insights"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block md:hidden"
+            >
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-muted-foreground hover:text-foreground"
+                    aria-label="View source code on GitHub"
+                >
+                    <Github className="h-4 w-4" />
+                </Button>
+            </Link>
         </nav>
     );
 }
