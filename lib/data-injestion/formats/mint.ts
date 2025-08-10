@@ -24,7 +24,7 @@ function map(elements: z.infer<typeof MintSchema>[]) {
             participantIban: "",
             participantBic: "",
             transactionType: amount >= 0 ? "credit" : "debit",
-            purpose: `${element["Original Description"]} (${element["Status"]})`,
+            purpose: `${element["Original Description"]} (${element["Status"]} | ${element["Category"]})`,
             amount: amount,
             currency: "USD",
             balanceAfterTransaction: 0,
