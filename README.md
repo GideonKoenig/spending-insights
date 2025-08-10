@@ -46,7 +46,7 @@ Rules let you automatically categorize transactions based on criteria:
 
 ## Supported Bank Formats
 
-The application automatically detects and imports CSV files from various German banks:
+The application automatically detects and imports CSV files from various banks:
 
 - **Standard Format 3** (Recommended)
 - **Standard Format 1**
@@ -57,7 +57,8 @@ The application automatically detects and imports CSV files from various German 
 - **Commerzbank**
 - **ING**
 - **Comdirect**
-- **Mint** (Personal finance app exports)
+- **Mint**
+- **Wespac**
 
 ### Common Limitations
 - Most formats don't provide actual account balance information, so running balances are calculated starting from 0

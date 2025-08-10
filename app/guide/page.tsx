@@ -189,6 +189,7 @@ export default function GuidePage() {
                                             "Consors",
                                             "DKB",
                                             "ING",
+                                            "Wespac",
                                             "Mint",
                                             "Sparkasse",
                                             "Volksbanken / Raiffeisenbanken",
