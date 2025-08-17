@@ -9,7 +9,8 @@ import { Comdirect } from "@/lib/data-injestion/formats/comdirect";
 import { Commerzbank } from "@/lib/data-injestion/formats/commerzbank";
 import { Consors } from "@/lib/data-injestion/formats/consors";
 import { Dkb } from "@/lib/data-injestion/formats/dkb";
-import { Ing } from "@/lib/data-injestion/formats/ing";
+import { Ing } from "@/lib/data-injestion/formats/ing-1";
+import { Ing2 } from "@/lib/data-injestion/formats/ing-2";
 import { StandardFormat1 } from "@/lib/data-injestion/formats/standard-format-1";
 import { StandardFormat2 } from "@/lib/data-injestion/formats/standard-format-2";
 import { Sparkasse } from "@/lib/data-injestion/formats/sparkasse";
@@ -27,6 +28,7 @@ const MAPPING_REGISTRY = [
     Consors,
     Dkb,
     Ing,
+    Ing2,
     Mint,
     Wespac,
     Sparkasse,
