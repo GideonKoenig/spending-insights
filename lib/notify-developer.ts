@@ -1,3 +1,5 @@
+import { parseLine } from "@/lib/csv-parser/utils";
+
 export function anonymizeText(text: string) {
     return text.replace(/./g, (char) => {
         if (char >= "A" && char <= "Z") return "A";
@@ -14,9 +16,7 @@ export function anonymizeRow(row: string[]) {
 export function extractSampleRows(csvContent: string, maxRows: number = 5) {
     const lines = csvContent.trim().split("\n");
     const dataLines = lines.slice(1, maxRows + 1);
-    return dataLines.map((line) =>
-        line.split(";").map((field) => field.trim().replace(/^"(.*)"$/, "$1"))
-    );
+    return dataLines.map((line) => parseLine(line));
 }
 
 export function anonymizeCsvSample(csvContent: string, maxRows: number = 5) {
