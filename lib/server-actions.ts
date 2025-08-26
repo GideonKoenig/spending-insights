@@ -36,8 +36,6 @@ export async function notifyDeveloperAboutUnknownCsvFormat(
             <p><strong>Bank:</strong> ${bankName || "<not specified>"}</p>
             <p><strong>CSV Structure with Sample Data (Anonymized):</strong></p>
             ${dataTableHtml}
-            <hr>
-            <p><em>This is an automated notification from your spending insights application.</em></p>
         `,
     };
 
