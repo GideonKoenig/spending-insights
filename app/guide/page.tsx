@@ -184,14 +184,15 @@ export default function GuidePage() {
                                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                                         {[
                                             "Arvest",
+                                            "Capital One",
                                             "Comdirect",
                                             "Commerzbank",
                                             "Consors",
                                             "DKB",
                                             "ING",
-                                            "Wespac",
                                             "Mint",
                                             "Sparkasse",
+                                            "Wespac",
                                             "Volksbanken / Raiffeisenbanken",
                                             "Postbank",
                                             "Targobank",

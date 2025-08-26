@@ -59,6 +59,8 @@ The application automatically detects and imports CSV files from various banks:
 - **Comdirect**
 - **Mint**
 - **Wespac**
+- **Arvest**
+- **Capital One**
 
 ### Common Limitations
 - Most formats don't provide actual account balance information, so running balances are calculated starting from 0
