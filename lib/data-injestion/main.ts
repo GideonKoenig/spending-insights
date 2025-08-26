@@ -21,6 +21,7 @@ import { Unspecified3 } from "@/lib/data-injestion/formats/unspecified-3";
 import { Unspecified4 } from "@/lib/data-injestion/formats/unspecified-4";
 import { Mint } from "@/lib/data-injestion/formats/mint";
 import { Wespac } from "@/lib/data-injestion/formats/wespac";
+import { CapitalOne } from "@/lib/data-injestion/formats/capital-one";
 
 const MAPPING_REGISTRY = [
     Arvest,
@@ -32,6 +33,7 @@ const MAPPING_REGISTRY = [
     Ing2,
     Mint,
     Wespac,
+    CapitalOne,
     Sparkasse,
     StandardFormat1,
     StandardFormat2,
