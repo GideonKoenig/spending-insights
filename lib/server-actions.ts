@@ -2,7 +2,10 @@
 
 import sgMail from "@sendgrid/mail";
 import { tryCatchAsync } from "@/lib/utils";
-import { formatAnonymizedDataAsHtml } from "@/lib/notify-developer";
+import {
+    formatAnonymizedDataAsHtml,
+    formatAnonymizedDataAsCsv,
+} from "@/lib/notify-developer";
 
 export async function notifyDeveloperAboutUnknownCsvFormat(
     headers: string[],
@@ -23,6 +26,7 @@ export async function notifyDeveloperAboutUnknownCsvFormat(
         headers,
         anonymizedSampleData
     );
+    const csvText = formatAnonymizedDataAsCsv(headers, anonymizedSampleData);
 
     sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
@@ -36,6 +40,11 @@ export async function notifyDeveloperAboutUnknownCsvFormat(
             <p><strong>Bank:</strong> ${bankName || "<not specified>"}</p>
             <p><strong>CSV Structure with Sample Data (Anonymized):</strong></p>
             ${dataTableHtml}
+            <h3>Native CSV format</h3>
+            <pre style="white-space: pre; background: #0b1220; color: #e5e7eb; padding: 12px; border-radius: 8px; overflow-x: auto;">${csvText
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")}</pre>
         `,
     };
 

@@ -74,3 +74,20 @@ export function formatAnonymizedDataAsHtml(
         }</em></p>
     `;
 }
+
+export function formatAnonymizedDataAsCsv(
+    headers: string[],
+    anonymizedRows: string[][]
+) {
+    const escape = (value: string) => {
+        const needsQuotes = /[",;\n]/.test(value);
+        const escaped = value.replace(/"/g, '""');
+        return needsQuotes ? `"${escaped}"` : escaped;
+    };
+
+    const headerLine = headers.map(escape).join(",");
+    const dataLines = anonymizedRows.map((row) =>
+        row.map((c) => escape(c || "")).join(",")
+    );
+    return [headerLine, ...dataLines].join("\n");
+}
