@@ -185,6 +185,7 @@ export default function GuidePage() {
                                         {[
                                             "Arvest",
                                             "Capital One",
+                                            "Chase",
                                             "Comdirect",
                                             "Commerzbank",
                                             "Consors",

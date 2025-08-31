@@ -8,6 +8,7 @@ Diese Anleitung beschreibt den kompakten, verbindlichen Ablauf von der Analyse e
 
 - **Header exakt aufnehmen** (Groß-/Kleinschreibung, Leerzeichen, Sonderzeichen). Die Erkennung vergleicht Keys und Anzahl 1:1.
 - **Datumsfelder** identifizieren (Buchungs-/Valutadatum) und Format prüfen:
+  - Zunächst prüfen: Reicht `new Date(dateStr)` zuverlässig? Manuelle Parser nur, wenn erforderlich.
   - dd.mm.yyyy → `parseDate`
   - dd/mm/yyyy oder mm/dd/yyyy → lokale Parser-Funktion im Format (Beispiel `wespac.ts`)
 - **Betrag**: eine Spalte mit Vorzeichen oder getrennte `Credit/Debit` → Nettobetrag: `amount = credit - debit`
@@ -60,7 +61,7 @@ Erkennung verlangt identische Key-Menge und -Anzahl.
 
 - Für jedes Element `Omit<Transaction, "hash">` erzeugen.
 - Betrag berechnen (`parseAmount`; bei Credit/Debit: `credit - debit`).
-- Datumsfelder parsen (`parseDate` oder lokale Slash-Variante).
+- Datumsfelder parsen (`new Date(dateStr)` bevorzugen; andernfalls `parseDate` oder lokaler Parser im Format).
 - Gegenpartei, Typ, Purpose ableiten; Währung setzen/übernehmen.
 - Saldo: vorhanden → übernehmen; sonst nach Sortierung laufend berechnen.
 
@@ -175,5 +176,21 @@ export const MyBank: DataInjestFormat<typeof MyBankSchema> = {
 - Alias-Imports (`@/*`) verwenden.
 - Keine erklärenden Kommentare in Code einfügen; klare, direkte Implementierung.
 - Zusatzinfos (Kategorien/Status) bis zur nativen Unterstützung im `purpose` erhalten.
-- Für neue Datumsformate lokale Parser nutzen; `parseDate` nicht global ändern.
+- Datumsparsing: `new Date(dateStr)` zuerst prüfen; nur bei Bedarf lokale Parser nutzen; `parseDate` nicht global ändern.
 - Kurztest durchführen: kleine Beispiel-CSV parsen, Erkennung, Mapping, Saldo prüfen.
+
+---
+
+## 12) Dokumentation aktualisieren
+
+- README: Unter "Supported Bank Formats" neue Bank ergänzen (falls das Format eine klar benannte Bank repräsentiert).
+- Guide-Seite: Liste der unterstützten Formate aktualisieren.
+- Nur echte Banknamen hinzufügen (nicht für generische/unspecified Formate). Einheitliche `displayName`-Wortwahl verwenden.
+
+---
+
+## 13) Anonymisierte Beispielzeile im Format hinterlegen
+
+- Die vom Benachrichtigungssystem gelieferte anonymisierte Beispielzeile samt Header als kommentierten Block am Dateianfang hinterlegen.
+- Zweck: spätere Wartung, schnelle Zuordnung und Vergleich bei Varianten.
+- Keine sensiblen Daten; nur das bereits anonymisierte Beispiel verwenden.

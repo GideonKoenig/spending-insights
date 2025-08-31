@@ -61,6 +61,7 @@ The application automatically detects and imports CSV files from various banks:
 - **Wespac**
 - **Arvest**
 - **Capital One**
+- **Chase**
 
 ### Common Limitations
 - Most formats don't provide actual account balance information, so running balances are calculated starting from 0

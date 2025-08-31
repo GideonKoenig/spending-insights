@@ -1,3 +1,7 @@
+// Sample (anonymized) header and row for reference:
+// Headers: ["Details","Posting Date","Description","Amount","Type","Balance","Check or Slip #", "<trailing empty>"]
+// Row: ["AAAAA","00/00/0000","AAA AAA AAAAA ...","-00.00","AAAA_AAAAA","","",""]
+
 import { DataInjestFormat } from "@/lib/data-injestion/types";
 import { parseAmount } from "@/lib/data-injestion/utils";
 import { Transaction } from "@/lib/types";
