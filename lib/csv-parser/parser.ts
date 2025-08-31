@@ -4,7 +4,12 @@ import { createRecord, parseLine } from "@/lib/csv-parser/utils";
 
 function getHeaders(text: string) {
     const firstLine = text.split("\n")[0];
-    const headers = parseLine(firstLine);
+    let headers = parseLine(firstLine);
+
+    // drop trailing empty header cells - some formats seem to have extra delimiters as the end
+    while (headers.length > 0 && headers[headers.length - 1] === "") {
+        headers = headers.slice(0, -1);
+    }
 
     if (headers.length === 0) {
         return newError("The CSV file is missing headers.");
@@ -35,7 +40,8 @@ function parse<T extends z.ZodObject<z.ZodRawShape>>(
     const headers = Object.keys(schema.shape);
     const dataLines = lines.slice(1);
     const results = dataLines.map((line, index) => {
-        const values = parseLine(line);
+        const values = parseLine(line).slice(0, headers.length);
+
         if (values.length !== headers.length) {
             return newError(
                 `Row ${index + 2}: Expected ${headers.length} values but got ${

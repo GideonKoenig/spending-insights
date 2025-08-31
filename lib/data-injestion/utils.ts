@@ -102,3 +102,48 @@ export function calculateIban(konto: string, blz: string): string {
 
     return `DE${check}${bban}`;
 }
+
+function roundToCents(value: number): number {
+    return Math.round(value * 100) / 100;
+}
+
+export function reconcileMissingBalances(
+    transactions: Omit<Transaction, "hash">[]
+): Omit<Transaction, "hash">[] {
+    if (transactions.length === 0) return transactions;
+
+    const sorted = [...transactions].sort(
+        (a, b) => a.bookingDate.getTime() - b.bookingDate.getTime()
+    );
+
+    const validBalanceIndex = sorted.findIndex(
+        (transaction) => transaction.balanceAfterTransaction !== 0
+    );
+
+    if (validBalanceIndex === -1) {
+        let running = 0;
+        for (const transaction of sorted) {
+            running = roundToCents(running + transaction.amount);
+            transaction.balanceAfterTransaction = running;
+        }
+        return sorted;
+    }
+
+    for (let i = validBalanceIndex + 1; i < sorted.length; i++) {
+        const prev = sorted[i - 1]!;
+        const curr = sorted[i]!;
+        curr.balanceAfterTransaction = roundToCents(
+            prev.balanceAfterTransaction + curr.amount
+        );
+    }
+
+    for (let i = validBalanceIndex - 1; i >= 0; i--) {
+        const next = sorted[i + 1]!;
+        const curr = sorted[i]!;
+        curr.balanceAfterTransaction = roundToCents(
+            next.balanceAfterTransaction - next.amount
+        );
+    }
+
+    return sorted;
+}

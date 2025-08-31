@@ -2,7 +2,11 @@ import { type Result, newSuccess } from "@/lib/utils";
 import { StandardFormat3 } from "@/lib/data-injestion/formats/standard-format-3";
 import { DataInjestFormat, PreparedFile } from "@/lib/data-injestion/types";
 import { CsvParser } from "@/lib/csv-parser/parser";
-import { hashTransactions, findFormat } from "@/lib/data-injestion/utils";
+import {
+    hashTransactions,
+    findFormat,
+    reconcileMissingBalances,
+} from "@/lib/data-injestion/utils";
 import { Account } from "@/lib/types";
 import z from "zod";
 import { Comdirect } from "@/lib/data-injestion/formats/comdirect";
@@ -22,6 +26,7 @@ import { Unspecified4 } from "@/lib/data-injestion/formats/unspecified-4";
 import { Mint } from "@/lib/data-injestion/formats/mint";
 import { Wespac } from "@/lib/data-injestion/formats/wespac";
 import { CapitalOne } from "@/lib/data-injestion/formats/capital-one";
+import { Chase } from "@/lib/data-injestion/formats/chase";
 
 const MAPPING_REGISTRY = [
     Arvest,
@@ -34,6 +39,7 @@ const MAPPING_REGISTRY = [
     Mint,
     Wespac,
     CapitalOne,
+    Chase,
     Sparkasse,
     StandardFormat1,
     StandardFormat2,
@@ -67,8 +73,12 @@ async function injest(files: PreparedFile[]) {
             continue;
         }
         const transactions = format.value.map(data.value);
+        const finalizedTransactions = reconcileMissingBalances(transactions);
         const accountName = file.name;
-        const hashedTransactions = hashTransactions(transactions, accountName);
+        const hashedTransactions = hashTransactions(
+            finalizedTransactions,
+            accountName
+        );
         const bankName = format.value.getBankName(data.value);
 
         results.push(
