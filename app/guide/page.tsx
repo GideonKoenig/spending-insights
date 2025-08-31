@@ -256,7 +256,7 @@ export default function GuidePage() {
                                             </h4>
                                             <p className="text-sm text-muted-foreground">
                                                 {
-                                                    "If your format isn't supported, sends file structure and strongly anonymized sample data to the developer."
+                                                    "If your format isn't supported, sends file structure and strongly anonymized sample data to the developer. Adding a new format may take a day or two. If you provided a bank name, you can check this Guide page later to see if it appears in the supported formats."
                                                 }
                                             </p>
                                         </div>
