@@ -27,6 +27,7 @@ import { Mint } from "@/lib/data-injestion/formats/mint";
 import { Wespac } from "@/lib/data-injestion/formats/wespac";
 import { CapitalOne } from "@/lib/data-injestion/formats/capital-one";
 import { Chase } from "@/lib/data-injestion/formats/chase";
+import { Unspecified5 } from "@/lib/data-injestion/formats/unspecified-5";
 
 const MAPPING_REGISTRY = [
     Arvest,
@@ -48,6 +49,7 @@ const MAPPING_REGISTRY = [
     Unspecified2,
     Unspecified3,
     Unspecified4,
+    Unspecified5,
 ] as unknown as DataInjestFormat<z.ZodObject<z.ZodRawShape>>[];
 
 async function injest(files: PreparedFile[]) {
