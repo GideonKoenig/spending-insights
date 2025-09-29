@@ -22,7 +22,7 @@ Interne Zielschnittstelle: `@/lib/types.Transaction` (ohne `hash` während des M
 
 ---
 
-## 2) Quelle identifizieren (Recherche)
+## 2) Quelle identifizieren (Online-Recherche, falls nötig)
 
 - Header-Sprache und typische Begriffe prüfen (de/en). 
 - Exakte Header-Strings im Web suchen (in Anführungszeichen).

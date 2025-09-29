@@ -25,6 +25,7 @@ import { Unspecified3 } from "@/lib/data-injestion/formats/unspecified-3";
 import { Unspecified4 } from "@/lib/data-injestion/formats/unspecified-4";
 import { Mint } from "@/lib/data-injestion/formats/mint";
 import { Wespac } from "@/lib/data-injestion/formats/wespac";
+import { Bnz } from "@/lib/data-injestion/formats/bnz";
 import { CapitalOne } from "@/lib/data-injestion/formats/capital-one";
 import { Chase } from "@/lib/data-injestion/formats/chase";
 import { Unspecified5 } from "@/lib/data-injestion/formats/unspecified-5";
@@ -40,6 +41,7 @@ const MAPPING_REGISTRY = [
     Ing2,
     Mint,
     Wespac,
+    Bnz,
     CapitalOne,
     Chase,
     Sparkasse,
