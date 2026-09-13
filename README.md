@@ -75,3 +75,7 @@ import to an existing booking. A booking uses one date for all its postings.
 Create a token in Agent access. Connect a Streamable HTTP MCP client to `/api/mcp`
 with `Authorization: Bearer <token>`. Tokens expire after one year and can be
 revoked. The UI and MCP share the operations in `lib/ledger/commands.ts`.
+
+The same endpoint supports MCP 2026-07-28 and legacy 2025 protocols. Clients
+select the protocol automatically according to their supported versions and
+settings. Both use the same tokens and tools, with no server-side MCP sessions.

@@ -1,11 +1,13 @@
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { McpServer, type CallToolResult } from "@modelcontextprotocol/server";
 import { commands } from "./ledger/commands";
 import { DomainError } from "./ledger/errors";
 import { z } from "zod";
-import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 
 export function createMcpServer(userId: string) {
-  const server = new McpServer({ name: "spending-insights", version: "2.0.0" });
+  const server = new McpServer(
+    { name: "spending-insights", version: "2.0.0" },
+    { capabilities: { tools: { listChanged: false } } },
+  );
   for (const [name, operation] of Object.entries(commands)) {
     const schema: z.ZodObject = operation.schema;
     server.registerTool(

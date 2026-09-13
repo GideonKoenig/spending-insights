@@ -1,24 +1,24 @@
-import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
+import { createMcpHandler } from "@modelcontextprotocol/server";
 import { authenticate, errorResponse, readJson } from "@/lib/http";
+import { DomainError } from "@/lib/ledger/errors";
 import { createMcpServer } from "@/lib/mcp";
 
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   try {
+    const origin = request.headers.get("origin");
+    const expected = new URL(process.env.BETTER_AUTH_URL ?? request.url).origin;
+    if (origin !== null && origin !== expected)
+      throw new DomainError("Invalid request origin.", 403);
     const userId = await authenticate(request);
     const body = await readJson(request);
-    const server = createMcpServer(userId);
-    const transport = new WebStandardStreamableHTTPServerTransport({
-      sessionIdGenerator: undefined,
-      enableJsonResponse: true,
+    const handler = createMcpHandler(() => createMcpServer(userId), {
+      legacy: "stateless",
+      maxSubscriptions: 0,
     });
-    await server.connect(transport);
-    try {
-      return await transport.handleRequest(request, { parsedBody: body });
-    } finally {
-      await server.close();
-    }
+    // The SDK closes each request's server when its response completes.
+    return await handler.fetch(request, { parsedBody: body });
   } catch (error) {
     return errorResponse(error);
   }
