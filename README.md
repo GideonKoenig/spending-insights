@@ -1,107 +1,77 @@
 # Spending Insights
 
-Understand your spending at a glance. Analyze your bank transactions locally and securely in your browser. Import CSV files, set up smart rules and instantly see where your money goes.
+EUR bookkeeping with PostgreSQL, a web app, and an MCP server. Bank accounts,
+investments, debts, people, and spending categories share a double-entry ledger.
+Investments track contributions and withdrawals, without market valuations.
 
-## Features
-
-- **Free & Open Access**: Completely free to use forever, no account registration required
-- **Transaction Management**: Import, view, and manage transactions from multiple bank accounts
-- **Smart Categorization**: Create custom rules for precise transaction tagging with 15 predefined categories
-- **Analytics & Insights**: Interactive charts and visualizations to understand your spending patterns
-- **Advanced Search & Filtering**: Find transactions with powerful filters by date, amount, merchant, or description
-- **Backup & Sharing**: Export your data and rules, or import from backup files
-- **Complete Privacy**: All processing happens locally in your browser - no servers, no uploads
-
-## Getting Started
+## Development
 
 ```bash
-# Clone repository
-git clone <repository-url>
-cd spending-insights
-
-# Install dependencies
 pnpm install
+cp .env.example .env.local
+```
 
-# Run development server
+Set a random `BETTER_AUTH_SECRET` of at least 32 characters and
+`ENABLE_DEV_LOGIN=true` in `.env.local`. With Docker and Docker Compose installed,
+start PostgreSQL in the background:
+
+```bash
+pnpm db:start
+```
+
+Then run:
+
+```bash
+pnpm db:migrate
+pnpm db:seed # optional fictional data for the local developer
 pnpm dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000) to start using the application.
+Open http://localhost:3000 and use the local development login. This login only
+exists in development mode, requires the explicit flag, and accepts a localhost
+origin. The `DATABASE_URL` in `.env.example` matches the container. Data is stored
+in a Docker volume. Stop PostgreSQL without deleting data:
 
-### Usage
+```bash
+pnpm db:stop
+```
 
-1. **Import Transactions**: Select your bank CSV file on the Transactions page
-2. **Create Rules**: Navigate to Categories to create rules for automatic categorization
-3. **Analyze**: View your categorized transactions and spending analytics
+```bash
+pnpm test
+pnpm typecheck
+pnpm lint
+pnpm build
+```
 
-## Creating Categorization Rules
+Tests use isolated users in the configured development database and remove them
+when finished. Keep PostgreSQL running for tests.
 
-Rules let you automatically categorize transactions based on criteria:
+## Google sign-in
 
-1. Go to the **Categories** page
-2. Select an uncategorized transaction
-3. Define matching criteria (merchant name, amount range, etc.)
-4. Assign a category (Food, Transportation, Housing, etc.)
-5. Save the rule to apply it to all matching transactions
+Set `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `BETTER_AUTH_URL`,
+`BETTER_AUTH_SECRET`, and `DATABASE_URL`. Register
+`<BETTER_AUTH_URL>/api/auth/callback/google` as the Google redirect URI.
+Production uses Google only. `pnpm start` applies pending migrations before
+starting the app.
 
-## Supported Bank Formats
+## Import and booking
 
-The application automatically detects and imports CSV files from various banks:
+Download the CSV template from Transactions. Its columns are:
 
-- **Standard Format 3** (Recommended)
-- **Standard Format 1**
-- **Standard Format 2**
-- **DKB**
-- **Sparkasse**
-- **Consors Bank**
-- **Commerzbank**
-- **ING**
-- **Comdirect**
-- **Mint**
-- **Wespac**
-- **Arvest**
-- **Capital One**
-- **Chase**
+```csv
+id,account,date,amount,currency,description,counterparty,reference
+```
 
-### Common Limitations
-- Most formats don't provide actual account balance information, so running balances are calculated starting from 0
-- BIC codes are frequently missing across formats
-- Some formats have missing participant names or IBAN information
+Use account keys, stable transaction IDs, ISO dates, decimal amounts and `EUR`.
+Positive amounts increase assets or reduce liabilities; negatives do the reverse.
+Identical IDs within an account are skipped; conflicting data rejects the import.
 
-If your bank isn't supported, you can use the "Notify Developer" option when uploading files to request format support. This sends anonymized sample data to help implement your format faster.
+Imports remain unbooked until manually booked or processed with rules. Reports
+exclude unbooked imports. Select both transfer sides together, or link a later
+import to an existing booking. A booking uses one date for all its postings.
 
-## Available Categories
+## Agent access
 
-- Advance Money
-- Entertainment
-- Food
-- Housing
-- Household Items
-- Household Supplies
-- Income
-- Insurance
-- Investments
-- Other
-- Personal Care
-- Professional
-- Reimbursements
-- Transportation
-- Utilities
-
-**Missing a category?** Please open an issue to request additional categories. If there's enough demand, I might add the option to create custom categories.
-
-## Technology Stack
-
-- **Framework**: Next.js 15 with App Router
-- **UI**: Tailwind CSS + shadcn/ui
-- **Language**: TypeScript
-- **Storage**: LocalStorage for rules and data
-
-## Privacy
-
-- All processing happens in your browser
-- No data is sent to external servers
-- No accounts or authentication needed
-
-## License
-MIT License 
+Create a token in Agent access. Connect a Streamable HTTP MCP client to `/api/mcp`
+with `Authorization: Bearer <token>`. Tokens expire after one year and can be
+revoked. The UI and MCP share the operations in `lib/ledger/commands.ts`.

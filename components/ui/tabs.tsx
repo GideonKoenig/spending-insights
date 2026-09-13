@@ -1,142 +1,90 @@
 "use client";
 
 import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
+import { Tabs as TabsPrimitive } from "radix-ui";
 
-const Tabs = React.forwardRef<
-    HTMLDivElement,
-    React.HTMLAttributes<HTMLDivElement> & {
-        defaultValue?: string;
-        value?: string;
-        onValueChange?: (value: string) => void;
-    }
->(({ className, defaultValue, value, onValueChange, ...props }, ref) => {
-    const [selectedValue, setSelectedValue] = React.useState(
-        defaultValue || ""
-    );
-    const actualValue = value !== undefined ? value : selectedValue;
+const tabsListVariants = cva(
+  "group/tabs-list inline-flex w-fit items-center justify-center rounded-lg p-[3px] text-muted-foreground group-data-[orientation=horizontal]/tabs:h-9 group-data-[orientation=vertical]/tabs:h-fit group-data-[orientation=vertical]/tabs:flex-col data-[variant=line]:rounded-none",
+  {
+    variants: {
+      variant: {
+        default: "border border-border bg-background",
+        line: "gap-1 bg-transparent",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  },
+);
 
-    const handleValueChange = (newValue: string) => {
-        if (value === undefined) {
-            setSelectedValue(newValue);
-        }
-        onValueChange?.(newValue);
-    };
-
-    return (
-        <div
-            ref={ref}
-            className={cn("w-full", className)}
-            data-value={actualValue}
-            {...props}
-        >
-            {React.Children.map(props.children, (child) =>
-                React.isValidElement(child)
-                    ? React.cloneElement(
-                          child as React.ReactElement<{
-                              value: string;
-                              onValueChange: (value: string) => void;
-                          }>,
-                          {
-                              value: actualValue,
-                              onValueChange: handleValueChange,
-                          }
-                      )
-                    : child
-            )}
-        </div>
-    );
-});
-Tabs.displayName = "Tabs";
-
-const TabsList = React.forwardRef<
-    HTMLDivElement,
-    React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-    <div
-        ref={ref}
-        className={cn(
-            "inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground",
-            className
-        )}
-        {...props}
+function Tabs({
+  className,
+  orientation = "horizontal",
+  ...props
+}: React.ComponentProps<typeof TabsPrimitive.Root>) {
+  return (
+    <TabsPrimitive.Root
+      data-slot="tabs"
+      data-orientation={orientation}
+      orientation={orientation}
+      className={cn(
+        "group/tabs flex gap-2 data-[orientation=horizontal]:flex-col",
+        className,
+      )}
+      {...props}
     />
-));
-TabsList.displayName = "TabsList";
+  );
+}
 
-const TabsTrigger = React.forwardRef<
-    HTMLButtonElement,
-    React.ButtonHTMLAttributes<HTMLButtonElement> & { value: string }
->(({ className, value, ...props }, ref) => {
-    const parent = React.useContext(TabsContext);
-    const isSelected = parent?.value === value;
+function TabsList({
+  className,
+  variant = "default",
+  ...props
+}: React.ComponentProps<typeof TabsPrimitive.List> &
+  VariantProps<typeof tabsListVariants>) {
+  return (
+    <TabsPrimitive.List
+      data-slot="tabs-list"
+      data-variant={variant}
+      className={cn(tabsListVariants({ variant }), className)}
+      {...props}
+    />
+  );
+}
 
-    return (
-        <button
-            ref={ref}
-            className={cn(
-                "inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-                isSelected
-                    ? "bg-background text-foreground shadow-sm"
-                    : "hover:bg-background/50",
-                className
-            )}
-            onClick={() => parent?.onValueChange?.(value)}
-            {...props}
-        />
-    );
-});
-TabsTrigger.displayName = "TabsTrigger";
+function TabsTrigger({
+  className,
+  ...props
+}: React.ComponentProps<typeof TabsPrimitive.Trigger>) {
+  return (
+    <TabsPrimitive.Trigger
+      data-slot="tabs-trigger"
+      className={cn(
+        "relative inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap text-foreground/60 transition-all group-data-[orientation=vertical]/tabs:w-full group-data-[orientation=vertical]/tabs:justify-start hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 group-data-[variant=default]/tabs-list:data-[state=active]:shadow-sm group-data-[variant=line]/tabs-list:data-[state=active]:shadow-none dark:text-muted-foreground dark:hover:text-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "group-data-[variant=line]/tabs-list:bg-transparent group-data-[variant=line]/tabs-list:data-[state=active]:bg-transparent dark:group-data-[variant=line]/tabs-list:data-[state=active]:border-transparent dark:group-data-[variant=line]/tabs-list:data-[state=active]:bg-transparent",
+        "data-[state=active]:bg-muted data-[state=active]:text-foreground ",
+        "after:absolute after:bg-foreground after:opacity-0 after:transition-opacity group-data-[orientation=horizontal]/tabs:after:inset-x-0 group-data-[orientation=horizontal]/tabs:after:bottom-[-5px] group-data-[orientation=horizontal]/tabs:after:h-0.5 group-data-[orientation=vertical]/tabs:after:inset-y-0 group-data-[orientation=vertical]/tabs:after:-right-1 group-data-[orientation=vertical]/tabs:after:w-0.5 group-data-[variant=line]/tabs-list:data-[state=active]:after:opacity-100",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
 
-const TabsContent = React.forwardRef<
-    HTMLDivElement,
-    React.HTMLAttributes<HTMLDivElement> & { value: string }
->(({ className, value, ...props }, ref) => {
-    const parent = React.useContext(TabsContext);
-    const isSelected = parent?.value === value;
+function TabsContent({
+  className,
+  ...props
+}: React.ComponentProps<typeof TabsPrimitive.Content>) {
+  return (
+    <TabsPrimitive.Content
+      data-slot="tabs-content"
+      className={cn("flex-1 outline-none", className)}
+      {...props}
+    />
+  );
+}
 
-    if (!isSelected) return null;
-
-    return <div ref={ref} className={cn("mt-2", className)} {...props} />;
-});
-TabsContent.displayName = "TabsContent";
-
-const TabsContext = React.createContext<{
-    value?: string;
-    onValueChange?: (value: string) => void;
-} | null>(null);
-
-const TabsProvider: React.FC<{
-    children: React.ReactNode;
-    value?: string;
-    onValueChange?: (value: string) => void;
-}> = ({ children, value, onValueChange }) => {
-    return (
-        <TabsContext.Provider value={{ value, onValueChange }}>
-            {children}
-        </TabsContext.Provider>
-    );
-};
-
-// Wrap Tabs to provide context
-const TabsWithContext = React.forwardRef<
-    HTMLDivElement,
-    React.ComponentPropsWithoutRef<typeof Tabs>
->((props, ref) => {
-    const { value, onValueChange, children, ...restProps } = props;
-    return (
-        <Tabs
-            ref={ref}
-            value={value}
-            onValueChange={onValueChange}
-            {...restProps}
-        >
-            <TabsProvider value={value} onValueChange={onValueChange}>
-                {children}
-            </TabsProvider>
-        </Tabs>
-    );
-});
-TabsWithContext.displayName = "Tabs";
-
-export { TabsWithContext as Tabs, TabsList, TabsTrigger, TabsContent };
+export { Tabs, TabsList, TabsTrigger, TabsContent, tabsListVariants };

@@ -1,0 +1,32 @@
+name: spending-insights-local
+
+services:
+  postgres:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: spending
+      POSTGRES_PASSWORD: local-development
+      POSTGRES_DB: spending_insights
+    ports:
+      - "127.0.0.1:55432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "pg_isready",
+          "-h",
+          "127.0.0.1",
+          "-U",
+          "spending",
+          "-d",
+          "spending_insights",
+        ]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+      start_period: 5s
+
+volumes:
+  postgres_data:
