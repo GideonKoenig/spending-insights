@@ -134,12 +134,7 @@ export function Shell({
           </ScrollArea>
           <div className="hidden shrink-0 border-t border-border p-5 lg:block">
             <div className="flex items-center justify-between gap-2">
-              <div className="min-w-0">
-                <p className="truncate text-sm">{name}</p>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  Personal · EUR
-                </p>
-              </div>
+              <p className="min-w-0 truncate text-sm">{name}</p>
               <Button
                 variant="ghost"
                 size="icon"

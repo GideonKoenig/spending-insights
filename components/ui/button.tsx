@@ -75,7 +75,7 @@ function Button({
           )}
           <span
             className={cn(
-              "inline-flex w-full items-center justify-[inherit] gap-2",
+              "inline-flex w-full items-center gap-2 [justify-content:inherit]",
               busy && "opacity-0",
             )}
           >
