@@ -14,10 +14,14 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { ArrowRight, ChevronDown } from "lucide-react";
+import { ArrowRight, ArrowUpRight, ChevronDown } from "lucide-react";
 import { useCommand } from "@/lib/client";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "./ui/tabs";
 import { euro, today, cn } from "@/lib/utils";
+import {
+  normalizationFactor,
+  type CategoryUnit,
+} from "@/lib/ledger/report-periods";
 import {
   DatePicker,
   SelectItem,
@@ -38,67 +42,52 @@ const chartNames = {
 export function Dashboard() {
   const [from, setFrom] = useState(`${today().slice(0, 4)}-01-01`);
   const [to, setTo] = useState(today());
-  const [granularity, setGranularity] = useState<"month" | "quarter" | "year">(
-    "month",
-  );
+  const [granularity, setGranularity] = useState<
+    "week" | "month" | "quarter" | "year"
+  >("month");
   const [chart, setChart] = useState<"spending" | "wealth" | "cash">(
     "spending",
-  );
-  const [compare, setCompare] = useState(false);
-  const [compareFrom, setCompareFrom] = useState(
-    `${Number(today().slice(0, 4)) - 1}-01-01`,
-  );
-  const [compareTo, setCompareTo] = useState(
-    `${Number(today().slice(0, 4)) - 1}-12-31`,
   );
   const [expanded, setExpanded] = useState<string | null>(null);
   const [categoryKind, setCategoryKind] = useState<"expense" | "income">(
     "expense",
   );
+  const [categoryUnit, setCategoryUnit] = useState<CategoryUnit>("total");
   const validRange = Boolean(from && to && from <= to);
-  const validComparison = Boolean(
-    compareFrom && compareTo && compareFrom <= compareTo,
-  );
   const overview = useCommand("overview", {});
   const report = useCommand("reports", { from, to, granularity }, validRange);
-  const comparison = useCommand(
-    "reports",
-    { from: compareFrom, to: compareTo, granularity },
-    compare && validComparison,
-  );
   const data = report.data;
-  const previous =
-    compare &&
-    validComparison &&
-    comparison.fetchStatus === "idle" &&
-    !comparison.isPlaceholderData
-      ? comparison.data?.totals
-      : undefined;
   const categories =
     data?.categories.filter((category) => category.kind === categoryKind) ?? [];
+  const categoryFactor = data
+    ? normalizationFactor(data.from, data.to, categoryUnit)
+    : 1;
+  const displayedCategories = categories.map((category) => ({
+    category,
+    amount: category.amount / categoryFactor,
+  }));
   const largestCategory = Math.max(
-    ...categories.map((category) => Math.abs(category.amount)),
+    ...displayedCategories.map(({ amount }) => Math.abs(amount)),
     1,
   );
   const accounts =
-    overview.data?.accounts.filter((account) => realRoles[account.role]) ?? [];
+    overview.data?.accounts
+      .filter((account) => realRoles[account.role])
+      .sort((left, right) => {
+        const leftBalance =
+          left.kind === "liability" ? -left.balance : left.balance;
+        const rightBalance =
+          right.kind === "liability" ? -right.balance : right.balance;
+        return rightBalance - leftBalance;
+      }) ?? [];
   return (
     <>
-      <PageHeader title="Overview">
-        <Button
-          variant={compare ? "primary" : "secondary"}
-          aria-pressed={compare}
-          onClick={() => setCompare(!compare)}
-        >
-          Compare periods
-        </Button>
-      </PageHeader>
+      <PageHeader title="Overview" />
       <div className="mb-6 flex flex-wrap items-center gap-3">
         <DatePicker
           className="w-auto"
           aria-label="From date"
           required
-
           value={from}
           onValueChange={(value) => setFrom(value)}
         />
@@ -107,7 +96,6 @@ export function Dashboard() {
           className="w-auto"
           aria-label="To date"
           required
-
           value={to}
           onValueChange={(value) => setTo(value)}
         />
@@ -117,6 +105,7 @@ export function Dashboard() {
           value={granularity}
           onValueChange={(value) => setGranularity(value as typeof granularity)}
         >
+          <SelectItem value="week">Weekly</SelectItem>
           <SelectItem value="month">Monthly</SelectItem>
           <SelectItem value="quarter">Quarterly</SelectItem>
           <SelectItem value="year">Yearly</SelectItem>
@@ -133,45 +122,7 @@ export function Dashboard() {
           All time
         </Button>
       </div>
-      {compare && (
-        <div className="mb-6 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-          <span>Compare with</span>
-          <DatePicker
-            aria-label="Comparison from"
-            required
-            className="w-auto"
-
-            value={compareFrom}
-            onValueChange={(value) => setCompareFrom(value)}
-          />
-          <span>to</span>
-          <DatePicker
-            aria-label="Comparison to"
-            required
-            className="w-auto"
-
-            value={compareTo}
-            onValueChange={(value) => setCompareTo(value)}
-          />
-          <span
-            role="status"
-            className={cn("text-xs", !validComparison && "text-danger")}
-          >
-            {!validComparison
-              ? "Start date must be on or before end date."
-              : comparison.isPaused
-                ? "Waiting for connection…"
-                : comparison.isFetching
-                  ? "Updating comparison…"
-                  : ""}
-          </span>
-        </div>
-      )}
-      <ErrorMessage
-        error={
-          report.error ?? overview.error ?? (compare ? comparison.error : null)
-        }
-      />
+      <ErrorMessage error={report.error ?? overview.error} />
       {!validRange ? (
         <Empty>Choose a start date on or before the end date.</Empty>
       ) : report.error || overview.error ? null : !data || !overview.data ? (
@@ -205,13 +156,11 @@ export function Dashboard() {
             <Metric
               label="Income"
               value={data.totals.income}
-              previous={previous?.income}
               color="text-primary"
             />
             <Metric
               label="Spending"
               value={data.totals.expense}
-              previous={previous?.expense}
               color="text-accent"
             />
             <Metric
@@ -371,19 +320,35 @@ export function Dashboard() {
           </Tabs>
           <div className="grid gap-6 xl:grid-cols-[1.3fr_1fr]">
             <div className="panel p-5 sm:p-6">
-              <div className="mb-5 flex items-center justify-between">
+              <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
                 <h2 className="font-medium">Categories</h2>
-                <Select
-                  className="w-auto"
-                  aria-label="Category type"
-                  value={categoryKind}
-                  onValueChange={(value) =>
-                    setCategoryKind(value as typeof categoryKind)
-                  }
-                >
-                  <SelectItem value="expense">Spending</SelectItem>
-                  <SelectItem value="income">Income</SelectItem>
-                </Select>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Select
+                    className="w-auto"
+                    aria-label="Category type"
+                    value={categoryKind}
+                    onValueChange={(value) =>
+                      setCategoryKind(value as typeof categoryKind)
+                    }
+                  >
+                    <SelectItem value="expense">Spending</SelectItem>
+                    <SelectItem value="income">Income</SelectItem>
+                  </Select>
+                  <Select
+                    className="w-auto"
+                    aria-label="Category amount"
+                    value={categoryUnit}
+                    onValueChange={(value) =>
+                      setCategoryUnit(value as CategoryUnit)
+                    }
+                  >
+                    <SelectItem value="total">Total</SelectItem>
+                    <SelectItem value="day">Per day</SelectItem>
+                    <SelectItem value="week">Per week</SelectItem>
+                    <SelectItem value="month">Per month</SelectItem>
+                    <SelectItem value="year">Per year</SelectItem>
+                  </Select>
+                </div>
               </div>
               {!categories.length ? (
                 <Empty>
@@ -392,7 +357,7 @@ export function Dashboard() {
                 </Empty>
               ) : (
                 <div className="space-y-5">
-                  {categories.map((category) => (
+                  {displayedCategories.map(({ category, amount }) => (
                     <div key={category.id}>
                       <Button
                         variant="ghost"
@@ -414,13 +379,13 @@ export function Dashboard() {
                           />
                           {category.name}
                         </span>
-                        <span className="number">{euro(category.amount)}</span>
+                        <span className="number">{euro(amount)}</span>
                       </Button>
                       <div className="h-1.5 overflow-hidden rounded-full bg-muted">
                         <div
                           className="h-full rounded-full bg-accent/75"
                           style={{
-                            width: `${(Math.abs(category.amount) / largestCategory) * 100}%`,
+                            width: `${(Math.abs(amount) / largestCategory) * 100}%`,
                           }}
                         />
                       </div>
@@ -437,7 +402,7 @@ export function Dashboard() {
                                   : child.name}
                               </span>
                               <span className="number">
-                                {euro(child.amount)}
+                                {euro(child.amount / categoryFactor)}
                               </span>
                             </div>
                           ))}
@@ -451,9 +416,15 @@ export function Dashboard() {
             <div className="panel p-5 sm:p-6">
               <div className="mb-5 flex items-center justify-between">
                 <h2 className="font-medium">Accounts</h2>
-                <Link href="/accounts" className="text-xs text-primary">
-                  Manage <span aria-hidden>↗</span>
-                </Link>
+                <Button variant="ghost" size="xs" asChild>
+                  <Link href="/accounts">
+                    Manage
+                    <ArrowUpRight
+                      aria-hidden
+                      className="text-muted-foreground"
+                    />
+                  </Link>
+                </Button>
               </div>
               <p className="mb-4 text-xs text-muted-foreground">
                 Current recorded balances
@@ -509,13 +480,11 @@ function Metric({
   label,
   value,
   note,
-  previous,
   color,
 }: {
   label: string;
   value: number;
   note?: string;
-  previous?: number;
   color?: string;
 }) {
   return (
@@ -526,11 +495,7 @@ function Metric({
       >
         {euro(value)}
       </p>
-      <p className="mt-2 min-h-4 text-[11px] text-muted-foreground">
-        {previous !== undefined
-          ? `${euro(previous)} in comparison period`
-          : note}
-      </p>
+      <p className="mt-2 min-h-4 text-[11px] text-muted-foreground">{note}</p>
     </div>
   );
 }

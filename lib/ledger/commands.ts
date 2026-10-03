@@ -202,11 +202,13 @@ export const commands = {
     applyRules,
   ),
   reports: command(
-    "Get income, expenses, category breakdowns, bank cash flow and recorded net worth for a date range, plus the previous equal-length period. All amounts are integer EUR cents. Unbooked imports are excluded.",
+    "Get income, expenses, category breakdowns, bank cash flow and recorded net worth for a date range. All amounts are integer EUR cents. Unbooked imports are excluded.",
     z.object({
       from: date,
       to: date,
-      granularity: z.enum(["month", "quarter", "year"]).default("month"),
+      granularity: z
+        .enum(["week", "month", "quarter", "year"])
+        .default("month"),
     }),
     reports,
     true,

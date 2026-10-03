@@ -26,6 +26,7 @@ import {
 } from "@/lib/db/schema";
 import { page } from "./contracts";
 import { DomainError } from "./errors";
+import { reportPeriodLabel, type ReportGranularity } from "./report-periods";
 
 export const transactionFilter = page.extend({
   status: z.enum(["all", "unbooked", "booked"]).default("unbooked"),
@@ -173,7 +174,7 @@ export async function reports(
   input: {
     from: string;
     to: string;
-    granularity: "month" | "quarter" | "year";
+    granularity: ReportGranularity;
   },
 ) {
   if (input.from > input.to)
@@ -197,7 +198,7 @@ export async function reports(
     );
   const aggregates = await tx
     .select({
-      month: sql<string>`to_char(${entries.date}, 'YYYY-MM')`,
+      date: sql<string>`${entries.date}::text`,
       income: sql<number>`coalesce(-sum(${postings.amount}) filter (where ${ledgerAccounts.kind} = 'income'), 0)::float8`,
       expense: sql<number>`coalesce(sum(${postings.amount}) filter (where ${ledgerAccounts.kind} = 'expense'), 0)::float8`,
       movement: sql<number>`coalesce(sum(${postings.amount}) filter (where ${ledgerAccounts.kind} in ('asset', 'liability')), 0)::float8`,
@@ -214,8 +215,8 @@ export async function reports(
         lte(entries.date, input.to),
       ),
     )
-    .groupBy(sql`to_char(${entries.date}, 'YYYY-MM')`)
-    .orderBy(sql`to_char(${entries.date}, 'YYYY-MM')`);
+    .groupBy(entries.date)
+    .orderBy(entries.date);
   const categoryRows = await tx
     .select({
       id: ledgerAccounts.id,
@@ -258,7 +259,7 @@ export async function reports(
     })
     .filter((category) => category.children.length)
     .sort((left, right) => right.amount - left.amount);
-  const byMonth = new Map(aggregates.map((row) => [row.month, row]));
+  const byDay = new Map(aggregates.map((row) => [row.date, row]));
   const periods: {
     label: string;
     income: number;
@@ -268,26 +269,19 @@ export async function reports(
     cashOut: number;
   }[] = [];
   let netWorth = opening.value;
-  const cursor = new Date(
-    Date.UTC(start.getUTCFullYear(), start.getUTCMonth(), 1),
-  );
+  const cursor = new Date(start);
   while (cursor <= end) {
-    const month = cursor.toISOString().slice(0, 7);
-    const row = byMonth.get(month);
+    const date = cursor.toISOString().slice(0, 10);
+    const row = byDay.get(date);
     netWorth += row?.movement ?? 0;
-    const label =
-      input.granularity === "year"
-        ? month.slice(0, 4)
-        : input.granularity === "quarter"
-          ? `${month.slice(0, 4)} Q${Math.floor(cursor.getUTCMonth() / 3) + 1}`
-          : month;
-    const previous = periods.at(-1);
-    if (previous?.label === label) {
-      previous.income += row?.income ?? 0;
-      previous.expense += row?.expense ?? 0;
-      previous.cashIn += row?.cashIn ?? 0;
-      previous.cashOut += row?.cashOut ?? 0;
-      previous.netWorth = netWorth;
+    const label = reportPeriodLabel(date, input.granularity);
+    const lastPeriod = periods.at(-1);
+    if (lastPeriod?.label === label) {
+      lastPeriod.income += row?.income ?? 0;
+      lastPeriod.expense += row?.expense ?? 0;
+      lastPeriod.cashIn += row?.cashIn ?? 0;
+      lastPeriod.cashOut += row?.cashOut ?? 0;
+      lastPeriod.netWorth = netWorth;
     } else
       periods.push({
         label,
@@ -297,30 +291,8 @@ export async function reports(
         cashIn: row?.cashIn ?? 0,
         cashOut: row?.cashOut ?? 0,
       });
-    cursor.setUTCMonth(cursor.getUTCMonth() + 1);
+    cursor.setUTCDate(cursor.getUTCDate() + 1);
   }
-  const duration = end.getTime() - start.getTime() + 86_400_000;
-  const priorFrom = new Date(start.getTime() - duration)
-    .toISOString()
-    .slice(0, 10);
-  const priorTo = new Date(start.getTime() - 86_400_000)
-    .toISOString()
-    .slice(0, 10);
-  const [prior] = await tx
-    .select({
-      income: sql<number>`coalesce(-sum(${postings.amount}) filter (where ${ledgerAccounts.kind} = 'income'), 0)::float8`,
-      expense: sql<number>`coalesce(sum(${postings.amount}) filter (where ${ledgerAccounts.kind} = 'expense'), 0)::float8`,
-    })
-    .from(postings)
-    .innerJoin(entries, eq(entries.id, postings.entryId))
-    .innerJoin(ledgerAccounts, eq(ledgerAccounts.id, postings.accountId))
-    .where(
-      and(
-        eq(postings.userId, userId),
-        gte(entries.date, priorFrom),
-        lte(entries.date, priorTo),
-      ),
-    );
   return {
     from: input.from,
     to: input.to,
@@ -331,12 +303,6 @@ export async function reports(
       expense: periods.reduce((sum, row) => sum + row.expense, 0),
       netWorth,
       openingNetWorth: opening.value,
-    },
-    previous: {
-      from: priorFrom,
-      to: priorTo,
-      income: prior.income,
-      expense: prior.expense,
     },
   };
 }
