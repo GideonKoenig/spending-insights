@@ -391,21 +391,25 @@ export function Dashboard() {
                       </div>
                       {expanded === category.id && (
                         <div className="mt-3 space-y-2 pl-5">
-                          {category.children.map((child) => (
-                            <div
-                              key={child.id}
-                              className="flex justify-between text-xs text-muted-foreground"
-                            >
-                              <span>
-                                {child.id === category.id
-                                  ? "Direct bookings"
-                                  : child.name}
-                              </span>
-                              <span className="number">
-                                {euro(child.amount / categoryFactor)}
-                              </span>
-                            </div>
-                          ))}
+                          {category.children
+                            .toSorted(
+                              (left, right) => right.amount - left.amount,
+                            )
+                            .map((child) => (
+                              <div
+                                key={child.id}
+                                className="flex justify-between text-xs text-muted-foreground"
+                              >
+                                <span>
+                                  {child.id === category.id
+                                    ? "Direct bookings"
+                                    : child.name}
+                                </span>
+                                <span className="number">
+                                  {euro(child.amount / categoryFactor)}
+                                </span>
+                              </div>
+                            ))}
                         </div>
                       )}
                     </div>
