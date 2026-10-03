@@ -52,7 +52,7 @@ export function Dashboard() {
   const [categoryKind, setCategoryKind] = useState<"expense" | "income">(
     "expense",
   );
-  const [categoryUnit, setCategoryUnit] = useState<CategoryUnit>("total");
+  const [categoryUnit, setCategoryUnit] = useState<CategoryUnit>("month");
   const validRange = Boolean(from && to && from <= to);
   const overview = useCommand("overview", {});
   const report = useCommand("reports", { from, to, granularity }, validRange);
