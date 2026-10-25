@@ -6,7 +6,10 @@ import { z } from "zod";
 export function createMcpServer(userId: string) {
   const server = new McpServer(
     { name: "spending-insights", version: "2.0.0" },
-    { capabilities: { tools: { listChanged: false } } },
+    {
+      capabilities: { tools: { listChanged: false } },
+      maxToolInputElements: 100_000,
+    },
   );
   for (const [name, operation] of Object.entries(commands)) {
     const schema: z.ZodObject = operation.schema;

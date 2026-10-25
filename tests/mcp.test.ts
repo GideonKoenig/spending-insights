@@ -120,6 +120,75 @@ describe.each(versions)("MCP %s over HTTP", (version) => {
     });
   });
 
+  it("accepts maximum imports and rejects excess validation work", async () => {
+    const { client } = await connect(version);
+    const key = `limits-${version}`;
+    await client.callTool({
+      name: "create_account",
+      arguments: { name: "Import limits", key, role: "bank" },
+    });
+    const rows = Array.from({ length: 10_000 }, (_, index) => ({
+      externalId: `limit-${index}`,
+      account: key,
+      date: "2026-01-01",
+      amount: "-10.00",
+      currency: "EUR",
+      description: "x",
+      counterparty: "",
+      reference: "",
+    }));
+    const base =
+      csvTemplate +
+      rows.map((row) => Object.values(row).join(",") + "\n").join("");
+    const padding = 5_000_000 - Buffer.byteLength(base);
+    for (const [index, row] of rows.entries()) {
+      row.description += "x".repeat(
+        Math.floor(padding / rows.length) +
+          (index < padding % rows.length ? 1 : 0),
+      );
+    }
+    const csv =
+      csvTemplate +
+      rows.map((row) => Object.values(row).join(",") + "\n").join("");
+    expect(Buffer.byteLength(csv)).toBe(5_000_000);
+    expect(
+      await client.callTool({ name: "import_csv", arguments: { csv } }),
+    ).toMatchObject({
+      structuredContent: { result: { preview: true, imported: 10_000 } },
+    });
+    for (const row of rows) row.description = "Import limit";
+    const input = {
+      rows,
+      preview: true,
+      padding: Array.from({ length: 9_997 }, () => 0),
+    };
+    expect(
+      await client.callTool({ name: "import_transactions", arguments: input }),
+    ).toMatchObject({
+      structuredContent: { result: { preview: true, imported: 10_000 } },
+    });
+    input.padding.push(0);
+    const excess = await client.callTool({
+      name: "import_transactions",
+      arguments: input,
+    });
+    expect(excess.isError).toBe(true);
+    expect(JSON.stringify(excess.content)).toContain(
+      "more than the maximum of 100000 elements",
+    );
+    expect(
+      await client.callTool({
+        name: "import_csv",
+        arguments: { csv: csv + "\n", preview: false },
+      }),
+    ).toMatchObject({ isError: true });
+    expect(
+      await client.callTool({ name: "list_transactions", arguments: {} }),
+    ).toMatchObject({
+      structuredContent: { result: { total: 0 } },
+    });
+  });
+
   it("rejects missing, invalid, revoked and expired tokens", async () => {
     expect((await request(version, "tools/list", {}, "")).status).toBe(401);
     expect((await request(version, "tools/list", {}, "invalid")).status).toBe(
