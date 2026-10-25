@@ -11,5 +11,5 @@ export interface TransactionEnricher {
 export type Enrichment = z.infer<typeof EnrichmentSchema>;
 export const EnrichmentSchema = z.object({
     enricherId: z.string(),
-    data: z.record(z.unknown()),
+    data: z.record(z.string(), z.unknown()),
 });
